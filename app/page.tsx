@@ -1,0 +1,121 @@
+'use client';
+
+import { useState } from 'react';
+import { useApp } from '@/lib/context';
+import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X } from 'lucide-react';
+import Image from 'next/image';
+import Dashboard from '@/components/Dashboard';
+import LeadsMembers from '@/components/LeadsMembers';
+import Schedule from '@/components/Schedule';
+import StaffSection from '@/components/StaffSection';
+import POS from '@/components/POS';
+import Reports from '@/components/Reports';
+import Promotions from '@/components/Promotions';
+import AuvoraChat from '@/components/AuvoraChat';
+
+type Section = 'dashboard' | 'leads-members' | 'schedule' | 'staff' | 'pos' | 'reports' | 'promotions';
+
+export default function CRMApp() {
+  const { location, setLocation } = useApp();
+  const [activeSection, setActiveSection] = useState<Section>('dashboard');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const locationName = location === 'athletic-club' ? 'Athletic Club' : 'Dance Studio';
+
+  const navItems = [
+    { id: 'dashboard' as Section, label: 'Dashboard', icon: Home },
+    { id: 'leads-members' as Section, label: 'Leads & Members', icon: Users },
+    { id: 'schedule' as Section, label: 'Schedule', icon: Calendar },
+    { id: 'staff' as Section, label: 'Staff', icon: UserCog },
+    { id: 'pos' as Section, label: 'POS', icon: ShoppingCart },
+    { id: 'reports' as Section, label: 'Reports', icon: TrendingUp },
+    { id: 'promotions' as Section, label: 'Promotions', icon: Tag },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-black text-white shadow-lg sticky top-0 z-40">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 hover:bg-gray-800 rounded"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            <Image
+              src="/thelab-logo.png"
+              alt="The LAB Tampa"
+              width={120}
+              height={40}
+              className="h-10 w-auto"
+            />
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <select
+              value={location}
+              onChange={(e) => setLocation(e.target.value as 'athletic-club' | 'dance-studio')}
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600"
+            >
+              <option value="athletic-club">Athletic Club</option>
+              <option value="dance-studio">Dance Studio</option>
+            </select>
+            
+            <div className="hidden md:block text-sm text-gray-400">
+              Logged in as: <span className="text-white font-medium">Owner/Manager</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex">
+        <nav className={`${mobileMenuOpen ? 'block' : 'hidden'} lg:block fixed lg:sticky top-16 lg:top-16 left-0 w-64 bg-white border-r border-gray-200 h-[calc(100vh-4rem)] overflow-y-auto z-30`}>
+          <div className="p-4">
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-gray-900">{locationName}</h2>
+              <p className="text-sm text-gray-500">CRM Dashboard</p>
+            </div>
+            
+            <ul className="space-y-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeSection === item.id;
+                return (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => {
+                        setActiveSection(item.id);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                        isActive
+                          ? 'bg-red-600 text-white'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      <Icon size={20} />
+                      <span className="font-medium">{item.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </nav>
+
+        <main className="flex-1 p-4 lg:p-8">
+          {activeSection === 'dashboard' && <Dashboard />}
+          {activeSection === 'leads-members' && <LeadsMembers />}
+          {activeSection === 'schedule' && <Schedule />}
+          {activeSection === 'staff' && <StaffSection />}
+          {activeSection === 'pos' && <POS />}
+          {activeSection === 'reports' && <Reports />}
+          {activeSection === 'promotions' && <Promotions />}
+        </main>
+      </div>
+
+      <AuvoraChat />
+    </div>
+  );
+}
