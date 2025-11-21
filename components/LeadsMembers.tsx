@@ -239,19 +239,19 @@ export default function LeadsMembers() {
                     <>
                       <div>
                         <p className="text-sm text-gray-600">Status</p>
-                        <p className="text-gray-900 font-medium capitalize">{selectedItem.status.replace('-', ' ')}</p>
+                        <p className="text-gray-900 font-medium capitalize">{'status' in selectedItem ? selectedItem.status.replace('-', ' ') : ''}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Source</p>
-                        <p className="text-gray-900 font-medium capitalize">{selectedItem.source}</p>
+                        <p className="text-gray-900 font-medium capitalize">{'source' in selectedItem ? selectedItem.source : ''}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Created Date</p>
-                        <p className="text-gray-900 font-medium">{selectedItem.createdDate}</p>
+                        <p className="text-gray-900 font-medium">{'createdDate' in selectedItem ? selectedItem.createdDate : ''}</p>
                       </div>
                       <div className="md:col-span-2">
                         <p className="text-sm text-gray-600">Notes</p>
-                        <p className="text-gray-900 font-medium">{selectedItem.notes}</p>
+                        <p className="text-gray-900 font-medium">{'notes' in selectedItem ? selectedItem.notes : ''}</p>
                       </div>
                     </>
                   ) : (
@@ -259,7 +259,7 @@ export default function LeadsMembers() {
                       <div>
                         <p className="text-sm text-gray-600">Type</p>
                         <p className="text-gray-900 font-medium">
-                          {selectedItem.type === 'membership' 
+                          {'type' in selectedItem && selectedItem.type === 'membership' 
                             ? ('membershipType' in selectedItem ? selectedItem.membershipType : '')
                             : ('packType' in selectedItem ? selectedItem.packType : '')
                           }
@@ -267,9 +267,9 @@ export default function LeadsMembers() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Zip Code</p>
-                        <p className="text-gray-900 font-medium">{selectedItem.zipCode}</p>
+                        <p className="text-gray-900 font-medium">{'zipCode' in selectedItem ? selectedItem.zipCode : ''}</p>
                       </div>
-                      {selectedItem.type === 'membership' ? (
+                      {'type' in selectedItem && selectedItem.type === 'membership' ? (
                         <>
                           <div>
                             <p className="text-sm text-gray-600">Join Date</p>
