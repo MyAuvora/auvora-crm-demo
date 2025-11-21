@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { members, classPackClients, leads } from '@/data/seedData';
-import { Search, Filter, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 
 type Tab = 'leads' | 'members';
 
@@ -15,7 +15,7 @@ export default function LeadsMembers() {
   const [sourceFilter, setSourceFilter] = useState<string>('all');
   const [membershipFilter, setMembershipFilter] = useState<string>('all');
   const [zipFilter, setZipFilter] = useState<string>('all');
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<(typeof locationLeads[0] | typeof allMembers[0]) | null>(null);
 
   const locationLeads = leads.filter(l => l.location === location);
   const locationMembers = members.filter(m => m.location === location);
@@ -30,14 +30,14 @@ export default function LeadsMembers() {
   });
 
   const allMembers = location === 'athletic-club' 
-    ? [...locationMembers.map(m => ({ ...m, type: 'membership' })), ...locationPackClients.map(c => ({ ...c, type: 'pack' }))]
-    : locationPackClients.map(c => ({ ...c, type: 'pack' }));
+    ? [...locationMembers.map(m => ({ ...m, type: 'membership' as const })), ...locationPackClients.map(c => ({ ...c, type: 'pack' as const }))]
+    : locationPackClients.map(c => ({ ...c, type: 'pack' as const }));
 
   const filteredMembers = allMembers.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          member.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesMembership = membershipFilter === 'all' || 
-                             (member.type === 'membership' && (member as any).membershipType === membershipFilter) ||
+                             (member.type === 'membership' && 'membershipType' in member && member.membershipType === membershipFilter) ||
                              (member.type === 'pack' && membershipFilter === 'pack');
     const matchesZip = zipFilter === 'all' || member.zipCode === zipFilter;
     return matchesSearch && matchesMembership && matchesZip;
@@ -199,8 +199,8 @@ export default function LeadsMembers() {
                       <td className="px-4 py-3 text-sm text-gray-900">{member.name}</td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {member.type === 'membership' 
-                          ? (member as any).membershipType 
-                          : `${(member as any).packType} (${(member as any).remainingClasses}/${(member as any).totalClasses} left)`
+                          ? ('membershipType' in member ? member.membershipType : '')
+                          : ('packType' in member ? `${member.packType} (${member.remainingClasses}/${member.totalClasses} left)` : '')
                         }
                       </td>
                       <td className="px-4 py-3 text-sm">
@@ -260,8 +260,8 @@ export default function LeadsMembers() {
                         <p className="text-sm text-gray-600">Type</p>
                         <p className="text-gray-900 font-medium">
                           {selectedItem.type === 'membership' 
-                            ? (selectedItem as any).membershipType 
-                            : `${(selectedItem as any).packType}`
+                            ? ('membershipType' in selectedItem ? selectedItem.membershipType : '')
+                            : ('packType' in selectedItem ? selectedItem.packType : '')
                           }
                         </p>
                       </div>
@@ -273,26 +273,26 @@ export default function LeadsMembers() {
                         <>
                           <div>
                             <p className="text-sm text-gray-600">Join Date</p>
-                            <p className="text-gray-900 font-medium">{(selectedItem as any).joinDate}</p>
+                            <p className="text-gray-900 font-medium">{'joinDate' in selectedItem ? selectedItem.joinDate : ''}</p>
                           </div>
                           <div>
                             <p className="text-sm text-gray-600">Last Visit</p>
-                            <p className="text-gray-900 font-medium">{(selectedItem as any).lastVisit}</p>
+                            <p className="text-gray-900 font-medium">{'lastVisit' in selectedItem ? selectedItem.lastVisit : ''}</p>
                           </div>
                           <div>
                             <p className="text-sm text-gray-600">Visits (Last 30 Days)</p>
-                            <p className="text-gray-900 font-medium">{(selectedItem as any).visitsLast30Days}</p>
+                            <p className="text-gray-900 font-medium">{'visitsLast30Days' in selectedItem ? selectedItem.visitsLast30Days : ''}</p>
                           </div>
                         </>
                       ) : (
                         <>
                           <div>
                             <p className="text-sm text-gray-600">Classes Remaining</p>
-                            <p className="text-gray-900 font-medium">{(selectedItem as any).remainingClasses} / {(selectedItem as any).totalClasses}</p>
+                            <p className="text-gray-900 font-medium">{'remainingClasses' in selectedItem && 'totalClasses' in selectedItem ? `${selectedItem.remainingClasses} / ${selectedItem.totalClasses}` : ''}</p>
                           </div>
                           <div>
                             <p className="text-sm text-gray-600">Purchase Date</p>
-                            <p className="text-gray-900 font-medium">{(selectedItem as any).purchaseDate}</p>
+                            <p className="text-gray-900 font-medium">{'purchaseDate' in selectedItem ? selectedItem.purchaseDate : ''}</p>
                           </div>
                         </>
                       )}

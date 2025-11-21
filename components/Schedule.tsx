@@ -7,7 +7,7 @@ import { X } from 'lucide-react';
 
 export default function Schedule() {
   const { location } = useApp();
-  const [selectedClass, setSelectedClass] = useState<any>(null);
+  const [selectedClass, setSelectedClass] = useState<typeof locationClasses[0] | null>(null);
 
   const locationClasses = classes.filter(c => c.location === location);
   const locationStaff = staff.filter(s => s.location === location);
@@ -45,7 +45,7 @@ export default function Schedule() {
                   const dayClasses = locationClasses.filter(c => c.dayOfWeek === day);
                   if (dayClasses.length === 0) return null;
                   
-                  return dayClasses.map((cls, idx) => (
+                  return dayClasses.map((cls) => (
                     <tr
                       key={cls.id}
                       onClick={() => setSelectedClass(cls)}

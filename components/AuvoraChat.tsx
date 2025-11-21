@@ -231,7 +231,7 @@ export default function AuvoraChat() {
     if (!messageText.trim()) return;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: `user-${messages.length}`,
       text: messageText,
       sender: 'user',
       timestamp: new Date()
@@ -239,7 +239,7 @@ export default function AuvoraChat() {
 
     const response = getResponse(messageText);
     const auvoraMessage: Message = {
-      id: (Date.now() + 1).toString(),
+      id: `auvora-${messages.length}`,
       text: response,
       sender: 'auvora',
       timestamp: new Date()

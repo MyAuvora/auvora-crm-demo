@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { products, members, classPackClients } from '@/data/seedData';
-import { ShoppingCart, Package, AlertTriangle } from 'lucide-react';
+import { ShoppingCart, AlertTriangle } from 'lucide-react';
+import { Product } from '@/lib/types';
 
 type CartItem = {
-  product: any;
+  product: Product;
   quantity: number;
 };
 
@@ -20,7 +21,7 @@ export default function POS() {
   const locationProducts = products.filter(p => p.location === location);
   const allMembers = [...members, ...classPackClients].filter(m => m.location === location);
 
-  const addToCart = (product: any) => {
+  const addToCart = (product: Product) => {
     const existing = cart.find(item => item.product.id === product.id);
     if (existing) {
       setCart(cart.map(item =>

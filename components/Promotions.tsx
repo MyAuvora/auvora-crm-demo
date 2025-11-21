@@ -2,7 +2,7 @@
 
 import { useApp } from '@/lib/context';
 import { promotions } from '@/data/seedData';
-import { Tag, TrendingUp, Calendar } from 'lucide-react';
+import { Tag, Calendar } from 'lucide-react';
 
 export default function Promotions() {
   const { location } = useApp();
