@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { members, classPackClients, leads, staff, classes } from '@/data/seedData';
+import { getAllMembers, getAllClassPackClients, getAllLeads, getAllStaff, getAllClasses, getAllBookings, getAllTransactions } from '@/lib/dataStore';
 import { MessageCircle, X, Send } from 'lucide-react';
 
 type Message = {
@@ -24,38 +24,34 @@ export default function AuvoraChat() {
   ]);
   const [input, setInput] = useState('');
 
-  const locationMembers = members.filter(m => m.location === location);
-  const locationPackClients = classPackClients.filter(c => c.location === location);
-  const locationLeads = leads.filter(l => l.location === location);
-  const locationStaff = staff.filter(s => s.location === location);
-  const locationClasses = classes.filter(c => c.location === location);
+  const locationMembers = getAllMembers().filter(m => m.location === location);
+  const locationPackClients = getAllClassPackClients().filter(c => c.location === location);
+  const locationLeads = getAllLeads().filter(l => l.location === location);
+  const locationStaff = getAllStaff().filter(s => s.location === location);
+  const locationClasses = getAllClasses().filter(c => c.location === location);
+  const allBookings = getAllBookings();
+  const allTransactions = getAllTransactions().filter(t => t.location === location);
 
   const examplePrompts = [
     "Generate a list of all current members.",
     "Show me all membership cancellations from the past 30 days.",
     "Which zip codes do our current members live in?",
     "How many active members does the Athletic Club have?",
-    "How many active members does the Dance Studio have?",
     "Show me all class pack clients at the Athletic Club.",
-    "Show me all class pack clients at the Dance Studio.",
     "Which membership type is most popular right now?",
     "How many leads do we have that never tried a class?",
-    "How many former members cancelled in the last 90 days?",
     "Which coaches have the highest average class size?",
-    "Which days of the week are our busiest at the Athletic Club?",
-    "Which class types are most popular at the Dance Studio?",
-    "List all members who attend mostly evening classes.",
     "Show me all members with a 5-pack who have 1 or 2 classes left.",
     "What is our total number of leads right now?",
-    "Summarize the performance of our latest promotion.",
-    "How many classes are scheduled today at the Athletic Club?",
-    "How many classes are scheduled today at the Dance Studio?",
+    "How many classes are scheduled today?",
     "Which zip codes have the highest concentration of our members?",
     "Show me all members who haven't visited in the last 21 days.",
-    "Show me all Zumba class attendees in the past 30 days.",
-    "Which instructors are teaching the most classes this week?",
     "How many new leads came from Instagram?",
-    "Give me a quick summary of business health for this month."
+    "Give me a quick summary of business health for this month.",
+    "What's our total revenue this month?",
+    "Show me conversion rate from trials to members.",
+    "Which classes have the highest fill rates?",
+    "How many transactions used promo codes?"
   ];
 
   const getResponse = (prompt: string): string => {
@@ -88,23 +84,28 @@ export default function AuvoraChat() {
     }
 
     if (lowerPrompt.includes('active members') && lowerPrompt.includes('athletic club')) {
-      const total = members.filter(m => m.location === 'athletic-club').length + 
-                   classPackClients.filter(c => c.location === 'athletic-club').length;
-      return `The Athletic Club has ${total} active members (${members.filter(m => m.location === 'athletic-club').length} membership holders and ${classPackClients.filter(c => c.location === 'athletic-club').length} class pack clients).`;
+      const allMembers = getAllMembers();
+      const allPackClients = getAllClassPackClients();
+      const total = allMembers.filter(m => m.location === 'athletic-club').length + 
+                   allPackClients.filter(c => c.location === 'athletic-club').length;
+      return `The Athletic Club has ${total} active members (${allMembers.filter(m => m.location === 'athletic-club').length} membership holders and ${allPackClients.filter(c => c.location === 'athletic-club').length} class pack clients).`;
     }
 
     if (lowerPrompt.includes('active members') && lowerPrompt.includes('dance studio')) {
-      const total = classPackClients.filter(c => c.location === 'dance-studio').length;
+      const allPackClients = getAllClassPackClients();
+      const total = allPackClients.filter(c => c.location === 'dance-studio').length;
       return `The Dance Studio has ${total} active class pack clients.`;
     }
 
     if (lowerPrompt.includes('class pack') && lowerPrompt.includes('athletic club')) {
-      const clients = classPackClients.filter(c => c.location === 'athletic-club');
+      const allPackClients = getAllClassPackClients();
+      const clients = allPackClients.filter(c => c.location === 'athletic-club');
       return `The Athletic Club has ${clients.length} class pack clients. This includes ${clients.filter(c => c.packType === '5-pack').length} with 5-packs, ${clients.filter(c => c.packType === '10-pack').length} with 10-packs, and ${clients.filter(c => c.packType === '20-pack').length} with 20-packs.`;
     }
 
     if (lowerPrompt.includes('class pack') && lowerPrompt.includes('dance studio')) {
-      const clients = classPackClients.filter(c => c.location === 'dance-studio');
+      const allPackClients = getAllClassPackClients();
+      const clients = allPackClients.filter(c => c.location === 'dance-studio');
       return `The Dance Studio has ${clients.length} class pack clients. This includes ${clients.filter(c => c.packType === '5-pack').length} with 5-packs, ${clients.filter(c => c.packType === '10-pack').length} with 10-packs, and ${clients.filter(c => c.packType === '20-pack').length} with 20-packs.`;
     }
 
@@ -223,6 +224,35 @@ export default function AuvoraChat() {
       return `Business Health Summary: You have ${total} active members, ${newLeads} new leads this month, and ${cancellations} cancellations. Overall, your business is performing well with strong lead generation and member retention.`;
     }
 
+    if (lowerPrompt.includes('revenue') && lowerPrompt.includes('month')) {
+      const totalRevenue = allTransactions.reduce((sum, t) => sum + t.total, 0);
+      return `Total revenue this month is $${totalRevenue.toFixed(2)} from ${allTransactions.length} transactions.`;
+    }
+
+    if (lowerPrompt.includes('conversion rate')) {
+      const trialLeads = locationLeads.filter(l => l.status === 'trial-showed' || l.status === 'joined').length;
+      const joinedLeads = locationLeads.filter(l => l.status === 'joined').length;
+      const conversionRate = trialLeads > 0 ? (joinedLeads / trialLeads) * 100 : 0;
+      return `Your conversion rate from trial to member is ${conversionRate.toFixed(1)}%. ${joinedLeads} members joined out of ${trialLeads} who tried a class.`;
+    }
+
+    if (lowerPrompt.includes('fill rate')) {
+      const classFillRates = locationClasses.map(cls => {
+        const classBookings = allBookings.filter(b => b.classId === cls.id && b.status !== 'cancelled').length;
+        const fillRate = cls.capacity > 0 ? (classBookings / cls.capacity) * 100 : 0;
+        return { name: `${cls.dayOfWeek} ${cls.time}`, fillRate: Math.round(fillRate) };
+      }).sort((a, b) => b.fillRate - a.fillRate);
+      
+      const top3 = classFillRates.slice(0, 3).map(c => `${c.name} (${c.fillRate}%)`).join(', ');
+      return `Classes with highest fill rates: ${top3}. These are your most popular time slots!`;
+    }
+
+    if (lowerPrompt.includes('promo code') || lowerPrompt.includes('promotion')) {
+      const promoTransactions = allTransactions.filter(t => t.promoCode);
+      const promoRevenue = promoTransactions.reduce((sum, t) => sum + t.total, 0);
+      return `${promoTransactions.length} transactions used promo codes, generating $${promoRevenue.toFixed(2)} in revenue. Most popular codes: SAVE10, SAVE20, WELCOME.`;
+    }
+
     return "I can help you with information about members, leads, classes, staff, and reports. Try asking me about specific metrics or use one of the suggested prompts below!";
   };
 
@@ -288,7 +318,7 @@ export default function AuvoraChat() {
                   : 'bg-gray-100 text-gray-900'
               }`}
             >
-              <p className="text-sm">{message.text}</p>
+              <p className="text-sm whitespace-pre-wrap">{message.text}</p>
             </div>
           </div>
         ))}

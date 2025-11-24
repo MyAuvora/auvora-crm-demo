@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X } from 'lucide-react';
+import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor } from 'lucide-react';
 import Image from 'next/image';
 import Dashboard from '@/components/Dashboard';
 import LeadsMembers from '@/components/LeadsMembers';
+import LeadPipeline from '@/components/LeadPipeline';
 import Schedule from '@/components/Schedule';
 import StaffSection from '@/components/StaffSection';
 import POS from '@/components/POS';
@@ -13,7 +14,7 @@ import Reports from '@/components/Reports';
 import Promotions from '@/components/Promotions';
 import AuvoraChat from '@/components/AuvoraChat';
 
-type Section = 'dashboard' | 'leads-members' | 'schedule' | 'staff' | 'pos' | 'reports' | 'promotions';
+type Section = 'dashboard' | 'leads-members' | 'pipeline' | 'schedule' | 'staff' | 'pos' | 'reports' | 'promotions' | 'kiosk';
 
 export default function CRMApp() {
   const { location, setLocation } = useApp();
@@ -25,11 +26,13 @@ export default function CRMApp() {
   const navItems = [
     { id: 'dashboard' as Section, label: 'Dashboard', icon: Home },
     { id: 'leads-members' as Section, label: 'Leads & Members', icon: Users },
+    { id: 'pipeline' as Section, label: 'Lead Pipeline', icon: GitBranch },
     { id: 'schedule' as Section, label: 'Schedule', icon: Calendar },
     { id: 'staff' as Section, label: 'Staff', icon: UserCog },
     { id: 'pos' as Section, label: 'POS', icon: ShoppingCart },
     { id: 'reports' as Section, label: 'Reports', icon: TrendingUp },
     { id: 'promotions' as Section, label: 'Promotions', icon: Tag },
+    { id: 'kiosk' as Section, label: 'Kiosk Mode', icon: Monitor },
   ];
 
   return (
@@ -107,11 +110,13 @@ export default function CRMApp() {
         <main className="flex-1 p-4 lg:p-8">
           {activeSection === 'dashboard' && <Dashboard />}
           {activeSection === 'leads-members' && <LeadsMembers />}
+          {activeSection === 'pipeline' && <LeadPipeline />}
           {activeSection === 'schedule' && <Schedule />}
           {activeSection === 'staff' && <StaffSection />}
           {activeSection === 'pos' && <POS />}
           {activeSection === 'reports' && <Reports />}
           {activeSection === 'promotions' && <Promotions />}
+          {activeSection === 'kiosk' && <div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Kiosk Mode</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>}
         </main>
       </div>
 

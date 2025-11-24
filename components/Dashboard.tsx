@@ -1,16 +1,17 @@
 'use client';
 
 import { useApp } from '@/lib/context';
-import { members, classPackClients, leads, classes } from '@/data/seedData';
+import { getAllMembers, getAllClassPackClients, getAllLeads, getAllClasses, getAllBookings } from '@/lib/dataStore';
 import { Users, TrendingUp, Calendar, UserPlus, Lightbulb } from 'lucide-react';
 
 export default function Dashboard() {
   const { location } = useApp();
   
-  const locationMembers = members.filter(m => m.location === location);
-  const locationPackClients = classPackClients.filter(c => c.location === location);
-  const locationLeads = leads.filter(l => l.location === location);
-  const locationClasses = classes.filter(c => c.location === location);
+  const locationMembers = getAllMembers().filter(m => m.location === location);
+  const locationPackClients = getAllClassPackClients().filter(c => c.location === location);
+  const locationLeads = getAllLeads().filter(l => l.location === location);
+  const locationClasses = getAllClasses().filter(c => c.location === location);
+  const allBookings = getAllBookings();
   
   const today = new Date().toISOString().split('T')[0];
   const todayLeads = locationLeads.filter(l => l.createdDate === today);
@@ -25,7 +26,10 @@ export default function Dashboard() {
     return c.dayOfWeek === dayOfWeek;
   });
   
-  const totalCheckIns = todayClasses.reduce((sum, c) => sum + c.bookedCount, 0);
+  const totalCheckIns = todayClasses.reduce((sum, c) => {
+    const classBookings = allBookings.filter(b => b.classId === c.id && b.status === 'checked-in');
+    return sum + classBookings.length;
+  }, 0);
   
   const totalActiveMembers = location === 'athletic-club' 
     ? locationMembers.length + locationPackClients.length

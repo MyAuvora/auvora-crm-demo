@@ -2,21 +2,41 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { classes, staff } from '@/data/seedData';
-import { X } from 'lucide-react';
+import { getAllClasses, getAllStaff, getAllBookings, getAllWaitlist } from '@/lib/dataStore';
+import { X, UserPlus, ClipboardList } from 'lucide-react';
+import BookingModal from './BookingModal';
+import CheckInModal from './CheckInModal';
+import { Class } from '@/lib/types';
 
 export default function Schedule() {
   const { location } = useApp();
-  const [selectedClass, setSelectedClass] = useState<typeof locationClasses[0] | null>(null);
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [, setRefreshTrigger] = useState(0);
 
-  const locationClasses = classes.filter(c => c.location === location);
-  const locationStaff = staff.filter(s => s.location === location);
+  const locationClasses = getAllClasses().filter(c => c.location === location);
+  const locationStaff = getAllStaff().filter(s => s.location === location);
+  const bookings = getAllBookings();
+  const waitlist = getAllWaitlist();
 
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const getStaffName = (coachId: string) => {
     const staffMember = locationStaff.find(s => s.id === coachId);
     return staffMember ? staffMember.name : 'Unknown';
+  };
+
+  const getClassBookingCount = (classId: string) => {
+    return bookings.filter(b => b.classId === classId && b.status !== 'cancelled').length;
+  };
+
+  const getClassWaitlistCount = (classId: string) => {
+    return waitlist.filter(w => w.classId === classId).length;
+  };
+
+  const handleRefresh = () => {
+    setRefreshTrigger(prev => prev + 1);
   };
 
   return (
@@ -57,13 +77,20 @@ export default function Schedule() {
                       <td className="px-4 py-3 text-sm text-gray-600">{cls.duration} min</td>
                       <td className="px-4 py-3 text-sm text-gray-600">{getStaffName(cls.coachId)}</td>
                       <td className="px-4 py-3 text-sm">
-                        <span className={`font-medium ${
-                          cls.bookedCount >= cls.capacity * 0.9 ? 'text-red-600' :
-                          cls.bookedCount >= cls.capacity * 0.7 ? 'text-yellow-600' :
-                          'text-green-600'
-                        }`}>
-                          {cls.bookedCount} / {cls.capacity}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-medium ${
+                            getClassBookingCount(cls.id) >= cls.capacity * 0.9 ? 'text-red-600' :
+                            getClassBookingCount(cls.id) >= cls.capacity * 0.7 ? 'text-yellow-600' :
+                            'text-green-600'
+                          }`}>
+                            {getClassBookingCount(cls.id)} / {cls.capacity}
+                          </span>
+                          {getClassWaitlistCount(cls.id) > 0 && (
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                              +{getClassWaitlistCount(cls.id)} waitlist
+                            </span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ));
@@ -99,20 +126,92 @@ export default function Schedule() {
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Capacity</p>
-                <p className="text-xl font-bold text-gray-900">{selectedClass.bookedCount} / {selectedClass.capacity}</p>
+                <p className="text-xl font-bold text-gray-900">{getClassBookingCount(selectedClass.id)} / {selectedClass.capacity}</p>
+                {getClassWaitlistCount(selectedClass.id) > 0 && (
+                  <p className="text-sm text-orange-600 mt-1">+{getClassWaitlistCount(selectedClass.id)} on waitlist</p>
+                )}
               </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowBookingModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                <UserPlus size={20} />
+                Book Member
+              </button>
+              <button
+                onClick={() => setShowCheckInModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              >
+                <ClipboardList size={20} />
+                Check-In Roster
+              </button>
             </div>
 
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-3">Booked Members</h3>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-600">
-                  {selectedClass.bookedCount} members are booked for this class.
-                </p>
+                {bookings.filter(b => b.classId === selectedClass.id && b.status !== 'cancelled').length === 0 ? (
+                  <p className="text-gray-600">No bookings yet for this class.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {bookings
+                      .filter(b => b.classId === selectedClass.id && b.status !== 'cancelled')
+                      .map(booking => (
+                        <div key={booking.id} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
+                          <span className="text-gray-900">{booking.memberName}</span>
+                          <span className={`text-sm px-2 py-1 rounded ${
+                            booking.status === 'checked-in' ? 'bg-green-100 text-green-700' :
+                            'bg-blue-100 text-blue-700'
+                          }`}>
+                            {booking.status === 'checked-in' ? 'Checked In' : 'Booked'}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
+
+            {getClassWaitlistCount(selectedClass.id) > 0 && (
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Waitlist</h3>
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <div className="space-y-2">
+                    {waitlist
+                      .filter(w => w.classId === selectedClass.id)
+                      .map(entry => (
+                        <div key={entry.id} className="flex justify-between items-center py-2 border-b border-orange-200 last:border-0">
+                          <span className="text-gray-900">{entry.memberName}</span>
+                          <span className="text-sm text-orange-600">
+                            Added {new Date(entry.addedAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+      )}
+
+      {showBookingModal && selectedClass && (
+        <BookingModal
+          classData={selectedClass}
+          onClose={() => setShowBookingModal(false)}
+          onSuccess={handleRefresh}
+        />
+      )}
+
+      {showCheckInModal && selectedClass && (
+        <CheckInModal
+          classData={selectedClass}
+          onClose={() => setShowCheckInModal(false)}
+          onSuccess={handleRefresh}
+        />
       )}
     </div>
   );

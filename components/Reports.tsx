@@ -1,15 +1,19 @@
 'use client';
 
 import { useApp } from '@/lib/context';
-import { members, classPackClients, leads } from '@/data/seedData';
+import { getAllMembers, getAllClassPackClients, getAllLeads, getAllTransactions, getAllBookings, getAllClasses } from '@/lib/dataStore';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { TrendingUp, DollarSign, Users, Target } from 'lucide-react';
 
 export default function Reports() {
   const { location } = useApp();
 
-  const locationMembers = members.filter(m => m.location === location);
-  const locationPackClients = classPackClients.filter(c => c.location === location);
-  const locationLeads = leads.filter(l => l.location === location);
+  const locationMembers = getAllMembers().filter(m => m.location === location);
+  const locationPackClients = getAllClassPackClients().filter(c => c.location === location);
+  const locationLeads = getAllLeads().filter(l => l.location === location);
+  const transactions = getAllTransactions().filter(t => t.location === location);
+  const bookings = getAllBookings();
+  const classes = getAllClasses().filter(c => c.location === location);
 
   const membershipData = location === 'athletic-club' ? [
     { name: '1x/week', count: locationMembers.filter(m => m.membershipType === '1x-week').length },
@@ -45,11 +49,89 @@ export default function Reports() {
   const thisMonth = new Date().toISOString().slice(0, 7);
   const cancellations = locationLeads.filter(l => l.status === 'cancelled' && l.createdDate.startsWith(thisMonth)).length;
 
+  const totalRevenue = transactions.reduce((sum, t) => sum + t.total, 0);
+  const avgTransactionValue = transactions.length > 0 ? totalRevenue / transactions.length : 0;
+  
+  const mrr = location === 'athletic-club' 
+    ? locationMembers.filter(m => m.status === 'active').length * 150 // avg membership price
+    : locationPackClients.length * 50; // avg monthly from packs
+
+  const trialLeads = locationLeads.filter(l => l.status === 'trial-showed' || l.status === 'joined').length;
+  const joinedLeads = locationLeads.filter(l => l.status === 'joined').length;
+  const conversionRate = trialLeads > 0 ? (joinedLeads / trialLeads) * 100 : 0;
+
+  const classFillRates = classes.map(cls => {
+    const classBookings = bookings.filter(b => b.classId === cls.id && b.status !== 'cancelled').length;
+    const fillRate = cls.capacity > 0 ? (classBookings / cls.capacity) * 100 : 0;
+    return {
+      name: `${cls.dayOfWeek.substring(0, 3)} ${cls.time}`,
+      fillRate: Math.round(fillRate),
+    };
+  }).slice(0, 10);
+
+  const promoRevenue: { [key: string]: number } = {};
+  transactions.forEach(t => {
+    if (t.promoCode) {
+      promoRevenue[t.promoCode] = (promoRevenue[t.promoCode] || 0) + t.total;
+    }
+  });
+  const promoData = Object.entries(promoRevenue).map(([code, revenue]) => ({ name: code, revenue }));
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
         <p className="text-gray-600 mt-1">View business insights and metrics</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Monthly Revenue</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">${totalRevenue.toFixed(0)}</p>
+            </div>
+            <div className="bg-green-100 p-3 rounded-full">
+              <DollarSign className="text-green-600" size={24} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 font-medium">MRR</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">${mrr.toFixed(0)}</p>
+            </div>
+            <div className="bg-blue-100 p-3 rounded-full">
+              <TrendingUp className="text-blue-600" size={24} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Conversion Rate</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{conversionRate.toFixed(1)}%</p>
+            </div>
+            <div className="bg-purple-100 p-3 rounded-full">
+              <Target className="text-purple-600" size={24} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Avg Transaction</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">${avgTransactionValue.toFixed(0)}</p>
+            </div>
+            <div className="bg-orange-100 p-3 rounded-full">
+              <Users className="text-orange-600" size={24} />
+            </div>
+          </div>
+        </div>
       </div>
 
       {location === 'athletic-club' && (
@@ -140,6 +222,38 @@ export default function Reports() {
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      {classFillRates.length > 0 && (
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Class Fill Rates</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={classFillRates}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="fillRate" fill="#8B5CF6" name="Fill Rate %" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {promoData.length > 0 && (
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Revenue by Promo Code</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={promoData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="revenue" fill="#10B981" name="Revenue ($)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,8 +2,13 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { members, classPackClients, leads } from '@/data/seedData';
-import { Search, X } from 'lucide-react';
+import { getAllLeads, getAllMembers, getAllClassPackClients, updateLeadStatus, getLeadNotes, getLeadTasks } from '@/lib/dataStore';
+import { Search, X, Snowflake, XCircle, Plus } from 'lucide-react';
+import { Member, ClassPackClient, Lead } from '@/lib/types';
+import FreezeModal from './FreezeModal';
+import CancelModal from './CancelModal';
+import AddNoteModal from './AddNoteModal';
+import AddTaskModal from './AddTaskModal';
 
 type Tab = 'leads' | 'members';
 
@@ -15,11 +20,15 @@ export default function LeadsMembers() {
   const [sourceFilter, setSourceFilter] = useState<string>('all');
   const [membershipFilter, setMembershipFilter] = useState<string>('all');
   const [zipFilter, setZipFilter] = useState<string>('all');
-  const [selectedItem, setSelectedItem] = useState<(typeof locationLeads[0] | typeof allMembers[0]) | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Lead | Member | ClassPackClient | null>(null);
+  const [showFreezeModal, setShowFreezeModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showAddNoteModal, setShowAddNoteModal] = useState(false);
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
 
-  const locationLeads = leads.filter(l => l.location === location);
-  const locationMembers = members.filter(m => m.location === location);
-  const locationPackClients = classPackClients.filter(c => c.location === location);
+  const locationLeads = getAllLeads().filter(l => l.location === location);
+  const locationMembers = getAllMembers().filter(m => m.location === location);
+  const locationPackClients = getAllClassPackClients().filter(c => c.location === location);
 
   const filteredLeads = locationLeads.filter(lead => {
     const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -99,9 +108,12 @@ export default function LeadsMembers() {
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
                 >
                   <option value="all">All Statuses</option>
-                  <option value="cancelled">Cancelled</option>
-                  <option value="trial-no-join">Trial - No Join</option>
                   <option value="new-lead">New Lead</option>
+                  <option value="trial-booked">Trial Booked</option>
+                  <option value="trial-showed">Trial Showed</option>
+                  <option value="joined">Joined</option>
+                  <option value="trial-no-join">Trial - No Join</option>
+                  <option value="cancelled">Cancelled</option>
                 </select>
                 <select
                   value={sourceFilter}
@@ -181,9 +193,12 @@ export default function LeadsMembers() {
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           lead.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                           lead.status === 'trial-no-join' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-green-100 text-green-700'
+                          lead.status === 'joined' ? 'bg-green-100 text-green-700' :
+                          lead.status === 'trial-showed' ? 'bg-blue-100 text-blue-700' :
+                          lead.status === 'trial-booked' ? 'bg-purple-100 text-purple-700' :
+                          'bg-gray-100 text-gray-700'
                         }`}>
-                          {lead.status.replace('-', ' ')}
+                          {lead.status.replace(/-/g, ' ')}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600 capitalize">{lead.source}</td>
@@ -204,8 +219,13 @@ export default function LeadsMembers() {
                         }
                       </td>
                       <td className="px-4 py-3 text-sm">
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                          Active
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          'status' in member && member.status === 'active' ? 'bg-green-100 text-green-700' :
+                          'status' in member && member.status === 'frozen' ? 'bg-blue-100 text-blue-700' :
+                          'status' in member && member.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                          'bg-green-100 text-green-700'
+                        }`}>
+                          {'status' in member ? member.status : 'Active'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">{member.zipCode}</td>
@@ -226,6 +246,65 @@ export default function LeadsMembers() {
               
               <div className="bg-gray-50 p-6 rounded-lg">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{selectedItem.name}</h3>
+                
+                {activeTab === 'leads' && 'status' in selectedItem && (
+                  <div className="mb-4 flex gap-2">
+                    <select
+                      value={selectedItem.status}
+                      onChange={(e) => {
+                        updateLeadStatus(selectedItem.id, e.target.value);
+                        setSelectedItem(null);
+                        setTimeout(() => setSelectedItem(getAllLeads().find(l => l.id === selectedItem.id) || null), 100);
+                      }}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    >
+                      <option value="new-lead">New Lead</option>
+                      <option value="trial-booked">Trial Booked</option>
+                      <option value="trial-showed">Trial Showed</option>
+                      <option value="joined">Joined</option>
+                      <option value="trial-no-join">Trial - No Join</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                    <button
+                      onClick={() => {
+                        setShowAddNoteModal(true);
+                      }}
+                      className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                    >
+                      <Plus size={16} />
+                      Add Note
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowAddTaskModal(true);
+                      }}
+                      className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                    >
+                      <Plus size={16} />
+                      Add Task
+                    </button>
+                  </div>
+                )}
+
+                {activeTab === 'members' && 'type' in selectedItem && selectedItem.type === 'membership' && 'status' in selectedItem && selectedItem.status === 'active' && (
+                  <div className="mb-4 flex gap-2">
+                    <button
+                      onClick={() => setShowFreezeModal(true)}
+                      className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                    >
+                      <Snowflake size={16} />
+                      Freeze Membership
+                    </button>
+                    <button
+                      onClick={() => setShowCancelModal(true)}
+                      className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                    >
+                      <XCircle size={16} />
+                      Cancel Membership
+                    </button>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-600">Email</p>
@@ -239,19 +318,45 @@ export default function LeadsMembers() {
                     <>
                       <div>
                         <p className="text-sm text-gray-600">Status</p>
-                        <p className="text-gray-900 font-medium capitalize">{selectedItem.status.replace('-', ' ')}</p>
+                        <p className="text-gray-900 font-medium capitalize">{'status' in selectedItem ? selectedItem.status.replace(/-/g, ' ') : ''}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Source</p>
-                        <p className="text-gray-900 font-medium capitalize">{selectedItem.source}</p>
+                        <p className="text-gray-900 font-medium capitalize">{'source' in selectedItem ? selectedItem.source : ''}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Created Date</p>
-                        <p className="text-gray-900 font-medium">{selectedItem.createdDate}</p>
+                        <p className="text-gray-900 font-medium">{'createdDate' in selectedItem ? selectedItem.createdDate : ''}</p>
                       </div>
                       <div className="md:col-span-2">
-                        <p className="text-sm text-gray-600">Notes</p>
-                        <p className="text-gray-900 font-medium">{selectedItem.notes}</p>
+                        <p className="text-sm text-gray-600 mb-2">Notes</p>
+                        <div className="space-y-2">
+                          {'notes' in selectedItem && selectedItem.notes && (
+                            <p className="text-gray-900 bg-white p-3 rounded border border-gray-200">{selectedItem.notes}</p>
+                          )}
+                          {getLeadNotes().filter(n => n.leadId === selectedItem.id).map(note => (
+                            <div key={note.id} className="bg-white p-3 rounded border border-gray-200">
+                              <p className="text-gray-900">{note.note}</p>
+                              <p className="text-xs text-gray-500 mt-1">{new Date(note.createdAt).toLocaleString()}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="md:col-span-2">
+                        <p className="text-sm text-gray-600 mb-2">Tasks</p>
+                        <div className="space-y-2">
+                          {getLeadTasks().filter(t => t.leadId === selectedItem.id).map(task => (
+                            <div key={task.id} className="bg-white p-3 rounded border border-gray-200 flex justify-between items-center">
+                              <div>
+                                <p className="text-gray-900">{task.description}</p>
+                                <p className="text-xs text-gray-500">Due: {task.dueDate}</p>
+                              </div>
+                              <span className={`px-2 py-1 rounded text-xs ${task.completed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                {task.completed ? 'Done' : 'Pending'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </>
                   ) : (
@@ -259,7 +364,7 @@ export default function LeadsMembers() {
                       <div>
                         <p className="text-sm text-gray-600">Type</p>
                         <p className="text-gray-900 font-medium">
-                          {selectedItem.type === 'membership' 
+                          {'type' in selectedItem && selectedItem.type === 'membership' 
                             ? ('membershipType' in selectedItem ? selectedItem.membershipType : '')
                             : ('packType' in selectedItem ? selectedItem.packType : '')
                           }
@@ -267,9 +372,9 @@ export default function LeadsMembers() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Zip Code</p>
-                        <p className="text-gray-900 font-medium">{selectedItem.zipCode}</p>
+                        <p className="text-gray-900 font-medium">{'zipCode' in selectedItem ? selectedItem.zipCode : ''}</p>
                       </div>
-                      {selectedItem.type === 'membership' ? (
+                      {'type' in selectedItem && selectedItem.type === 'membership' ? (
                         <>
                           <div>
                             <p className="text-sm text-gray-600">Join Date</p>
@@ -282,6 +387,10 @@ export default function LeadsMembers() {
                           <div>
                             <p className="text-sm text-gray-600">Visits (Last 30 Days)</p>
                             <p className="text-gray-900 font-medium">{'visitsLast30Days' in selectedItem ? selectedItem.visitsLast30Days : ''}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Status</p>
+                            <p className="text-gray-900 font-medium capitalize">{'status' in selectedItem ? selectedItem.status : 'Active'}</p>
                           </div>
                         </>
                       ) : (
@@ -299,6 +408,56 @@ export default function LeadsMembers() {
                     </>
                   )}
                 </div>
+
+                {showFreezeModal && 'type' in selectedItem && selectedItem.type === 'membership' && (
+                  <FreezeModal
+                    memberId={selectedItem.id}
+                    memberName={selectedItem.name}
+                    onClose={() => setShowFreezeModal(false)}
+                    onSuccess={() => {
+                      setShowFreezeModal(false);
+                      setSelectedItem(null);
+                      setTimeout(() => setSelectedItem(getAllMembers().find(m => m.id === selectedItem.id) || null), 100);
+                    }}
+                  />
+                )}
+
+                {showCancelModal && 'type' in selectedItem && selectedItem.type === 'membership' && (
+                  <CancelModal
+                    memberId={selectedItem.id}
+                    memberName={selectedItem.name}
+                    onClose={() => setShowCancelModal(false)}
+                    onSuccess={() => {
+                      setShowCancelModal(false);
+                      setSelectedItem(null);
+                      setTimeout(() => setSelectedItem(getAllMembers().find(m => m.id === selectedItem.id) || null), 100);
+                    }}
+                  />
+                )}
+
+                {showAddNoteModal && activeTab === 'leads' && (
+                  <AddNoteModal
+                    leadId={selectedItem.id}
+                    onClose={() => setShowAddNoteModal(false)}
+                    onSuccess={() => {
+                      setShowAddNoteModal(false);
+                      setSelectedItem(null);
+                      setTimeout(() => setSelectedItem(getAllLeads().find(l => l.id === selectedItem.id) || null), 100);
+                    }}
+                  />
+                )}
+
+                {showAddTaskModal && activeTab === 'leads' && (
+                  <AddTaskModal
+                    leadId={selectedItem.id}
+                    onClose={() => setShowAddTaskModal(false)}
+                    onSuccess={() => {
+                      setShowAddTaskModal(false);
+                      setSelectedItem(null);
+                      setTimeout(() => setSelectedItem(getAllLeads().find(l => l.id === selectedItem.id) || null), 100);
+                    }}
+                  />
+                )}
               </div>
             </div>
           )}
