@@ -131,6 +131,68 @@ function getWeekStart(date: Date = new Date()): string {
   return d.toISOString().split('T')[0];
 }
 
+function generateSampleRevenue(): Transaction[] {
+  const transactions: Transaction[] = [];
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  
+  const productTypes = [
+    { id: 'membership-1x', name: '1x/Week Membership', price: 99, category: 'membership' },
+    { id: 'membership-2x', name: '2x/Week Membership', price: 149, category: 'membership' },
+    { id: 'membership-unlimited', name: 'Unlimited Membership', price: 199, category: 'membership' },
+    { id: 'pack-5', name: '5-Class Pack', price: 75, category: 'class-pack' },
+    { id: 'pack-10', name: '10-Class Pack', price: 140, category: 'class-pack' },
+    { id: 'pack-20', name: '20-Class Pack', price: 260, category: 'class-pack' },
+    { id: 'retail-water', name: 'Water Bottle', price: 3, category: 'retail' },
+    { id: 'retail-shirt', name: 'T-Shirt', price: 25, category: 'retail' },
+  ];
+  
+  let transactionId = 1;
+  
+  for (let monthOffset = 0; monthOffset <= currentMonth; monthOffset++) {
+    const month = monthOffset;
+    const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+    const isCurrentMonth = month === currentMonth;
+    const maxDay = isCurrentMonth ? now.getDate() : daysInMonth;
+    
+    for (let day = 1; day <= maxDay; day++) {
+      const numTransactions = Math.floor(Math.random() * 5) + 2;
+      
+      for (let i = 0; i < numTransactions; i++) {
+        const location = Math.random() > 0.5 ? 'athletic-club' : 'dance-studio';
+        const product = productTypes[Math.floor(Math.random() * productTypes.length)];
+        const quantity = product.category === 'retail' ? Math.floor(Math.random() * 3) + 1 : 1;
+        const subtotal = product.price * quantity;
+        const discount = Math.random() > 0.8 ? subtotal * 0.1 : 0;
+        const tax = (subtotal - discount) * 0.07;
+        const total = subtotal - discount + tax;
+        
+        const timestamp = new Date(currentYear, month, day, Math.floor(Math.random() * 12) + 8, Math.floor(Math.random() * 60)).toISOString();
+        
+        transactions.push({
+          id: `txn-sample-${transactionId++}`,
+          memberName: `Member ${transactionId}`,
+          items: [{
+            productId: product.id,
+            productName: product.name,
+            quantity,
+            price: product.price,
+          }],
+          subtotal,
+          discount,
+          tax,
+          total,
+          timestamp,
+          location,
+        });
+      }
+    }
+  }
+  
+  return transactions;
+}
+
 function initializeStore(): DataStore {
   if (typeof window === 'undefined') {
     return {
@@ -160,6 +222,10 @@ function initializeStore(): DataStore {
     if (stored) {
       const parsed = JSON.parse(stored) as DataStore;
       if (parsed.version === STORAGE_VERSION) {
+        if (parsed.transactions.length === 0 || !parsed.transactions.some((t: Transaction) => t.id.startsWith('txn-sample-'))) {
+          parsed.transactions = [...parsed.transactions, ...generateSampleRevenue()];
+          saveStore(parsed);
+        }
         return parsed;
       }
     }
@@ -178,7 +244,7 @@ function initializeStore(): DataStore {
     products: seedProducts,
     bookings: [],
     waitlist: [],
-    transactions: [],
+    transactions: generateSampleRevenue(),
     auditLog: [],
     membershipFreezes: [],
     membershipCancellations: [],

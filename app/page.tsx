@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor } from 'lucide-react';
-import Image from 'next/image';
 import Dashboard from '@/components/Dashboard';
 import LeadsMembers from '@/components/LeadsMembers';
 import LeadPipeline from '@/components/LeadPipeline';
@@ -58,16 +57,9 @@ export default function CRMApp() {
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <div className="flex items-center gap-2">
-              <Image
-                src="https://thelabtampa.com/wp-content/uploads/2025/01/The-LAB-Logo-White-1.png"
-                alt="The LAB Tampa"
-                width={120}
-                height={40}
-                className="h-10 w-auto object-contain"
-                unoptimized
-              />
-              <span className="text-xl font-bold hidden sm:block">The LAB Tampa</span>
+            <div className="flex flex-col leading-tight">
+              <span className="text-2xl font-bold text-white">The LAB</span>
+              <span className="text-lg font-semibold text-white">Tampa</span>
             </div>
           </div>
           

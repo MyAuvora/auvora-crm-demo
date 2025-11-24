@@ -2,18 +2,22 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllMembers, getAllClassPackClients, getAllLeads, getAllClasses, getAllBookings, getAllTransactions } from '@/lib/dataStore';
-import { Users, TrendingUp, Calendar, UserPlus, Lightbulb, DollarSign, X } from 'lucide-react';
+import { getAllMembers, getAllLeads, getAllClasses, getAllBookings, getAllTransactions, getAllStaff, getAllWaitlist, getAllProducts } from '@/lib/dataStore';
+import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X } from 'lucide-react';
+import { Class } from '@/lib/types';
+import { Transaction } from '@/lib/dataStore';
 
 export default function Dashboard() {
   const { location } = useApp();
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   
   const locationMembers = getAllMembers().filter(m => m.location === location);
-  const locationPackClients = getAllClassPackClients().filter(c => c.location === location);
   const locationLeads = getAllLeads().filter(l => l.location === location);
   const locationClasses = getAllClasses().filter(c => c.location === location);
   const allBookings = getAllBookings();
+  const allWaitlist = getAllWaitlist();
+  const allStaff = getAllStaff();
   
   const today = new Date().toISOString().split('T')[0];
   const todayLeads = locationLeads.filter(l => l.createdDate === today);
@@ -33,9 +37,7 @@ export default function Dashboard() {
     return sum + classBookings.length;
   }, 0);
   
-  const totalActiveMembers = location === 'athletic-club' 
-    ? locationMembers.length + locationPackClients.length
-    : locationPackClients.length;
+  const totalActiveMembers = locationMembers.length;
   
   const allTransactions = getAllTransactions().filter(t => t.location === location);
   const now = new Date();
@@ -77,26 +79,75 @@ export default function Dashboard() {
       case 'leads':
         return {
           title: "Today's New Leads",
-          items: todayLeads.map(l => `${l.name} - ${l.source}`)
+          items: todayLeads.map(l => ({ id: l.id, text: `${l.name} - ${l.source}` })),
+          clickable: true
         };
       case 'members':
         return {
-          title: "Active Members",
-          items: [`${locationMembers.length} membership holders`, `${locationPackClients.length} class pack clients`]
+          title: "Active Members (Membership Holders Only)",
+          items: locationMembers.map(m => `${m.name} - ${m.membershipType} (${m.status})`)
         };
       case 'mtd':
         return {
-          title: "Month-to-Date Revenue",
-          items: monthTransactions.map(t => `${t.timestamp}: $${t.total.toFixed(2)} - ${t.memberName || 'Guest'}`)
+          title: "Month-to-Date Revenue Breakdown",
+          items: generateRevenueBreakdown(monthTransactions),
+          isRevenue: true
         };
       case 'ytd':
         return {
-          title: "Year-to-Date Revenue",
-          items: [`Total: $${yearToDateRevenue.toFixed(2)}`, `Transactions: ${yearTransactions.length}`, `Average: $${(yearToDateRevenue / Math.max(yearTransactions.length, 1)).toFixed(2)}`]
+          title: "Year-to-Date Revenue Breakdown",
+          items: generateRevenueBreakdown(yearTransactions),
+          isRevenue: true
         };
       default:
         return { title: '', items: [] };
     }
+  };
+  
+  const generateRevenueBreakdown = (transactions: Transaction[]) => {
+    const allProducts = getAllProducts();
+    const byDate: { [date: string]: { membership: number; classPack: number; retail: number; total: number } } = {};
+    
+    transactions.forEach(t => {
+      const date = t.timestamp.split('T')[0];
+      if (!byDate[date]) {
+        byDate[date] = { membership: 0, classPack: 0, retail: 0, total: 0 };
+      }
+      
+      t.items.forEach(item => {
+        const product = allProducts.find(p => p.id === item.productId);
+        const category = product?.category || 
+          (item.productId.includes('membership') ? 'membership' : 
+           item.productId.includes('pack') ? 'class-pack' : 'retail');
+        
+        const amount = item.price * item.quantity;
+        
+        if (category === 'membership') {
+          byDate[date].membership += amount;
+        } else if (category === 'class-pack') {
+          byDate[date].classPack += amount;
+        } else {
+          byDate[date].retail += amount;
+        }
+        byDate[date].total += amount;
+      });
+    });
+    
+    const sortedDates = Object.keys(byDate).sort();
+    let runningTotal = 0;
+    
+    return sortedDates.map(date => {
+      const data = byDate[date];
+      runningTotal += data.total;
+      return {
+        date,
+        membership: data.membership,
+        classPack: data.classPack,
+        retail: data.retail,
+        dayTotal: data.total,
+        runningTotal
+      };
+    });
   };
 
   return (
@@ -118,21 +169,6 @@ export default function Dashboard() {
             </div>
             <div className="bg-red-100 p-3 rounded-full">
               <Users className="text-red-600" size={24} />
-            </div>
-          </div>
-        </button>
-
-        <button 
-          onClick={() => setSelectedMetric('classes')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 font-medium">Classes Today</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{todayClasses.length}</p>
-            </div>
-            <div className="bg-blue-100 p-3 rounded-full">
-              <Calendar className="text-blue-600" size={24} />
             </div>
           </div>
         </button>
@@ -212,13 +248,68 @@ export default function Dashboard() {
             </div>
             <div className="p-6 overflow-y-auto max-h-[60vh]">
               {getMetricDetails(selectedMetric).items.length > 0 ? (
-                <ul className="space-y-2">
-                  {getMetricDetails(selectedMetric).items.map((item, i) => (
-                    <li key={i} className="p-3 bg-gray-50 rounded border border-gray-200 text-gray-900">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                getMetricDetails(selectedMetric).isRevenue ? (
+                  <div className="space-y-4">
+                    {(getMetricDetails(selectedMetric).items as Array<{date: string; membership: number; classPack: number; retail: number; dayTotal: number; runningTotal: number}>).map((item, i: number) => (
+                      <div key={i} className="p-4 bg-gray-50 rounded border border-gray-200">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="font-bold text-gray-900">{item.date}</h4>
+                          <span className="text-lg font-bold text-gray-900">${item.dayTotal.toFixed(2)}</span>
+                        </div>
+                        <div className="space-y-1 text-sm">
+                          {item.membership > 0 && (
+                            <div className="flex justify-between text-gray-700">
+                              <span>Memberships:</span>
+                              <span className="font-medium">${item.membership.toFixed(2)}</span>
+                            </div>
+                          )}
+                          {item.classPack > 0 && (
+                            <div className="flex justify-between text-gray-700">
+                              <span>Class Packs:</span>
+                              <span className="font-medium">${item.classPack.toFixed(2)}</span>
+                            </div>
+                          )}
+                          {item.retail > 0 && (
+                            <div className="flex justify-between text-gray-700">
+                              <span>Retail:</span>
+                              <span className="font-medium">${item.retail.toFixed(2)}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between text-gray-600 text-xs pt-1 border-t border-gray-300 mt-2">
+                            <span>Running Total:</span>
+                            <span className="font-bold">${item.runningTotal.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <ul className="space-y-2">
+                    {getMetricDetails(selectedMetric).items.map((item, i) => {
+                      const isClickable = getMetricDetails(selectedMetric).clickable && typeof item === 'object' && 'id' in item;
+                      if (isClickable) {
+                        const clickableItem = item as { id: string; text: string };
+                        return (
+                          <li key={i}>
+                            <button
+                              onClick={() => {
+                                console.log('Navigate to lead:', clickableItem.id);
+                              }}
+                              className="w-full text-left p-3 bg-gray-50 rounded border border-gray-200 text-gray-900 hover:bg-gray-100 transition-colors"
+                            >
+                              {clickableItem.text}
+                            </button>
+                          </li>
+                        );
+                      }
+                      return (
+                        <li key={i} className="p-3 bg-gray-50 rounded border border-gray-200 text-gray-900">
+                          {typeof item === 'string' ? item : (item as { text: string }).text}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )
               ) : (
                 <p className="text-gray-500 text-center py-8">No data available</p>
               )}
@@ -236,12 +327,17 @@ export default function Dashboard() {
               const checkedIn = classBookings.filter(b => b.status === 'checked-in').length;
               const booked = classBookings.length;
               const fillPercentage = cls.capacity > 0 ? (booked / cls.capacity) * 100 : 0;
+              const coach = allStaff.find(s => s.id === cls.coachId);
               
               return (
-                <div key={cls.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <button
+                  key={cls.id}
+                  onClick={() => setSelectedClass(cls)}
+                  className="w-full p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors text-left"
+                >
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h3 className="font-bold text-gray-900">{cls.name}</h3>
+                      <h3 className="font-bold text-gray-900">{cls.name} • {coach?.name || 'TBD'}</h3>
                       <p className="text-sm text-gray-600">{cls.time} • {cls.duration} min</p>
                     </div>
                     <div className="text-right">
@@ -255,7 +351,7 @@ export default function Dashboard() {
                       style={{ width: `${Math.min(fillPercentage, 100)}%` }}
                     />
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -263,6 +359,77 @@ export default function Dashboard() {
           <p className="text-gray-500 text-center py-8">No classes scheduled for today</p>
         )}
       </div>
+      
+      {selectedClass && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">{selectedClass.name} - {selectedClass.time}</h3>
+              <button
+                onClick={() => setSelectedClass(null)}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[60vh]">
+              {(() => {
+                const classBookings = allBookings.filter(b => b.classId === selectedClass.id);
+                const checkedInBookings = classBookings.filter(b => b.status === 'checked-in');
+                const bookedNotCheckedIn = classBookings.filter(b => b.status === 'booked');
+                const waitlistEntries = allWaitlist.filter(w => w.classId === selectedClass.id);
+                
+                return (
+                  <div className="space-y-6">
+                    {checkedInBookings.length > 0 && (
+                      <div>
+                        <h4 className="font-bold text-gray-900 mb-2">Checked In ({checkedInBookings.length})</h4>
+                        <ul className="space-y-2">
+                          {checkedInBookings.map((booking, i) => (
+                            <li key={i} className="p-3 bg-green-50 rounded border border-green-200 text-gray-900">
+                              {booking.memberName}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {bookedNotCheckedIn.length > 0 && (
+                      <div>
+                        <h4 className="font-bold text-gray-900 mb-2">Booked (Not Checked In) ({bookedNotCheckedIn.length})</h4>
+                        <ul className="space-y-2">
+                          {bookedNotCheckedIn.map((booking, i) => (
+                            <li key={i} className="p-3 bg-blue-50 rounded border border-blue-200 text-gray-900">
+                              {booking.memberName}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {waitlistEntries.length > 0 && (
+                      <div>
+                        <h4 className="font-bold text-gray-900 mb-2">Waitlist ({waitlistEntries.length})</h4>
+                        <ul className="space-y-2">
+                          {waitlistEntries.map((entry, i) => (
+                            <li key={i} className="p-3 bg-yellow-50 rounded border border-yellow-200 text-gray-900">
+                              {entry.memberName}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {checkedInBookings.length === 0 && bookedNotCheckedIn.length === 0 && waitlistEntries.length === 0 && (
+                      <p className="text-gray-500 text-center py-8">No bookings for this class yet</p>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
