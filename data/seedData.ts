@@ -34,6 +34,22 @@ export function generateMembers(): Member[] {
   
   for (let i = 0; i < 150; i++) {
     const name = generateName();
+    const joinDate = randomDate(365);
+    const joinDateObj = new Date(joinDate);
+    
+    const lastPaymentDate = new Date(joinDateObj);
+    lastPaymentDate.setMonth(lastPaymentDate.getMonth() + Math.floor((new Date().getTime() - joinDateObj.getTime()) / (30 * 24 * 60 * 60 * 1000)));
+    
+    const nextPaymentDue = new Date(lastPaymentDate);
+    nextPaymentDue.setMonth(nextPaymentDue.getMonth() + 1);
+    
+    const isOverdue = Math.random() < 0.15;
+    const paymentStatus: 'current' | 'overdue' = isOverdue ? 'overdue' : 'current';
+    
+    if (isOverdue) {
+      nextPaymentDue.setDate(nextPaymentDue.getDate() - Math.floor(Math.random() * 30 + 5)); // 5-35 days overdue
+    }
+    
     members.push({
       id: `member-${i + 1}`,
       name,
@@ -44,8 +60,11 @@ export function generateMembers(): Member[] {
       lastVisit: randomDate(30),
       zipCode: randomItem(tampaZipCodes),
       location: 'athletic-club',
-      joinDate: randomDate(365),
-      visitsLast30Days: Math.floor(Math.random() * 20) + 1
+      joinDate,
+      visitsLast30Days: Math.floor(Math.random() * 20) + 1,
+      paymentStatus,
+      lastPaymentDate: lastPaymentDate.toISOString().split('T')[0],
+      nextPaymentDue: nextPaymentDue.toISOString().split('T')[0]
     });
   }
   

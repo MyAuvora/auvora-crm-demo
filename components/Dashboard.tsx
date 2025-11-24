@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllMembers, getAllLeads, getAllClasses, getAllBookings, getAllTransactions, getAllStaff, getAllWaitlist, getAllProducts } from '@/lib/dataStore';
-import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X } from 'lucide-react';
+import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X, AlertCircle, CreditCard } from 'lucide-react';
 import { Class } from '@/lib/types';
 import { Transaction } from '@/lib/dataStore';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [paymentProcessing, setPaymentProcessing] = useState<Record<string, 'processing' | 'complete' | 'incomplete'>>({});
   
   const locationMembers = getAllMembers().filter(m => m.location === location);
   const locationLeads = getAllLeads().filter(l => l.location === location);
@@ -41,6 +42,8 @@ export default function Dashboard() {
   
   const totalActiveMembers = locationMembers.length;
   
+  const missedPayments = locationMembers.filter(m => m.paymentStatus === 'overdue');
+  
   const allTransactions = getAllTransactions().filter(t => t.location === location);
   const now = new Date();
   const currentMonth = now.toISOString().slice(0, 7);
@@ -59,8 +62,32 @@ export default function Dashboard() {
     "Instagram is your top lead source this month."
   ];
   
+  const handleProcessPayment = (memberId: string) => {
+    setPaymentProcessing(prev => ({ ...prev, [memberId]: 'processing' }));
+    
+    setTimeout(() => {
+      const success = Math.random() > 0.2;
+      setPaymentProcessing(prev => ({ 
+        ...prev, 
+        [memberId]: success ? 'complete' : 'incomplete' 
+      }));
+    }, 1500);
+  };
+  
   const getMetricDetails = (metric: string) => {
     switch(metric) {
+      case 'missed-payments':
+        return {
+          title: "Missed Payments",
+          items: missedPayments.map(m => ({ 
+            id: m.id, 
+            text: `${m.name} - ${m.membershipType} (Due: ${m.nextPaymentDue})`,
+            hasActions: true
+          })),
+          clickable: true,
+          isMember: true,
+          hasPaymentActions: true
+        };
       case 'checkins':
         const checkedInBookings = allBookings.filter(b => 
           b.status === 'checked-in' && 
@@ -275,6 +302,21 @@ export default function Dashboard() {
             </div>
           </div>
         </button>
+        
+        <button 
+          onClick={() => setSelectedMetric('missed-payments')}
+          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Missed Payments</p>
+              <p className="text-3xl font-bold text-red-600 mt-2">{missedPayments.length}</p>
+            </div>
+            <div className="bg-red-100 p-3 rounded-full">
+              <AlertCircle className="text-red-600" size={24} />
+            </div>
+          </div>
+        </button>
       </div>
       
       {selectedMetric && (
@@ -321,10 +363,67 @@ export default function Dashboard() {
                   <ul className="space-y-2">
                     {getMetricDetails(selectedMetric).items.map((item, i) => {
                       const isClickable = getMetricDetails(selectedMetric).clickable && typeof item === 'object' && 'id' in item;
+                      const hasPaymentActions = getMetricDetails(selectedMetric).hasPaymentActions;
+                      
                       if (isClickable) {
-                        const clickableItem = item as { id: string; text: string };
+                        const clickableItem = item as { id: string; text: string; hasActions?: boolean };
                         const isMember = getMetricDetails(selectedMetric).isMember;
                         const isLead = getMetricDetails(selectedMetric).isLead;
+                        const processingStatus = paymentProcessing[clickableItem.id];
+                        
+                        if (hasPaymentActions && clickableItem.hasActions) {
+                          return (
+                            <li key={i} className="p-3 bg-gray-50 rounded border border-gray-200">
+                              <div className="flex items-center justify-between gap-3">
+                                <button
+                                  onClick={() => {
+                                    setSelectedMetric(null);
+                                    navigateToMember(clickableItem.id);
+                                  }}
+                                  className="flex-1 text-left text-gray-900 hover:text-red-600 transition-colors font-medium"
+                                >
+                                  {clickableItem.text}
+                                </button>
+                                <button
+                                  onClick={() => handleProcessPayment(clickableItem.id)}
+                                  disabled={processingStatus === 'processing' || processingStatus === 'complete'}
+                                  className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 min-w-[120px] justify-center ${
+                                    processingStatus === 'complete' 
+                                      ? 'bg-green-600 text-white cursor-default' 
+                                      : processingStatus === 'incomplete'
+                                      ? 'bg-red-600 text-white hover:bg-red-700'
+                                      : processingStatus === 'processing'
+                                      ? 'bg-gray-400 text-white cursor-wait'
+                                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                                  }`}
+                                >
+                                  {processingStatus === 'processing' ? (
+                                    <>
+                                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                                      Processing
+                                    </>
+                                  ) : processingStatus === 'complete' ? (
+                                    <>
+                                      <CreditCard size={16} />
+                                      Complete
+                                    </>
+                                  ) : processingStatus === 'incomplete' ? (
+                                    <>
+                                      <AlertCircle size={16} />
+                                      Incomplete
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CreditCard size={16} />
+                                      Process
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </li>
+                          );
+                        }
+                        
                         return (
                           <li key={i}>
                             <button

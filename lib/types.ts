@@ -18,6 +18,9 @@ export interface Member {
   location: Location;
   joinDate: string;
   visitsLast30Days: number;
+  paymentStatus?: 'current' | 'overdue';
+  lastPaymentDate?: string;
+  nextPaymentDue?: string;
 }
 
 export interface ClassPackClient {
