@@ -17,23 +17,35 @@ import AuvoraChat from '@/components/AuvoraChat';
 type Section = 'dashboard' | 'leads-members' | 'pipeline' | 'schedule' | 'staff' | 'pos' | 'reports' | 'promotions' | 'kiosk';
 
 export default function CRMApp() {
-  const { location, setLocation } = useApp();
+  const { location, setLocation, userRole, setUserRole } = useApp();
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const locationName = location === 'athletic-club' ? 'Athletic Club' : 'Dance Studio';
+  
+  const getRoleName = (role: string) => {
+    switch(role) {
+      case 'owner': return 'Owner/Admin';
+      case 'manager': return 'Manager';
+      case 'coach': return 'Coach/Trainer';
+      case 'front-desk': return 'Front Desk';
+      default: return 'Owner/Admin';
+    }
+  };
 
-  const navItems = [
-    { id: 'dashboard' as Section, label: 'Dashboard', icon: Home },
-    { id: 'leads-members' as Section, label: 'Leads & Members', icon: Users },
-    { id: 'pipeline' as Section, label: 'Lead Pipeline', icon: GitBranch },
-    { id: 'schedule' as Section, label: 'Schedule', icon: Calendar },
-    { id: 'staff' as Section, label: 'Staff', icon: UserCog },
-    { id: 'pos' as Section, label: 'POS', icon: ShoppingCart },
-    { id: 'reports' as Section, label: 'Reports', icon: TrendingUp },
-    { id: 'promotions' as Section, label: 'Promotions', icon: Tag },
-    { id: 'kiosk' as Section, label: 'Kiosk Mode', icon: Monitor },
+  const allNavItems = [
+    { id: 'dashboard' as Section, label: 'Dashboard', icon: Home, roles: ['owner', 'manager', 'coach', 'front-desk'] },
+    { id: 'leads-members' as Section, label: 'Leads & Members', icon: Users, roles: ['owner', 'manager', 'front-desk'] },
+    { id: 'pipeline' as Section, label: 'Lead Pipeline', icon: GitBranch, roles: ['owner', 'manager'] },
+    { id: 'schedule' as Section, label: 'Schedule', icon: Calendar, roles: ['owner', 'manager', 'coach', 'front-desk'] },
+    { id: 'staff' as Section, label: 'Staff', icon: UserCog, roles: ['owner', 'manager'] },
+    { id: 'pos' as Section, label: 'POS', icon: ShoppingCart, roles: ['owner', 'manager', 'front-desk'] },
+    { id: 'reports' as Section, label: 'Reports', icon: TrendingUp, roles: ['owner', 'manager'] },
+    { id: 'promotions' as Section, label: 'Promotions', icon: Tag, roles: ['owner', 'manager'] },
+    { id: 'kiosk' as Section, label: 'Kiosk Mode', icon: Monitor, roles: ['front-desk'] },
   ];
+  
+  const navItems = allNavItems.filter(item => item.roles.includes(userRole));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -46,13 +58,17 @@ export default function CRMApp() {
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <Image
-              src="/thelab-logo.png"
-              alt="The LAB Tampa"
-              width={120}
-              height={40}
-              className="h-10 w-auto"
-            />
+            <div className="flex items-center gap-2">
+              <Image
+                src="https://thelabtampa.com/wp-content/uploads/2025/01/The-LAB-Logo-White-1.png"
+                alt="The LAB Tampa"
+                width={120}
+                height={40}
+                className="h-10 w-auto object-contain"
+                unoptimized
+              />
+              <span className="text-xl font-bold hidden sm:block">The LAB Tampa</span>
+            </div>
           </div>
           
           <div className="flex items-center gap-4">
@@ -65,8 +81,19 @@ export default function CRMApp() {
               <option value="dance-studio">Dance Studio</option>
             </select>
             
-            <div className="hidden md:block text-sm text-gray-400">
-              Logged in as: <span className="text-white font-medium">Owner/Manager</span>
+            <select
+              value={userRole}
+              onChange={(e) => setUserRole(e.target.value as 'owner' | 'manager' | 'coach' | 'front-desk')}
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600"
+            >
+              <option value="owner">Owner/Admin</option>
+              <option value="manager">Manager</option>
+              <option value="coach">Coach/Trainer</option>
+              <option value="front-desk">Front Desk</option>
+            </select>
+            
+            <div className="hidden lg:block text-sm text-gray-400">
+              Logged in as: <span className="text-white font-medium">{getRoleName(userRole)}</span>
             </div>
           </div>
         </div>
