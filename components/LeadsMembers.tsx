@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllLeads, getAllMembers, getAllClassPackClients, updateLeadStatus, getLeadNotes, getLeadTasks } from '@/lib/dataStore';
-import { Search, X, Snowflake, XCircle, Plus } from 'lucide-react';
+import { Search, X, Snowflake, XCircle, Plus, MessageSquare } from 'lucide-react';
 import { Member, ClassPackClient, Lead } from '@/lib/types';
 import FreezeModal from './FreezeModal';
 import CancelModal from './CancelModal';
 import AddNoteModal from './AddNoteModal';
 import AddTaskModal from './AddTaskModal';
+import SendTextModal from './SendTextModal';
 
 type Tab = 'leads' | 'members';
 
@@ -25,6 +26,7 @@ export default function LeadsMembers() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showAddNoteModal, setShowAddNoteModal] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [showSendTextModal, setShowSendTextModal] = useState(false);
   
   useEffect(() => {
     if (deepLink) {
@@ -272,7 +274,7 @@ export default function LeadsMembers() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{selectedItem.name}</h3>
                 
                 {activeTab === 'leads' && 'status' in selectedItem && (
-                  <div className="mb-4 flex gap-2">
+                  <div className="mb-4 flex gap-2 flex-wrap">
                     <select
                       value={selectedItem.status}
                       onChange={(e) => {
@@ -289,6 +291,13 @@ export default function LeadsMembers() {
                       <option value="trial-no-join">Trial - No Join</option>
                       <option value="cancelled">Cancelled</option>
                     </select>
+                    <button
+                      onClick={() => setShowSendTextModal(true)}
+                      className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                    >
+                      <MessageSquare size={16} />
+                      Send Text
+                    </button>
                     <button
                       onClick={() => {
                         setShowAddNoteModal(true);
@@ -311,7 +320,14 @@ export default function LeadsMembers() {
                 )}
 
                 {activeTab === 'members' && 'type' in selectedItem && selectedItem.type === 'membership' && 'status' in selectedItem && selectedItem.status === 'active' && (
-                  <div className="mb-4 flex gap-2">
+                  <div className="mb-4 flex gap-2 flex-wrap">
+                    <button
+                      onClick={() => setShowSendTextModal(true)}
+                      className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                    >
+                      <MessageSquare size={16} />
+                      Send Text
+                    </button>
                     <button
                       onClick={() => setShowFreezeModal(true)}
                       className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
@@ -325,6 +341,18 @@ export default function LeadsMembers() {
                     >
                       <XCircle size={16} />
                       Cancel Membership
+                    </button>
+                  </div>
+                )}
+                
+                {activeTab === 'members' && 'type' in selectedItem && selectedItem.type === 'class-pack' && (
+                  <div className="mb-4 flex gap-2 flex-wrap">
+                    <button
+                      onClick={() => setShowSendTextModal(true)}
+                      className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                    >
+                      <MessageSquare size={16} />
+                      Send Text
                     </button>
                   </div>
                 )}
@@ -480,6 +508,14 @@ export default function LeadsMembers() {
                       setSelectedItem(null);
                       setTimeout(() => setSelectedItem(getAllLeads().find(l => l.id === selectedItem.id) || null), 100);
                     }}
+                  />
+                )}
+
+                {showSendTextModal && (
+                  <SendTextModal
+                    recipientName={selectedItem.name}
+                    recipientPhone={selectedItem.phone}
+                    onClose={() => setShowSendTextModal(false)}
                   />
                 )}
               </div>
