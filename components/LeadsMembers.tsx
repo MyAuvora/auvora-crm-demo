@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllLeads, getAllMembers, getAllClassPackClients, updateLeadStatus, getLeadNotes, getLeadTasks } from '@/lib/dataStore';
 import { Search, X, Snowflake, XCircle, Plus } from 'lucide-react';
@@ -13,7 +13,7 @@ import AddTaskModal from './AddTaskModal';
 type Tab = 'leads' | 'members';
 
 export default function LeadsMembers() {
-  const { location } = useApp();
+  const { location, deepLink, setDeepLink } = useApp();
   const [activeTab, setActiveTab] = useState<Tab>('leads');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -25,6 +25,30 @@ export default function LeadsMembers() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showAddNoteModal, setShowAddNoteModal] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  
+  useEffect(() => {
+    if (deepLink) {
+      const handleDeepLink = () => {
+        if (deepLink.type === 'member') {
+          const allMembers = [...getAllMembers(), ...getAllClassPackClients()];
+          const member = allMembers.find(m => m.id === deepLink.id);
+          if (member) {
+            setActiveTab('members');
+            setSelectedItem(member);
+          }
+        } else if (deepLink.type === 'lead') {
+          const lead = getAllLeads().find(l => l.id === deepLink.id);
+          if (lead) {
+            setActiveTab('leads');
+            setSelectedItem(lead);
+          }
+        }
+        setDeepLink(null);
+      };
+      
+      setTimeout(handleDeepLink, 0);
+    }
+  }, [deepLink, setDeepLink]);
 
   const locationLeads = getAllLeads().filter(l => l.location === location);
   const locationMembers = getAllMembers().filter(m => m.location === location);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useApp } from '@/lib/context';
+import { useApp, Section } from '@/lib/context';
 import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor } from 'lucide-react';
 import Dashboard from '@/components/Dashboard';
 import LeadsMembers from '@/components/LeadsMembers';
@@ -13,11 +13,8 @@ import Reports from '@/components/Reports';
 import Promotions from '@/components/Promotions';
 import AuvoraChat from '@/components/AuvoraChat';
 
-type Section = 'dashboard' | 'leads-members' | 'pipeline' | 'schedule' | 'staff' | 'pos' | 'reports' | 'promotions' | 'kiosk';
-
 export default function CRMApp() {
-  const { location, setLocation, userRole, setUserRole } = useApp();
-  const [activeSection, setActiveSection] = useState<Section>('dashboard');
+  const { location, setLocation, userRole, setUserRole, activeSection, setActiveSection } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const locationName = location === 'athletic-club' ? 'Athletic Club' : 'Dance Studio';

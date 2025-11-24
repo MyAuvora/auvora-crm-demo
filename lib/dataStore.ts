@@ -193,6 +193,40 @@ function generateSampleRevenue(): Transaction[] {
   return transactions;
 }
 
+function generateSampleBookings(): Booking[] {
+  const bookings: Booking[] = [];
+  const classes = seedClasses;
+  const members = seedMembers;
+  const packClients = seedClassPackClients;
+  const allClients = [...members, ...packClients];
+  
+  const today = new Date();
+  const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][today.getDay()];
+  const todayClasses = classes.filter(c => c.dayOfWeek === dayOfWeek);
+  
+  todayClasses.forEach(cls => {
+    const numBookings = Math.min(Math.floor(Math.random() * (cls.capacity - 2)) + 3, cls.capacity);
+    const locationClients = allClients.filter(c => c.location === cls.location);
+    
+    for (let i = 0; i < numBookings && i < locationClients.length; i++) {
+      const client = locationClients[i];
+      const isCheckedIn = Math.random() > 0.3;
+      
+      bookings.push({
+        id: `booking-sample-${cls.id}-${i}`,
+        classId: cls.id,
+        memberId: client.id,
+        memberName: client.name,
+        status: isCheckedIn ? 'checked-in' : 'booked',
+        bookedAt: new Date(today.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+        checkedInAt: isCheckedIn ? new Date(today.getTime() - 60 * 60 * 1000).toISOString() : undefined,
+      });
+    }
+  });
+  
+  return bookings;
+}
+
 function initializeStore(): DataStore {
   if (typeof window === 'undefined') {
     return {
@@ -226,6 +260,10 @@ function initializeStore(): DataStore {
           parsed.transactions = [...parsed.transactions, ...generateSampleRevenue()];
           saveStore(parsed);
         }
+        if (parsed.bookings.length === 0 || !parsed.bookings.some((b: Booking) => b.id.startsWith('booking-sample-'))) {
+          parsed.bookings = [...parsed.bookings, ...generateSampleBookings()];
+          saveStore(parsed);
+        }
         return parsed;
       }
     }
@@ -242,7 +280,7 @@ function initializeStore(): DataStore {
     classes: seedClasses,
     promotions: seedPromotions,
     products: seedProducts,
-    bookings: [],
+    bookings: generateSampleBookings(),
     waitlist: [],
     transactions: generateSampleRevenue(),
     auditLog: [],

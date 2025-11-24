@@ -4,6 +4,12 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Location } from './types';
 
 export type UserRole = 'owner' | 'manager' | 'coach' | 'front-desk';
+export type Section = 'dashboard' | 'leads-members' | 'pipeline' | 'schedule' | 'staff' | 'pos' | 'reports' | 'promotions' | 'kiosk';
+
+export interface DeepLink {
+  type: 'member' | 'lead' | 'class';
+  id: string;
+}
 
 interface AppContextType {
   location: Location;
@@ -12,6 +18,12 @@ interface AppContextType {
   setChatOpen: (open: boolean) => void;
   userRole: UserRole;
   setUserRole: (role: UserRole) => void;
+  activeSection: Section;
+  setActiveSection: (section: Section) => void;
+  deepLink: DeepLink | null;
+  setDeepLink: (link: DeepLink | null) => void;
+  navigateToMember: (memberId: string) => void;
+  navigateToLead: (leadId: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -20,9 +32,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [location, setLocation] = useState<Location>('athletic-club');
   const [chatOpen, setChatOpen] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>('owner');
+  const [activeSection, setActiveSection] = useState<Section>('dashboard');
+  const [deepLink, setDeepLink] = useState<DeepLink | null>(null);
+
+  const navigateToMember = (memberId: string) => {
+    setDeepLink({ type: 'member', id: memberId });
+    setActiveSection('leads-members');
+  };
+
+  const navigateToLead = (leadId: string) => {
+    setDeepLink({ type: 'lead', id: leadId });
+    setActiveSection('leads-members');
+  };
 
   return (
-    <AppContext.Provider value={{ location, setLocation, chatOpen, setChatOpen, userRole, setUserRole }}>
+    <AppContext.Provider value={{ 
+      location, 
+      setLocation, 
+      chatOpen, 
+      setChatOpen, 
+      userRole, 
+      setUserRole,
+      activeSection,
+      setActiveSection,
+      deepLink,
+      setDeepLink,
+      navigateToMember,
+      navigateToLead
+    }}>
       {children}
     </AppContext.Provider>
   );

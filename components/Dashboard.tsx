@@ -6,11 +6,13 @@ import { getAllMembers, getAllLeads, getAllClasses, getAllBookings, getAllTransa
 import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X } from 'lucide-react';
 import { Class } from '@/lib/types';
 import { Transaction } from '@/lib/dataStore';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 export default function Dashboard() {
-  const { location } = useApp();
+  const { location, navigateToMember, navigateToLead } = useApp();
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
   const locationMembers = getAllMembers().filter(m => m.location === location);
   const locationLeads = getAllLeads().filter(l => l.location === location);
@@ -85,35 +87,36 @@ export default function Dashboard() {
       case 'members':
         return {
           title: "Active Members (Membership Holders Only)",
-          items: locationMembers.map(m => `${m.name} - ${m.membershipType} (${m.status})`)
+          items: locationMembers.map(m => ({ id: m.id, text: `${m.name} - ${m.membershipType} (${m.status})` })),
+          clickable: true,
+          isMember: true
         };
       case 'mtd':
         return {
-          title: "Month-to-Date Revenue Breakdown",
-          items: generateRevenueBreakdown(monthTransactions),
-          isRevenue: true
+          title: "Month-to-Date Revenue by Category",
+          items: generateRevenueByCategory(monthTransactions),
+          isChart: true
         };
       case 'ytd':
         return {
-          title: "Year-to-Date Revenue Breakdown",
-          items: generateRevenueBreakdown(yearTransactions),
-          isRevenue: true
+          title: "Year-to-Date Revenue by Category",
+          items: generateRevenueByCategory(yearTransactions),
+          isChart: true
         };
       default:
         return { title: '', items: [] };
     }
   };
   
-  const generateRevenueBreakdown = (transactions: Transaction[]) => {
+  const generateRevenueByCategory = (transactions: Transaction[]) => {
     const allProducts = getAllProducts();
-    const byDate: { [date: string]: { membership: number; classPack: number; retail: number; total: number } } = {};
+    const categories: { [key: string]: number } = {
+      'Memberships': 0,
+      'Class Packs': 0,
+      'Retail': 0
+    };
     
     transactions.forEach(t => {
-      const date = t.timestamp.split('T')[0];
-      if (!byDate[date]) {
-        byDate[date] = { membership: 0, classPack: 0, retail: 0, total: 0 };
-      }
-      
       t.items.forEach(item => {
         const product = allProducts.find(p => p.id === item.productId);
         const category = product?.category || 
@@ -123,32 +126,51 @@ export default function Dashboard() {
         const amount = item.price * item.quantity;
         
         if (category === 'membership') {
-          byDate[date].membership += amount;
+          categories['Memberships'] += amount;
         } else if (category === 'class-pack') {
-          byDate[date].classPack += amount;
+          categories['Class Packs'] += amount;
         } else {
-          byDate[date].retail += amount;
+          categories['Retail'] += amount;
         }
-        byDate[date].total += amount;
       });
     });
     
-    const sortedDates = Object.keys(byDate).sort();
-    let runningTotal = 0;
-    
-    return sortedDates.map(date => {
-      const data = byDate[date];
-      runningTotal += data.total;
-      return {
-        date,
-        membership: data.membership,
-        classPack: data.classPack,
-        retail: data.retail,
-        dayTotal: data.total,
-        runningTotal
-      };
-    });
+    return [
+      { name: 'Memberships', value: categories['Memberships'], color: '#AC1305' },
+      { name: 'Class Packs', value: categories['Class Packs'], color: '#EAB308' },
+      { name: 'Retail', value: categories['Retail'], color: '#10B981' }
+    ].filter(item => item.value > 0);
   };
+  
+  const getCategoryPurchasers = (category: string, transactions: Transaction[]) => {
+    const allProducts = getAllProducts();
+    const purchasers: { [key: string]: { name: string; total: number; memberId?: string } } = {};
+    
+    transactions.forEach(t => {
+      t.items.forEach(item => {
+        const product = allProducts.find(p => p.id === item.productId);
+        const itemCategory = product?.category || 
+          (item.productId.includes('membership') ? 'membership' : 
+           item.productId.includes('pack') ? 'class-pack' : 'retail');
+        
+        let matches = false;
+        if (category === 'Memberships' && itemCategory === 'membership') matches = true;
+        if (category === 'Class Packs' && itemCategory === 'class-pack') matches = true;
+        if (category === 'Retail' && itemCategory === 'retail') matches = true;
+        
+        if (matches) {
+          const key = t.memberName || 'Guest';
+          if (!purchasers[key]) {
+            purchasers[key] = { name: key, total: 0, memberId: t.memberId };
+          }
+          purchasers[key].total += item.price * item.quantity;
+        }
+      });
+    });
+    
+    return Object.values(purchasers).sort((a, b) => b.total - a.total);
+  };
+  
 
   return (
     <div className="space-y-6">
@@ -248,40 +270,31 @@ export default function Dashboard() {
             </div>
             <div className="p-6 overflow-y-auto max-h-[60vh]">
               {getMetricDetails(selectedMetric).items.length > 0 ? (
-                getMetricDetails(selectedMetric).isRevenue ? (
-                  <div className="space-y-4">
-                    {(getMetricDetails(selectedMetric).items as Array<{date: string; membership: number; classPack: number; retail: number; dayTotal: number; runningTotal: number}>).map((item, i: number) => (
-                      <div key={i} className="p-4 bg-gray-50 rounded border border-gray-200">
-                        <div className="flex justify-between items-center mb-2">
-                          <h4 className="font-bold text-gray-900">{item.date}</h4>
-                          <span className="text-lg font-bold text-gray-900">${item.dayTotal.toFixed(2)}</span>
-                        </div>
-                        <div className="space-y-1 text-sm">
-                          {item.membership > 0 && (
-                            <div className="flex justify-between text-gray-700">
-                              <span>Memberships:</span>
-                              <span className="font-medium">${item.membership.toFixed(2)}</span>
-                            </div>
-                          )}
-                          {item.classPack > 0 && (
-                            <div className="flex justify-between text-gray-700">
-                              <span>Class Packs:</span>
-                              <span className="font-medium">${item.classPack.toFixed(2)}</span>
-                            </div>
-                          )}
-                          {item.retail > 0 && (
-                            <div className="flex justify-between text-gray-700">
-                              <span>Retail:</span>
-                              <span className="font-medium">${item.retail.toFixed(2)}</span>
-                            </div>
-                          )}
-                          <div className="flex justify-between text-gray-600 text-xs pt-1 border-t border-gray-300 mt-2">
-                            <span>Running Total:</span>
-                            <span className="font-bold">${item.runningTotal.toFixed(2)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                getMetricDetails(selectedMetric).isChart ? (
+                  <div>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={getMetricDetails(selectedMetric).items as Array<{name: string; value: number; color: string}>}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, value }) => `${name}: $${value.toFixed(0)}`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                          onClick={(data) => setSelectedCategory(data.name)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {(getMetricDetails(selectedMetric).items as Array<{name: string; value: number; color: string}>).map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <p className="text-sm text-gray-600 text-center mt-4">Click on a category to see purchasers</p>
                   </div>
                 ) : (
                   <ul className="space-y-2">
@@ -289,11 +302,17 @@ export default function Dashboard() {
                       const isClickable = getMetricDetails(selectedMetric).clickable && typeof item === 'object' && 'id' in item;
                       if (isClickable) {
                         const clickableItem = item as { id: string; text: string };
+                        const isMember = getMetricDetails(selectedMetric).isMember;
                         return (
                           <li key={i}>
                             <button
                               onClick={() => {
-                                console.log('Navigate to lead:', clickableItem.id);
+                                setSelectedMetric(null);
+                                if (isMember) {
+                                  navigateToMember(clickableItem.id);
+                                } else {
+                                  navigateToLead(clickableItem.id);
+                                }
                               }}
                               className="w-full text-left p-3 bg-gray-50 rounded border border-gray-200 text-gray-900 hover:bg-gray-100 transition-colors"
                             >
@@ -360,6 +379,59 @@ export default function Dashboard() {
         )}
       </div>
       
+      {selectedCategory && selectedMetric && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">{selectedCategory} Purchasers</h3>
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[60vh]">
+              {(() => {
+                const transactions = selectedMetric === 'mtd' ? monthTransactions : yearTransactions;
+                const purchasers = getCategoryPurchasers(selectedCategory, transactions);
+                
+                return (
+                  <ul className="space-y-2">
+                    {purchasers.map((purchaser, i) => (
+                      <li key={i}>
+                        {purchaser.memberId ? (
+                          <button
+                            onClick={() => {
+                              setSelectedCategory(null);
+                              setSelectedMetric(null);
+                              navigateToMember(purchaser.memberId!);
+                            }}
+                            className="w-full text-left p-3 bg-gray-50 rounded border border-gray-200 text-gray-900 hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium">{purchaser.name}</span>
+                              <span className="text-gray-600">${purchaser.total.toFixed(2)}</span>
+                            </div>
+                          </button>
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded border border-gray-200 text-gray-900">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium">{purchaser.name}</span>
+                              <span className="text-gray-600">${purchaser.total.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+      
       {selectedClass && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
@@ -386,8 +458,16 @@ export default function Dashboard() {
                         <h4 className="font-bold text-gray-900 mb-2">Checked In ({checkedInBookings.length})</h4>
                         <ul className="space-y-2">
                           {checkedInBookings.map((booking, i) => (
-                            <li key={i} className="p-3 bg-green-50 rounded border border-green-200 text-gray-900">
-                              {booking.memberName}
+                            <li key={i}>
+                              <button
+                                onClick={() => {
+                                  setSelectedClass(null);
+                                  navigateToMember(booking.memberId);
+                                }}
+                                className="w-full text-left p-3 bg-green-50 rounded border border-green-200 text-gray-900 hover:bg-green-100 transition-colors"
+                              >
+                                {booking.memberName}
+                              </button>
                             </li>
                           ))}
                         </ul>
@@ -399,8 +479,16 @@ export default function Dashboard() {
                         <h4 className="font-bold text-gray-900 mb-2">Booked (Not Checked In) ({bookedNotCheckedIn.length})</h4>
                         <ul className="space-y-2">
                           {bookedNotCheckedIn.map((booking, i) => (
-                            <li key={i} className="p-3 bg-blue-50 rounded border border-blue-200 text-gray-900">
-                              {booking.memberName}
+                            <li key={i}>
+                              <button
+                                onClick={() => {
+                                  setSelectedClass(null);
+                                  navigateToMember(booking.memberId);
+                                }}
+                                className="w-full text-left p-3 bg-blue-50 rounded border border-blue-200 text-gray-900 hover:bg-blue-100 transition-colors"
+                              >
+                                {booking.memberName}
+                              </button>
                             </li>
                           ))}
                         </ul>
@@ -412,8 +500,16 @@ export default function Dashboard() {
                         <h4 className="font-bold text-gray-900 mb-2">Waitlist ({waitlistEntries.length})</h4>
                         <ul className="space-y-2">
                           {waitlistEntries.map((entry, i) => (
-                            <li key={i} className="p-3 bg-yellow-50 rounded border border-yellow-200 text-gray-900">
-                              {entry.memberName}
+                            <li key={i}>
+                              <button
+                                onClick={() => {
+                                  setSelectedClass(null);
+                                  navigateToMember(entry.memberId);
+                                }}
+                                className="w-full text-left p-3 bg-yellow-50 rounded border border-yellow-200 text-gray-900 hover:bg-yellow-100 transition-colors"
+                              >
+                                {entry.memberName}
+                              </button>
                             </li>
                           ))}
                         </ul>
