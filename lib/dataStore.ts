@@ -227,6 +227,40 @@ function generateSampleBookings(): Booking[] {
   return bookings;
 }
 
+function migratePaymentFields(members: Member[]): Member[] {
+  const now = new Date();
+  
+  return members.map(m => {
+    if (m.paymentStatus && m.lastPaymentDate && m.nextPaymentDue) {
+      return m;
+    }
+    
+    const joinDate = new Date(m.joinDate);
+    const monthsSinceJoin = Math.max(0, Math.floor((now.getTime() - joinDate.getTime()) / (30 * 24 * 60 * 60 * 1000)));
+    
+    const lastPaymentDate = new Date(joinDate);
+    lastPaymentDate.setMonth(joinDate.getMonth() + monthsSinceJoin);
+    
+    const nextPaymentDue = new Date(lastPaymentDate);
+    nextPaymentDue.setMonth(lastPaymentDate.getMonth() + 1);
+    
+    const memberIdNum = parseInt(m.id.replace(/\D/g, '')) || 0;
+    const isOverdue = (memberIdNum % 100) < 15;
+    
+    if (isOverdue) {
+      const daysOverdue = 5 + ((memberIdNum * 7) % 30);
+      nextPaymentDue.setDate(nextPaymentDue.getDate() - daysOverdue);
+    }
+    
+    return {
+      ...m,
+      paymentStatus: isOverdue ? 'overdue' : 'current',
+      lastPaymentDate: lastPaymentDate.toISOString().split('T')[0],
+      nextPaymentDue: nextPaymentDue.toISOString().split('T')[0]
+    };
+  });
+}
+
 function initializeStore(): DataStore {
   if (typeof window === 'undefined') {
     return {
@@ -256,14 +290,27 @@ function initializeStore(): DataStore {
     if (stored) {
       const parsed = JSON.parse(stored) as DataStore;
       if (parsed.version === STORAGE_VERSION) {
+        let needsSave = false;
+        
         if (parsed.transactions.length === 0 || !parsed.transactions.some((t: Transaction) => t.id.startsWith('txn-sample-'))) {
           parsed.transactions = [...parsed.transactions, ...generateSampleRevenue()];
-          saveStore(parsed);
+          needsSave = true;
         }
         if (parsed.bookings.length === 0 || !parsed.bookings.some((b: Booking) => b.id.startsWith('booking-sample-'))) {
           parsed.bookings = [...parsed.bookings, ...generateSampleBookings()];
+          needsSave = true;
+        }
+        
+        const migratedMembers = migratePaymentFields(parsed.members);
+        if (migratedMembers.some((m, i) => m !== parsed.members[i])) {
+          parsed.members = migratedMembers;
+          needsSave = true;
+        }
+        
+        if (needsSave) {
           saveStore(parsed);
         }
+        
         return parsed;
       }
     }
