@@ -103,6 +103,27 @@ export default function Dashboard() {
           items: generateRevenueByCategory(yearTransactions),
           isChart: true
         };
+      case 'month-leads':
+        return {
+          title: "New Leads This Month",
+          items: monthLeads.map(l => ({ id: l.id, text: `${l.name} - ${l.source} (${l.status})` })),
+          clickable: true,
+          isLead: true
+        };
+      case 'new-joins':
+        return {
+          title: "New Joins This Month",
+          items: locationMembers.filter(m => m.joinDate.startsWith(thisMonth)).map(m => ({ id: m.id, text: `${m.name} - ${m.membershipType} (Joined: ${m.joinDate})` })),
+          clickable: true,
+          isMember: true
+        };
+      case 'cancellations':
+        return {
+          title: "Cancellations This Month",
+          items: locationLeads.filter(l => l.status === 'cancelled' && l.createdDate.startsWith(thisMonth)).map(l => ({ id: l.id, text: `${l.name} - ${l.source} (Cancelled)` })),
+          clickable: true,
+          isLead: true
+        };
       default:
         return { title: '', items: [] };
     }
@@ -303,6 +324,7 @@ export default function Dashboard() {
                       if (isClickable) {
                         const clickableItem = item as { id: string; text: string };
                         const isMember = getMetricDetails(selectedMetric).isMember;
+                        const isLead = getMetricDetails(selectedMetric).isLead;
                         return (
                           <li key={i}>
                             <button
@@ -310,7 +332,7 @@ export default function Dashboard() {
                                 setSelectedMetric(null);
                                 if (isMember) {
                                   navigateToMember(clickableItem.id);
-                                } else {
+                                } else if (isLead) {
                                   navigateToLead(clickableItem.id);
                                 }
                               }}
@@ -531,18 +553,27 @@ export default function Dashboard() {
         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
           <h2 className="text-xl font-bold text-gray-900 mb-4">This Month</h2>
           <div className="space-y-4">
-            <div className="flex justify-between items-center py-3 border-b border-gray-100">
+            <button
+              onClick={() => setSelectedMetric('month-leads')}
+              className="w-full flex justify-between items-center py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors rounded px-2"
+            >
               <span className="text-gray-600">New Leads</span>
               <span className="text-2xl font-bold text-gray-900">{monthLeads.length}</span>
-            </div>
-            <div className="flex justify-between items-center py-3 border-b border-gray-100">
+            </button>
+            <button
+              onClick={() => setSelectedMetric('new-joins')}
+              className="w-full flex justify-between items-center py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors rounded px-2"
+            >
               <span className="text-gray-600">New Joins</span>
               <span className="text-2xl font-bold text-green-600">{newJoins}</span>
-            </div>
-            <div className="flex justify-between items-center py-3">
+            </button>
+            <button
+              onClick={() => setSelectedMetric('cancellations')}
+              className="w-full flex justify-between items-center py-3 hover:bg-gray-50 transition-colors rounded px-2"
+            >
               <span className="text-gray-600">Cancellations</span>
               <span className="text-2xl font-bold text-red-600">{cancellations}</span>
-            </div>
+            </button>
           </div>
         </div>
 
