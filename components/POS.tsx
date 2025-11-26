@@ -6,6 +6,8 @@ import { getAllProducts, getAllMembers, getAllClassPackClients, createTransactio
 import { ShoppingCart, AlertTriangle, Receipt, Tag, FileText, DollarSign, X } from 'lucide-react';
 import { Product } from '@/lib/types';
 import { hasPermission, getPermissionError } from '@/lib/permissions';
+import { useToast } from '@/lib/useToast';
+import ConfirmDialog from './ConfirmDialog';
 
 type CartItem = {
   product: Product;
@@ -14,6 +16,7 @@ type CartItem = {
 
 export default function POS() {
   const { location, userRole } = useApp();
+  const { success, error, warning } = useToast();
   const [activeTab, setActiveTab] = useState<'pos' | 'inventory' | 'transactions' | 'invoices'>('pos');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
@@ -24,6 +27,7 @@ export default function POS() {
   const [lastTransaction, setLastTransaction] = useState<Transaction | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showRefundModal, setShowRefundModal] = useState(false);
+  const [showConfirmRefund, setShowConfirmRefund] = useState(false);
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
 
@@ -91,13 +95,13 @@ export default function POS() {
         const promoData = promoCodes[code];
         
         if (promoData.status !== 'active') {
-          alert(`Promo code "${code}" is not currently active (Status: ${promoData.status})`);
+          warning(`Promo code "${code}" is not currently active (Status: ${promoData.status})`);
           return;
         }
         
         const today = new Date().toISOString().split('T')[0];
         if (today < promoData.startDate || today > promoData.endDate) {
-          alert(`Promo code "${code}" is not valid for today's date`);
+          warning(`Promo code "${code}" is not valid for today's date`);
           return;
         }
         
@@ -106,11 +110,11 @@ export default function POS() {
         setTimeout(() => setShowSuccess(false), 2000);
         return;
       }
-    } catch (error) {
-      console.error('Error checking promo codes:', error);
+    } catch (err) {
+      console.error('Error checking promo codes:', err);
     }
     
-    alert('Invalid promo code');
+    error('Invalid promo code');
   };
 
   const getTotal = () => {
@@ -171,47 +175,53 @@ export default function POS() {
     setLastTransaction(transaction);
     setSelectedInvoice(invoice);
     setShowReceipt(true);
-    setShowSuccess(true);
     setCart([]);
     setSelectedMember('');
     setPromoCode('');
     setDiscount(0);
-    setTimeout(() => setShowSuccess(false), 3000);
+    success(`Sale completed! Total: $${total.toFixed(2)}`);
   };
 
   const handleRefund = () => {
     if (!hasPermission(userRole, 'refund:process')) {
-      alert(getPermissionError('refund:process'));
+      error(getPermissionError('refund:process'));
       return;
     }
 
     if (!selectedInvoice || !refundAmount || !refundReason) {
-      alert('Please enter refund amount and reason');
+      warning('Please enter refund amount and reason');
       return;
     }
 
     const amount = parseFloat(refundAmount);
     if (isNaN(amount) || amount <= 0) {
-      alert('Please enter a valid refund amount');
+      error('Please enter a valid refund amount');
       return;
     }
 
     const maxRefund = selectedInvoice.total - selectedInvoice.amountRefunded;
     if (amount > maxRefund) {
-      alert(`Maximum refund amount is $${maxRefund.toFixed(2)}`);
+      error(`Maximum refund amount is $${maxRefund.toFixed(2)}`);
       return;
     }
 
+    setShowConfirmRefund(true);
+  };
+
+  const confirmRefund = () => {
+    if (!selectedInvoice || !refundAmount) return;
+
     try {
+      const amount = parseFloat(refundAmount);
       refundInvoice(selectedInvoice.id, amount, refundReason, 'Owner');
       setShowRefundModal(false);
+      setShowConfirmRefund(false);
       setRefundAmount('');
       setRefundReason('');
       setSelectedInvoice(null);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+      success(`Refund of $${amount.toFixed(2)} processed successfully`);
     } catch {
-      alert('Error processing refund');
+      error('Error processing refund');
     }
   };
 
@@ -853,6 +863,17 @@ export default function POS() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={showConfirmRefund}
+        title="Confirm Refund"
+        message={`Are you sure you want to process a refund of $${refundAmount}? This action cannot be undone.`}
+        confirmText="Process Refund"
+        cancelText="Cancel"
+        confirmVariant="danger"
+        onConfirm={confirmRefund}
+        onCancel={() => setShowConfirmRefund(false)}
+      />
     </div>
   );
 }
