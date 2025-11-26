@@ -7,6 +7,7 @@ import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X, AlertCircle, Cre
 import { Class } from '@/lib/types';
 import { Transaction } from '@/lib/dataStore';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import DashboardOpsFeed from './DashboardOpsFeed';
 
 export default function Dashboard() {
   const { location, navigateToMember, navigateToLead } = useApp();
@@ -247,6 +248,8 @@ export default function Dashboard() {
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600 mt-1">Welcome back! Here&apos;s what&apos;s happening today.</p>
       </div>
+
+      <DashboardOpsFeed />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <button 

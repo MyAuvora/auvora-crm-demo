@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp, Section } from '@/lib/context';
-import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor, MessageSquare, Share2, DollarSign } from 'lucide-react';
+import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor, MessageSquare, Share2, DollarSign, Search } from 'lucide-react';
 import Dashboard from '@/components/Dashboard';
 import LeadsMembers from '@/components/LeadsMembers';
 import LeadPipeline from '@/components/LeadPipeline';
@@ -15,10 +15,28 @@ import Messaging from '@/components/Messaging';
 import SocialMedia from '@/components/SocialMedia';
 import QuickBooksIntegration from '@/components/QuickBooksIntegration';
 import AuvoraChat from '@/components/AuvoraChat';
+import CommandPalette from '@/components/CommandPalette';
 
 export default function CRMApp() {
   const { location, setLocation, userRole, setUserRole, activeSection, setActiveSection } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowCommandPalette(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleNavigate = (section: string) => {
+    setActiveSection(section as Section);
+  };
 
   const locationName = location === 'athletic-club' ? 'Athletic Club' : 'Dance Studio';
   
@@ -67,6 +85,16 @@ export default function CRMApp() {
           </div>
           
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowCommandPalette(true)}
+              className="bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-700 hover:bg-gray-700 flex items-center gap-2"
+              title="Search (Cmd+K or Ctrl+K)"
+            >
+              <Search size={16} />
+              <span className="hidden md:inline text-sm">Search</span>
+              <kbd className="hidden md:inline px-1.5 py-0.5 bg-gray-700 border border-gray-600 rounded text-xs">⌘K</kbd>
+            </button>
+            
             <select
               value={location}
               onChange={(e) => setLocation(e.target.value as 'athletic-club' | 'dance-studio')}
@@ -146,6 +174,11 @@ export default function CRMApp() {
       </div>
 
       <AuvoraChat />
+      <CommandPalette 
+        isOpen={showCommandPalette} 
+        onClose={() => setShowCommandPalette(false)}
+        onNavigate={handleNavigate}
+      />
     </div>
   );
 }
