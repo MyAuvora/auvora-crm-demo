@@ -65,7 +65,7 @@ export interface Staff {
   id: string;
   name: string;
   email: string;
-  role: 'coach' | 'front-desk' | 'instructor';
+  role: 'coach' | 'front-desk' | 'instructor' | 'manager';
   location: Location;
   specialties?: string[];
   styles?: string[];
