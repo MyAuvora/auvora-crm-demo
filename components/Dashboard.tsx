@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllMembers, getAllLeads, getAllClasses, getAllBookings, getAllTransactions, getAllStaff, getAllWaitlist, getAllProducts } from '@/lib/dataStore';
-import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X, AlertCircle, CreditCard } from 'lucide-react';
+import { getAllMembers, getAllLeads, getAllClasses, getAllBookings, getAllTransactions, getAllStaff, getAllWaitlist, getAllProducts, getAllClassPackClients, getAllRefunds } from '@/lib/dataStore';
+import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X, AlertCircle, CreditCard, Zap, Target, MessageSquare, Package } from 'lucide-react';
 import { Class } from '@/lib/types';
 import { Transaction } from '@/lib/dataStore';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
@@ -48,6 +48,20 @@ export default function Dashboard() {
   const now = new Date();
   const currentMonth = now.toISOString().slice(0, 7);
   const currentYear = now.getFullYear().toString();
+
+  const locationPackClients = getAllClassPackClients().filter(c => c.location === location);
+  const lowPackClients = locationPackClients.filter(c => c.remainingClasses <= 2);
+  
+  const atRiskMembers = locationMembers.filter(m => {
+    const lastVisit = m.lastVisit ? new Date(m.lastVisit) : null;
+    if (!lastVisit) return false;
+    const daysSinceVisit = Math.floor((now.getTime() - lastVisit.getTime()) / (1000 * 60 * 60 * 24));
+    return daysSinceVisit >= 14 && m.status === 'active';
+  });
+
+  const allRefunds = getAllRefunds().filter(ref => ref.location === location);
+  const thisMonthRefunds = allRefunds.filter(ref => ref.refundedAt.startsWith(currentMonth));
+  const refundAmount = thisMonthRefunds.reduce((sum, ref) => sum + ref.amount, 0);
   
   const monthTransactions = allTransactions.filter(t => t.timestamp.startsWith(currentMonth));
   const yearTransactions = allTransactions.filter(t => t.timestamp.startsWith(currentYear));
@@ -696,6 +710,145 @@ export default function Dashboard() {
               </li>
             ))}
           </ul>
+        </div>
+      </div>
+
+      <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg shadow-md border border-red-200 p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Zap className="text-red-600" size={24} />
+          <h2 className="text-xl font-bold text-gray-900">Action Playbooks</h2>
+        </div>
+        <p className="text-sm text-gray-600 mb-6">Quick actions to improve your business metrics</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="bg-red-100 p-2 rounded-lg">
+                <CreditCard className="text-red-600" size={20} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 text-sm">Recover Payments</h3>
+                <p className="text-xs text-gray-600 mt-1">{missedPayments.length} overdue payments</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedMetric('missedPayments')}
+              className="w-full px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Process All
+            </button>
+          </div>
+
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="bg-orange-100 p-2 rounded-lg">
+                <Target className="text-orange-600" size={20} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 text-sm">Re-engage At-Risk</h3>
+                <p className="text-xs text-gray-600 mt-1">{atRiskMembers.length} members inactive 14+ days</p>
+              </div>
+            </div>
+            <button
+              onClick={() => alert('Opening Messaging with at-risk segment...')}
+              className="w-full px-3 py-2 bg-orange-600 text-white text-sm rounded-lg hover:bg-orange-700 transition-colors"
+            >
+              Send Message
+            </button>
+          </div>
+
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <Package className="text-blue-600" size={20} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 text-sm">Refill Class Packs</h3>
+                <p className="text-xs text-gray-600 mt-1">{lowPackClients.length} clients with ≤2 classes left</p>
+              </div>
+            </div>
+            <button
+              onClick={() => alert('Opening POS with pack renewal offer...')}
+              className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Create Offer
+            </button>
+          </div>
+
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="bg-purple-100 p-2 rounded-lg">
+                <MessageSquare className="text-purple-600" size={20} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 text-sm">Review Refunds</h3>
+                <p className="text-xs text-gray-600 mt-1">${refundAmount.toFixed(0)} refunded this month</p>
+              </div>
+            </div>
+            <button
+              onClick={() => alert('Opening refund analysis...')}
+              className="w-full px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              View Details
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
+          <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <Lightbulb className="text-yellow-500" size={20} />
+            Predictive Insights
+          </h3>
+          <div className="space-y-2">
+            {atRiskMembers.length > 10 && (
+              <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                <AlertCircle className="text-orange-600 flex-shrink-0 mt-0.5" size={16} />
+                <div className="flex-1">
+                  <p className="text-sm text-gray-900">
+                    <span className="font-semibold">{atRiskMembers.length} members</span> haven&apos;t visited in 14+ days and may churn soon.
+                  </p>
+                  <button
+                    onClick={() => alert('Opening re-engagement campaign...')}
+                    className="text-sm text-orange-600 hover:text-orange-700 font-medium mt-1"
+                  >
+                    Launch re-engagement campaign →
+                  </button>
+                </div>
+              </div>
+            )}
+            {lowPackClients.length > 5 && (
+              <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <AlertCircle className="text-blue-600 flex-shrink-0 mt-0.5" size={16} />
+                <div className="flex-1">
+                  <p className="text-sm text-gray-900">
+                    <span className="font-semibold">{lowPackClients.length} clients</span> are running low on class packs (≤2 remaining).
+                  </p>
+                  <button
+                    onClick={() => alert('Creating renewal offers...')}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-1"
+                  >
+                    Create renewal offers →
+                  </button>
+                </div>
+              </div>
+            )}
+            {missedPayments.length > 15 && (
+              <div className="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={16} />
+                <div className="flex-1">
+                  <p className="text-sm text-gray-900">
+                    <span className="font-semibold">{missedPayments.length} members</span> have overdue payments totaling ${(missedPayments.length * 150).toFixed(0)}.
+                  </p>
+                  <button
+                    onClick={() => setSelectedMetric('missedPayments')}
+                    className="text-sm text-red-600 hover:text-red-700 font-medium mt-1"
+                  >
+                    Process all payments →
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
