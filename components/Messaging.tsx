@@ -133,6 +133,7 @@ export default function Messaging() {
           recipientId: recipient.id,
           recipientName: recipient.name,
           type: 'sms',
+          recipientType: recipient.type === 'lead' ? 'lead' : 'member',
           template: 'Custom Message',
           message: messageText,
           status: 'sent',
