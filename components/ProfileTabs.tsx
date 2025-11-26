@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { X, CreditCard, Calendar, MessageSquare, FileText, Upload, Download, Trash2 } from 'lucide-react';
+import { X, CreditCard, Calendar, MessageSquare, FileText, Upload, Download, Trash2, Plus, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
-import { getPersonById, getPersonTransactions, getPersonBookings, getPersonCommunications, getPersonTimeline, getAllClasses } from '@/lib/dataStore';
+import { getPersonById, getPersonTransactions, getPersonBookings, getPersonCommunications, getPersonTimeline, getAllClasses, getPaymentMethodsByMember, addPaymentMethod } from '@/lib/dataStore';
 import { Member, ClassPackClient, DropInClient } from '@/lib/types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -17,6 +17,9 @@ interface ProfileTabsProps {
 
 export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTabsProps) {
   const [activeTab, setActiveTab] = useState<Tab>('account');
+  const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
+  const [newCard, setNewCard] = useState({ brand: 'Visa', last4: '', expMonth: '', expYear: '' });
+  const [billingAddress, setBillingAddress] = useState({ street: '', city: '', state: '', zip: '' });
   
   const personData = getPersonById(personId);
   if (!personData) return null;
@@ -26,6 +29,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
   const bookings = getPersonBookings(personId);
   const communications = getPersonCommunications(personId);
   const timeline = getPersonTimeline(personId);
+  const paymentMethods = getPaymentMethodsByMember(personId);
   
   const last30DaysVisits = bookings
     .filter(b => {
@@ -227,40 +231,222 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
           )}
           
           {activeTab === 'billing' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">Transaction History</h3>
-                <button
-                  onClick={() => alert('Charge feature coming soon')}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
-                >
-                  <CreditCard size={16} />
-                  Charge
-                </button>
+            <div className="space-y-6">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Payment Methods</h3>
+                  <button
+                    onClick={() => setShowAddPaymentMethod(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                  >
+                    <Plus size={16} />
+                    Add Card
+                  </button>
+                </div>
+                
+                {showAddPaymentMethod && (
+                  <div className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <h4 className="font-medium mb-3">Add Payment Method</h4>
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Card Brand</label>
+                        <select
+                          value={newCard.brand}
+                          onChange={(e) => setNewCard({ ...newCard, brand: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        >
+                          <option>Visa</option>
+                          <option>Mastercard</option>
+                          <option>Amex</option>
+                          <option>Discover</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Last 4 Digits</label>
+                        <input
+                          type="text"
+                          maxLength={4}
+                          value={newCard.last4}
+                          onChange={(e) => setNewCard({ ...newCard, last4: e.target.value.replace(/\D/g, '') })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          placeholder="1234"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Exp Month</label>
+                        <input
+                          type="text"
+                          maxLength={2}
+                          value={newCard.expMonth}
+                          onChange={(e) => setNewCard({ ...newCard, expMonth: e.target.value.replace(/\D/g, '') })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          placeholder="12"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Exp Year</label>
+                        <input
+                          type="text"
+                          maxLength={4}
+                          value={newCard.expYear}
+                          onChange={(e) => setNewCard({ ...newCard, expYear: e.target.value.replace(/\D/g, '') })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          placeholder="2025"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          if (newCard.last4.length === 4 && newCard.expMonth && newCard.expYear) {
+                            addPaymentMethod({
+                              memberId: personId,
+                              brand: newCard.brand,
+                              last4: newCard.last4,
+                              expMonth: parseInt(newCard.expMonth),
+                              expYear: parseInt(newCard.expYear),
+                              isDefault: paymentMethods.length === 0,
+                              addedAt: new Date().toISOString(),
+                            });
+                            setNewCard({ brand: 'Visa', last4: '', expMonth: '', expYear: '' });
+                            setShowAddPaymentMethod(false);
+                          } else {
+                            alert('Please fill in all card details');
+                          }
+                        }}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                      >
+                        Save Card
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowAddPaymentMethod(false);
+                          setNewCard({ brand: 'Visa', last4: '', expMonth: '', expYear: '' });
+                        }}
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {paymentMethods.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4 border border-gray-200 rounded-lg">No payment methods on file</p>
+                ) : (
+                  <div className="space-y-2">
+                    {paymentMethods.map(pm => (
+                      <div key={pm.id} className="p-4 border border-gray-200 rounded-lg flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <CreditCard className="text-gray-600" size={24} />
+                          <div>
+                            <div className="font-medium">{pm.brand} •••• {pm.last4}</div>
+                            <div className="text-sm text-gray-600">Expires {pm.expMonth}/{pm.expYear}</div>
+                          </div>
+                        </div>
+                        {pm.isDefault && (
+                          <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">Default</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Billing Address</h3>
+                </div>
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                      <input
+                        type="text"
+                        value={billingAddress.street}
+                        onChange={(e) => setBillingAddress({ ...billingAddress, street: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        placeholder="123 Main St"
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                        <input
+                          type="text"
+                          value={billingAddress.city}
+                          onChange={(e) => setBillingAddress({ ...billingAddress, city: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          placeholder="Tampa"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <input
+                          type="text"
+                          value={billingAddress.state}
+                          onChange={(e) => setBillingAddress({ ...billingAddress, state: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          placeholder="FL"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
+                        <input
+                          type="text"
+                          value={billingAddress.zip}
+                          onChange={(e) => setBillingAddress({ ...billingAddress, zip: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          placeholder="33602"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => alert('Billing address saved!')}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 w-fit"
+                    >
+                      <MapPin size={16} />
+                      Save Address
+                    </button>
+                  </div>
+                </div>
               </div>
               
-              {transactions.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">No transactions found</p>
-              ) : (
-                <div className="space-y-2">
-                  {transactions.map(t => (
-                    <div key={t.id} className="p-4 border border-gray-200 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium">{format(new Date(t.timestamp), 'MMM d, yyyy')}</span>
-                        <span className="font-bold">${t.total.toFixed(2)}</span>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {t.items.map(i => `${i.productName} (${i.quantity})`).join(', ')}
-                      </div>
-                      {t.promoCode && (
-                        <div className="text-sm text-green-600 mt-1">
-                          Promo: {t.promoCode} (-${t.discount.toFixed(2)})
-                        </div>
-                      )}
-                    </div>
-                  ))}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Transaction History</h3>
+                  <button
+                    onClick={() => alert('Charge feature coming soon')}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                  >
+                    <CreditCard size={16} />
+                    Charge
+                  </button>
                 </div>
-              )}
+                
+                {transactions.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">No transactions found</p>
+                ) : (
+                  <div className="space-y-2">
+                    {transactions.map(t => (
+                      <div key={t.id} className="p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">{format(new Date(t.timestamp), 'MMM d, yyyy')}</span>
+                          <span className="font-bold">${t.total.toFixed(2)}</span>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {t.items.map(i => `${i.productName} (${i.quantity})`).join(', ')}
+                        </div>
+                        {t.promoCode && (
+                          <div className="text-sm text-green-600 mt-1">
+                            Promo: {t.promoCode} (-${t.discount.toFixed(2)})
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
           
