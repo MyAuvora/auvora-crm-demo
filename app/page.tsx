@@ -17,11 +17,14 @@ import QuickBooksIntegration from '@/components/QuickBooksIntegration';
 import Settings from '@/components/Settings';
 import AuvoraChat from '@/components/AuvoraChat';
 import CommandPalette from '@/components/CommandPalette';
+import { ToastContainer } from '@/components/Toast';
+import { useToast } from '@/lib/useToast';
 
 export default function CRMApp() {
   const { location, setLocation, userRole, setUserRole, activeSection, setActiveSection } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const { toasts, closeToast } = useToast();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -182,6 +185,7 @@ export default function CRMApp() {
         onClose={() => setShowCommandPalette(false)}
         onNavigate={handleNavigate}
       />
+      <ToastContainer toasts={toasts} onClose={closeToast} />
     </div>
   );
 }
