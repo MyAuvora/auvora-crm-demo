@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { X, CreditCard, Calendar, MessageSquare } from 'lucide-react';
+import { X, CreditCard, Calendar, MessageSquare, FileText, Upload, Download, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { getPersonById, getPersonTransactions, getPersonBookings, getPersonCommunications, getPersonTimeline, getAllClasses } from '@/lib/dataStore';
 import { Member, ClassPackClient, DropInClient } from '@/lib/types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-type Tab = 'account' | 'billing' | 'attendance' | 'messages' | 'timeline';
+type Tab = 'account' | 'billing' | 'attendance' | 'messages' | 'documents' | 'timeline';
 
 interface ProfileTabsProps {
   personId: string;
@@ -102,6 +102,16 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
               }`}
             >
               Messages
+            </button>
+            <button
+              onClick={() => setActiveTab('documents')}
+              className={`px-4 py-3 font-medium ${
+                activeTab === 'documents'
+                  ? 'text-red-600 border-b-2 border-red-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Documents
             </button>
             <button
               onClick={() => setActiveTab('timeline')}
@@ -367,6 +377,122 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                   ))}
                 </div>
               )}
+            </div>
+          )}
+          
+          {activeTab === 'documents' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Documents & Contracts</h3>
+                <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
+                  <Upload size={18} />
+                  Upload Document
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                {/* Sample membership contract */}
+                {type === 'member' && (
+                  <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="bg-red-100 p-2 rounded">
+                          <FileText className="text-red-600" size={24} />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900">Membership Agreement</h4>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Signed on {(person as Member).joinDate}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2">
+                            <span className="text-xs text-gray-500">PDF • 245 KB</span>
+                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Signed</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button className="p-2 hover:bg-gray-200 rounded transition-colors" title="Download">
+                          <Download size={18} className="text-gray-600" />
+                        </button>
+                        <button className="p-2 hover:bg-red-100 rounded transition-colors" title="Delete">
+                          <Trash2 size={18} className="text-red-600" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Sample waiver */}
+                <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className="bg-blue-100 p-2 rounded">
+                        <FileText className="text-blue-600" size={24} />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900">Liability Waiver</h4>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Signed on {type === 'member' ? (person as Member).joinDate : type === 'class-pack' ? (person as ClassPackClient).purchaseDate : (person as DropInClient).firstVisit}
+                        </p>
+                        <div className="flex items-center gap-4 mt-2">
+                          <span className="text-xs text-gray-500">PDF • 156 KB</span>
+                          <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Signed</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button className="p-2 hover:bg-gray-200 rounded transition-colors" title="Download">
+                        <Download size={18} className="text-gray-600" />
+                      </button>
+                      <button className="p-2 hover:bg-red-100 rounded transition-colors" title="Delete">
+                        <Trash2 size={18} className="text-red-600" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Sample photo release */}
+                <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className="bg-purple-100 p-2 rounded">
+                        <FileText className="text-purple-600" size={24} />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900">Photo Release Form</h4>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Signed on {type === 'member' ? (person as Member).joinDate : type === 'class-pack' ? (person as ClassPackClient).purchaseDate : (person as DropInClient).firstVisit}
+                        </p>
+                        <div className="flex items-center gap-4 mt-2">
+                          <span className="text-xs text-gray-500">PDF • 89 KB</span>
+                          <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Signed</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button className="p-2 hover:bg-gray-200 rounded transition-colors" title="Download">
+                        <Download size={18} className="text-gray-600" />
+                      </button>
+                      <button className="p-2 hover:bg-red-100 rounded transition-colors" title="Delete">
+                        <Trash2 size={18} className="text-red-600" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Empty state message */}
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                  <FileText size={48} className="mx-auto text-gray-400 mb-3" />
+                  <p className="text-gray-600 mb-2">Upload additional documents</p>
+                  <p className="text-sm text-gray-500">Drag and drop files here or click the Upload button above</p>
+                </div>
+              </div>
+              
+              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-900">
+                  <strong>Note:</strong> This is a demo. In production, documents would be stored securely with encryption and access controls. Integration with DocuSign or similar e-signature platforms would enable digital contract signing.
+                </p>
+              </div>
             </div>
           )}
           
