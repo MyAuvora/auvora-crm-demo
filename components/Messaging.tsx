@@ -136,7 +136,6 @@ export default function Messaging() {
           template: 'Custom Message',
           message: messageText,
           status: 'sent',
-          location
         });
       }
     });
