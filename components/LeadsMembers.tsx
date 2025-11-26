@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllLeads, getAllMembers, getAllClassPackClients, getAllDropInClients, updateLeadStatus, getLeadNotes, getLeadTasks } from '@/lib/dataStore';
+import { getAllLeads, getAllMembers, getAllClassPackClients, getAllDropInClients, updateLeadStatus, getLeadNotes, getLeadTasks, getLastVisitForPerson } from '@/lib/dataStore';
 import { Search, X, Snowflake, XCircle, Plus, MessageSquare } from 'lucide-react';
+import { format } from 'date-fns';
 import { Member, ClassPackClient, DropInClient, Lead } from '@/lib/types';
 import FreezeModal from './FreezeModal';
 import CancelModal from './CancelModal';
@@ -225,11 +226,17 @@ export default function LeadsMembers() {
                         <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Source</th>
                         <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Created</th>
                       </>
-                    ) : (
+                    ) : activeTab === 'members' ? (
                       <>
                         <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Type</th>
                         <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Zip Code</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Last Visit</th>
+                      </>
+                    ) : (
+                      <>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Pack Type</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Classes Left</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Last Visit</th>
                       </>
                     )}
                   </tr>
@@ -258,50 +265,71 @@ export default function LeadsMembers() {
                       <td className="px-4 py-3 text-sm text-gray-600">{lead.createdDate}</td>
                     </tr>
                   ))}
-                  {activeTab === 'members' && filteredMembers.map(member => (
-                    <tr
-                      key={member.id}
-                      onClick={() => setSelectedItem(member)}
-                      className="hover:bg-gray-50 cursor-pointer"
-                    >
-                      <td className="px-4 py-3 text-sm text-gray-900">{member.name}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {member.type === 'membership' 
-                          ? ('membershipType' in member ? member.membershipType : '')
-                          : 'Drop-In'
-                        }
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          'status' in member && member.status === 'active' ? 'bg-green-100 text-green-700' :
-                          'status' in member && member.status === 'frozen' ? 'bg-blue-100 text-blue-700' :
-                          'status' in member && member.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                          'bg-green-100 text-green-700'
-                        }`}>
-                          {'status' in member ? member.status : 'Active'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{member.zipCode}</td>
-                    </tr>
-                  ))}
-                  {activeTab === 'class-packs' && filteredClassPacks.map(pack => (
-                    <tr
-                      key={pack.id}
-                      onClick={() => setSelectedItem(pack)}
-                      className="hover:bg-gray-50 cursor-pointer"
-                    >
-                      <td className="px-4 py-3 text-sm text-gray-900">{pack.name}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {pack.packType} ({pack.remainingClasses}/{pack.totalClasses} left)
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                          Active
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{pack.zipCode}</td>
-                    </tr>
-                  ))}
+                  {activeTab === 'members' && filteredMembers.map(member => {
+                    const lastVisit = getLastVisitForPerson(member.id);
+                    return (
+                      <tr
+                        key={member.id}
+                        onClick={() => setSelectedItem(member)}
+                        className="hover:bg-gray-50 cursor-pointer"
+                      >
+                        <td className="px-4 py-3 text-sm text-gray-900">{member.name}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {member.type === 'membership' 
+                            ? ('membershipType' in member ? member.membershipType : '')
+                            : 'Drop-In'
+                          }
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            'status' in member && member.status === 'active' ? 'bg-green-100 text-green-700' :
+                            'status' in member && member.status === 'frozen' ? 'bg-blue-100 text-blue-700' :
+                            'status' in member && member.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                            'bg-green-100 text-green-700'
+                          }`}>
+                            {'status' in member ? member.status : 'Active'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {lastVisit ? format(lastVisit, 'MMM d, yyyy') : '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {activeTab === 'class-packs' && filteredClassPacks.map(pack => {
+                    const lastVisit = getLastVisitForPerson(pack.id);
+                    const progressPercent = (pack.remainingClasses / pack.totalClasses) * 100;
+                    return (
+                      <tr
+                        key={pack.id}
+                        onClick={() => setSelectedItem(pack)}
+                        className="hover:bg-gray-50 cursor-pointer"
+                      >
+                        <td className="px-4 py-3 text-sm text-gray-900">{pack.name}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{pack.packType}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 bg-gray-200 rounded-full h-2 max-w-[100px]">
+                              <div 
+                                className={`h-2 rounded-full ${
+                                  progressPercent > 50 ? 'bg-green-500' :
+                                  progressPercent > 20 ? 'bg-yellow-500' :
+                                  'bg-red-500'
+                                }`}
+                                style={{ width: `${progressPercent}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-gray-600 whitespace-nowrap">
+                              {pack.remainingClasses}/{pack.totalClasses}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {lastVisit ? format(lastVisit, 'MMM d, yyyy') : '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

@@ -723,6 +723,36 @@ export function logCommunication(log: Omit<CommunicationLog, 'id' | 'sentAt'>): 
   return newLog;
 }
 
+export function getLastVisitForPerson(personId: string): Date | null {
+  const bookings = getAllBookings();
+  const checkedInBookings = bookings.filter(
+    b => b.memberId === personId && b.status === 'checked-in' && b.checkedInAt
+  );
+  
+  if (checkedInBookings.length === 0) return null;
+  
+  const sortedBookings = checkedInBookings.sort((a, b) => {
+    const dateA = new Date(a.checkedInAt!).getTime();
+    const dateB = new Date(b.checkedInAt!).getTime();
+    return dateB - dateA;
+  });
+  
+  return new Date(sortedBookings[0].checkedInAt!);
+}
+
+export function getVisitsInLastNDays(personId: string, days: number): number {
+  const bookings = getAllBookings();
+  const now = new Date();
+  const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+  
+  return bookings.filter(
+    b => b.memberId === personId && 
+         b.status === 'checked-in' && 
+         b.checkedInAt &&
+         new Date(b.checkedInAt) >= cutoffDate
+  ).length;
+}
+
 export function resetData() {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(STORAGE_KEY);
