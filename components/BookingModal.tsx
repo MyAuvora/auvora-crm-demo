@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { X, Search } from 'lucide-react';
 import { Class } from '@/lib/types';
-import { getAllMembers, getAllClassPackClients, bookClass, addToWaitlist, getAllBookings } from '@/lib/dataStore';
+import { getAllMembers, getAllClassPackClients, getAllDropInClients, bookClass, addToWaitlist, getAllBookings } from '@/lib/dataStore';
 
 interface BookingModalProps {
   classData: Class;
@@ -18,9 +18,11 @@ export default function BookingModal({ classData, onClose, onSuccess }: BookingM
 
   const members = getAllMembers().filter(m => m.location === classData.location);
   const packClients = getAllClassPackClients().filter(c => c.location === classData.location);
+  const dropInClients = getAllDropInClients().filter(d => d.location === classData.location);
   const allMembers = [
-    ...members.map(m => ({ id: m.id, name: m.name, type: 'member' as const })),
-    ...packClients.map(c => ({ id: c.id, name: c.name, type: 'pack' as const }))
+    ...members.map(m => ({ id: m.id, name: m.name, type: 'member' as const, details: `Membership: ${m.membershipType}` })),
+    ...packClients.map(c => ({ id: c.id, name: c.name, type: 'pack' as const, details: `${c.remainingClasses}/${c.totalClasses} classes left` })),
+    ...dropInClients.map(d => ({ id: d.id, name: d.name, type: 'drop-in' as const, details: `Drop-In ($20/class)` }))
   ];
 
   const filteredMembers = allMembers.filter(m => 
@@ -115,7 +117,7 @@ export default function BookingModal({ classData, onClose, onSuccess }: BookingM
                   }`}
                 >
                   <div className="font-medium text-gray-900">{member.name}</div>
-                  <div className="text-sm text-gray-500">{member.type === 'member' ? 'Membership' : 'Class Pack'}</div>
+                  <div className="text-sm text-gray-500">{member.details}</div>
                 </div>
               ))
             )}
