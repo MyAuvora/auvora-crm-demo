@@ -1,9 +1,9 @@
 'use client';
 
-import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product } from './types';
-import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts } from '@/data/seedData';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, Measurement } from './types';
+import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes } from '@/data/seedData';
 
-const STORAGE_VERSION = 2;
+const STORAGE_VERSION = 3;
 const STORAGE_KEY = 'auvora-crm-data';
 
 export interface Booking {
@@ -184,6 +184,9 @@ interface DataStore {
   refunds: Refund[];
   paymentMethods: PaymentMethod[];
   paymentPlans: PaymentPlan[];
+  goals: Goal[];
+  notes: Note[];
+  measurements: Measurement[];
 }
 
 let store: DataStore | null = null;
@@ -355,6 +358,9 @@ function initializeStore(): DataStore {
       refunds: [],
       paymentMethods: [],
       paymentPlans: [],
+      goals: [],
+      notes: [],
+      measurements: [],
     };
   }
 
@@ -367,6 +373,9 @@ function initializeStore(): DataStore {
       if (!parsed.refunds) parsed.refunds = [];
       if (!parsed.paymentMethods) parsed.paymentMethods = [];
       if (!parsed.paymentPlans) parsed.paymentPlans = [];
+      if (!parsed.goals) parsed.goals = [];
+      if (!parsed.notes) parsed.notes = [];
+      if (!parsed.measurements) parsed.measurements = [];
       
       if (parsed.version === STORAGE_VERSION) {
         let needsSave = false;
@@ -437,6 +446,9 @@ function initializeStore(): DataStore {
     refunds: [],
     paymentMethods: [],
     paymentPlans: [],
+    goals: seedGoals,
+    notes: seedNotes,
+    measurements: [],
   };
 
   saveStore(initialStore);
@@ -1306,4 +1318,212 @@ export function deleteStaff(staffId: string): boolean {
   }
   
   return false;
+}
+
+export function getAllGoals() {
+  return getStore().goals;
+}
+
+export function getGoalsByMember(memberId: string) {
+  return getStore().goals.filter(g => g.memberId === memberId);
+}
+
+export function createGoal(goal: Omit<Goal, 'id' | 'createdDate' | 'updatedDate'>) {
+  const store = getStore();
+  const newGoal: Goal = {
+    ...goal,
+    id: `goal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    createdDate: new Date().toISOString(),
+    updatedDate: new Date().toISOString(),
+  };
+  
+  store.goals.push(newGoal);
+  
+  const member = store.members.find(m => m.id === goal.memberId);
+  if (member) {
+    addAuditLog('create_goal', 'goal', newGoal.id, `Goal created: ${goal.title}`, member.location);
+  }
+  
+  saveStore(store);
+  return { success: true, goal: newGoal };
+}
+
+export function updateGoal(goalId: string, updates: Partial<Goal>) {
+  const store = getStore();
+  const goal = store.goals.find(g => g.id === goalId);
+  
+  if (!goal) {
+    return { success: false, message: 'Goal not found' };
+  }
+  
+  Object.assign(goal, updates, { updatedDate: new Date().toISOString() });
+  
+  if (updates.status === 'completed' && !goal.completedDate) {
+    goal.completedDate = new Date().toISOString();
+  }
+  
+  const member = store.members.find(m => m.id === goal.memberId);
+  if (member) {
+    addAuditLog('update_goal', 'goal', goalId, `Goal updated: ${goal.title}`, member.location);
+  }
+  
+  saveStore(store);
+  return { success: true, goal };
+}
+
+export function deleteGoal(goalId: string) {
+  const store = getStore();
+  const goalIndex = store.goals.findIndex(g => g.id === goalId);
+  
+  if (goalIndex === -1) {
+    return { success: false, message: 'Goal not found' };
+  }
+  
+  const goal = store.goals[goalIndex];
+  const member = store.members.find(m => m.id === goal.memberId);
+  
+  store.goals.splice(goalIndex, 1);
+  
+  if (member) {
+    addAuditLog('delete_goal', 'goal', goalId, `Goal deleted: ${goal.title}`, member.location);
+  }
+  
+  saveStore(store);
+  return { success: true };
+}
+
+export function getAllNotes() {
+  return getStore().notes;
+}
+
+export function getNotesByMember(memberId: string) {
+  return getStore().notes.filter(n => n.memberId === memberId);
+}
+
+export function createNote(note: Omit<Note, 'id' | 'createdDate' | 'updatedDate'>) {
+  const store = getStore();
+  const newNote: Note = {
+    ...note,
+    id: `note-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    createdDate: new Date().toISOString(),
+    updatedDate: new Date().toISOString(),
+  };
+  
+  store.notes.push(newNote);
+  
+  const member = store.members.find(m => m.id === note.memberId);
+  if (member) {
+    addAuditLog('create_note', 'note', newNote.id, `${note.type} note added by ${note.authorName}`, member.location);
+  }
+  
+  saveStore(store);
+  return { success: true, note: newNote };
+}
+
+export function updateNote(noteId: string, updates: Partial<Note>) {
+  const store = getStore();
+  const note = store.notes.find(n => n.id === noteId);
+  
+  if (!note) {
+    return { success: false, message: 'Note not found' };
+  }
+  
+  Object.assign(note, updates, { updatedDate: new Date().toISOString() });
+  
+  const member = store.members.find(m => m.id === note.memberId);
+  if (member) {
+    addAuditLog('update_note', 'note', noteId, `Note updated by ${note.authorName}`, member.location);
+  }
+  
+  saveStore(store);
+  return { success: true, note };
+}
+
+export function deleteNote(noteId: string) {
+  const store = getStore();
+  const noteIndex = store.notes.findIndex(n => n.id === noteId);
+  
+  if (noteIndex === -1) {
+    return { success: false, message: 'Note not found' };
+  }
+  
+  const note = store.notes[noteIndex];
+  const member = store.members.find(m => m.id === note.memberId);
+  
+  store.notes.splice(noteIndex, 1);
+  
+  if (member) {
+    addAuditLog('delete_note', 'note', noteId, `Note deleted by ${note.authorName}`, member.location);
+  }
+  
+  saveStore(store);
+  return { success: true };
+}
+
+export function getAllMeasurements() {
+  return getStore().measurements;
+}
+
+export function getMeasurementsByMember(memberId: string) {
+  return getStore().measurements.filter(m => m.memberId === memberId).sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+}
+
+export function createMeasurement(measurement: Omit<Measurement, 'id'>) {
+  const store = getStore();
+  const newMeasurement: Measurement = {
+    ...measurement,
+    id: `measurement-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  };
+  
+  store.measurements.push(newMeasurement);
+  
+  const member = store.members.find(m => m.id === measurement.memberId);
+  if (member) {
+    addAuditLog('create_measurement', 'measurement', newMeasurement.id, `Measurements recorded`, member.location);
+  }
+  
+  saveStore(store);
+  return { success: true, measurement: newMeasurement };
+}
+
+export function updateMeasurement(measurementId: string, updates: Partial<Measurement>) {
+  const store = getStore();
+  const measurement = store.measurements.find(m => m.id === measurementId);
+  
+  if (!measurement) {
+    return { success: false, message: 'Measurement not found' };
+  }
+  
+  Object.assign(measurement, updates);
+  
+  const member = store.members.find(m => m.id === measurement.memberId);
+  if (member) {
+    addAuditLog('update_measurement', 'measurement', measurementId, `Measurements updated`, member.location);
+  }
+  
+  saveStore(store);
+  return { success: true, measurement };
+}
+
+export function deleteMeasurement(measurementId: string) {
+  const store = getStore();
+  const measurementIndex = store.measurements.findIndex(m => m.id === measurementId);
+  
+  if (measurementIndex === -1) {
+    return { success: false, message: 'Measurement not found' };
+  }
+  
+  const measurement = store.measurements[measurementIndex];
+  const member = store.members.find(m => m.id === measurement.memberId);
+  
+  store.measurements.splice(measurementIndex, 1);
+  
+  if (member) {
+    addAuditLog('delete_measurement', 'measurement', measurementId, `Measurements deleted`, member.location);
+  }
+  
+  saveStore(store);
+  return { success: true };
 }

@@ -1,4 +1,4 @@
-import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product } from '@/lib/types';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note } from '@/lib/types';
 
 const tampaZipCodes = ['33602', '33603', '33606', '33607', '33609', '33611', '33612', '33613', '33614', '33615'];
 
@@ -379,6 +379,112 @@ export function generateProducts(): Product[] {
   ];
 }
 
+export function generateGoals(): Goal[] {
+  const goals: Goal[] = [];
+  const members = generateMembers();
+  const staff = generateStaff().filter(s => s.role === 'coach');
+  
+  const goalTemplates = [
+    { category: 'weight-loss' as const, title: 'Lose 10 pounds', description: 'Achieve healthy weight loss through consistent training and nutrition', startValue: '180', targetValue: '170', units: 'lbs' },
+    { category: 'weight-loss' as const, title: 'Lose 20 pounds', description: 'Long-term weight loss goal with sustainable habits', startValue: '200', targetValue: '180', units: 'lbs' },
+    { category: 'strength' as const, title: 'Increase bench press by 20%', description: 'Build upper body strength progressively', startValue: '135', targetValue: '162', units: 'lbs' },
+    { category: 'strength' as const, title: 'Complete 10 pull-ups', description: 'Develop back and arm strength', startValue: '3', targetValue: '10', units: 'reps' },
+    { category: 'attendance' as const, title: 'Attend 3x per week', description: 'Build consistent training habit', startValue: '1', targetValue: '3', units: 'days/week' },
+    { category: 'attendance' as const, title: 'Attend 4x per week', description: 'Increase training frequency', startValue: '2', targetValue: '4', units: 'days/week' },
+    { category: 'mobility' as const, title: 'Touch toes without bending knees', description: 'Improve hamstring flexibility', startValue: '', targetValue: '', units: '' },
+    { category: 'mobility' as const, title: 'Full squat depth', description: 'Achieve proper squat form and mobility', startValue: '', targetValue: '', units: '' },
+    { category: 'rehab' as const, title: 'Return to training post-injury', description: 'Safely rebuild strength and mobility after knee injury', startValue: '', targetValue: '', units: '' },
+    { category: 'strength' as const, title: 'Deadlift 200 pounds', description: 'Build lower body and back strength', startValue: '135', targetValue: '200', units: 'lbs' },
+  ];
+  
+  for (let i = 0; i < 12; i++) {
+    const member = members[i];
+    const coach = randomItem(staff);
+    const template = randomItem(goalTemplates);
+    const daysAgo = Math.floor(Math.random() * 60);
+    const createdDate = new Date();
+    createdDate.setDate(createdDate.getDate() - daysAgo);
+    
+    const targetDate = new Date(createdDate);
+    targetDate.setDate(targetDate.getDate() + 90);
+    
+    const isCompleted = Math.random() < 0.3;
+    const status = isCompleted ? 'completed' as const : 'active' as const;
+    const progress = isCompleted ? 100 : Math.floor(Math.random() * 70) + 10;
+    
+    const currentValue = template.startValue && template.targetValue ? 
+      (parseInt(template.startValue) + (parseInt(template.targetValue) - parseInt(template.startValue)) * (progress / 100)).toString() : 
+      '';
+    
+    goals.push({
+      id: `goal-${i + 1}`,
+      memberId: member.id,
+      title: template.title,
+      description: template.description,
+      category: template.category,
+      targetDate: targetDate.toISOString().split('T')[0],
+      startValue: template.startValue,
+      targetValue: template.targetValue,
+      currentValue,
+      units: template.units,
+      status,
+      progress,
+      assignedCoach: coach.id,
+      memberVisible: true,
+      privateNotes: Math.random() < 0.5 ? 'Client is very motivated and consistent' : '',
+      createdDate: createdDate.toISOString(),
+      updatedDate: new Date().toISOString(),
+      completedDate: isCompleted ? new Date().toISOString() : undefined,
+    });
+  }
+  
+  return goals;
+}
+
+export function generateNotes(): Note[] {
+  const notes: Note[] = [];
+  const members = generateMembers();
+  const staff = generateStaff().filter(s => s.role === 'coach');
+  
+  const noteTemplates = [
+    { type: 'session' as const, title: 'Great Training Session', content: 'Focus: Upper body strength\nExercises completed: Bench press, rows, shoulder press\nRPE: 8/10\nNotes: Client showed excellent form and pushed hard today. Ready to increase weight next session.' },
+    { type: 'session' as const, title: 'Lower Body Focus', content: 'Focus: Legs and core\nExercises completed: Squats, deadlifts, lunges, planks\nRPE: 9/10\nNotes: Client struggled with squat depth but improved throughout the session.' },
+    { type: 'assessment' as const, title: 'Monthly Fitness Assessment', content: 'Strengths: Cardiovascular endurance has improved significantly\nAreas for improvement: Core stability, upper body strength\nRecommendations: Add 2 core-focused sessions per week' },
+    { type: 'injury' as const, title: 'Knee Discomfort', content: 'Injury: Right knee slight discomfort during squats\nStatus: Minor, no swelling\nModifications needed: Reduce squat depth, avoid jumping movements\nNext steps: Monitor for 1 week, ice after workouts' },
+    { type: 'nutrition' as const, title: 'Nutrition Check-in', content: 'Current habits: Eating 3 meals per day, drinking plenty of water\nChallenges: Late night snacking, weekend overeating\nRecommendations: Meal prep on Sundays, keep healthy snacks available' },
+    { type: 'general' as const, title: 'Progress Update', content: 'Client is making excellent progress toward their goals. Attendance has been consistent at 3-4x per week. Energy levels are up and they report feeling stronger.' },
+    { type: 'session' as const, title: 'HIIT Workout', content: 'Focus: Cardio and conditioning\nExercises completed: Burpees, mountain climbers, jump rope, kettlebell swings\nRPE: 9/10\nNotes: Client kept up with the pace well. Heart rate recovery is improving.' },
+    { type: 'assessment' as const, title: 'Initial Assessment', content: 'Strengths: Good mobility, motivated mindset\nAreas for improvement: Overall strength, endurance\nRecommendations: Start with 2-3 sessions per week, focus on compound movements' },
+  ];
+  
+  for (let i = 0; i < 20; i++) {
+    const member = members[i % 12];
+    const coach = randomItem(staff);
+    const template = randomItem(noteTemplates);
+    const daysAgo = Math.floor(Math.random() * 45);
+    const createdDate = new Date();
+    createdDate.setDate(createdDate.getDate() - daysAgo);
+    
+    const visibilityOptions: ('private' | 'team' | 'member')[] = ['private', 'team', 'member'];
+    const visibility = template.type === 'injury' ? 'team' : randomItem(visibilityOptions);
+    
+    notes.push({
+      id: `note-${i + 1}`,
+      memberId: member.id,
+      type: template.type,
+      title: template.title,
+      content: template.content,
+      authorId: coach.id,
+      authorName: coach.name,
+      visibility,
+      createdDate: createdDate.toISOString(),
+      updatedDate: createdDate.toISOString(),
+    });
+  }
+  
+  return notes;
+}
+
 export const members = generateMembers();
 export const classPackClients = generateClassPackClients();
 export const dropInClients = generateDropInClients();
@@ -387,3 +493,5 @@ export const staff = generateStaff();
 export const classes = generateClasses();
 export const promotions = generatePromotions();
 export const products = generateProducts();
+export const goals = generateGoals();
+export const notes = generateNotes();

@@ -6,8 +6,9 @@ import { format } from 'date-fns';
 import { getPersonById, getPersonTransactions, getPersonBookings, getPersonCommunications, getPersonTimeline, getAllClasses, getPaymentMethodsByMember, addPaymentMethod, updateBillingAddress } from '@/lib/dataStore';
 import { Member, ClassPackClient, DropInClient } from '@/lib/types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import TrainingTab from './TrainingTab';
 
-type Tab = 'account' | 'billing' | 'attendance' | 'messages' | 'documents' | 'timeline';
+type Tab = 'account' | 'billing' | 'attendance' | 'messages' | 'documents' | 'training' | 'timeline';
 
 interface ProfileTabsProps {
   personId: string;
@@ -116,6 +117,16 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
               }`}
             >
               Documents
+            </button>
+            <button
+              onClick={() => setActiveTab('training')}
+              className={`px-4 py-3 font-medium ${
+                activeTab === 'training'
+                  ? 'text-red-600 border-b-2 border-red-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Training
             </button>
             <button
               onClick={() => setActiveTab('timeline')}
@@ -691,6 +702,15 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                 </p>
               </div>
             </div>
+          )}
+          
+          {activeTab === 'training' && (
+            <TrainingTab
+              memberId={personId}
+              memberName={person.name}
+              currentStaffId="staff-1"
+              currentStaffName="Coach Mike"
+            />
           )}
           
           {activeTab === 'timeline' && (

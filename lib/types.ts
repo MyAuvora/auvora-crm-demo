@@ -105,3 +105,58 @@ export interface Product {
   stock: number;
   location: Location;
 }
+
+export type GoalCategory = 'weight-loss' | 'strength' | 'attendance' | 'mobility' | 'rehab' | 'other';
+export type GoalStatus = 'active' | 'completed' | 'paused' | 'abandoned';
+
+export interface Goal {
+  id: string;
+  memberId: string;
+  title: string;
+  description: string;
+  category: GoalCategory;
+  targetDate: string;
+  startValue?: string;
+  targetValue?: string;
+  currentValue?: string;
+  units?: string;
+  status: GoalStatus;
+  progress: number; // 0-100
+  assignedCoach: string; // staff id
+  memberVisible: boolean;
+  privateNotes?: string; // coach-only notes
+  createdDate: string;
+  updatedDate: string;
+  completedDate?: string;
+}
+
+export type NoteType = 'session' | 'assessment' | 'injury' | 'nutrition' | 'general';
+export type NoteVisibility = 'private' | 'team' | 'member';
+
+export interface Note {
+  id: string;
+  memberId: string;
+  type: NoteType;
+  title: string;
+  content: string;
+  authorId: string; // staff id
+  authorName: string;
+  visibility: NoteVisibility;
+  classId?: string; // if linked to a specific class
+  createdDate: string;
+  updatedDate: string;
+}
+
+export interface Measurement {
+  id: string;
+  memberId: string;
+  date: string;
+  weight?: number;
+  bodyFat?: number;
+  waist?: number;
+  hips?: number;
+  chest?: number;
+  arms?: number;
+  recordedBy: string; // staff id
+  notes?: string;
+}
