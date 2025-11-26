@@ -291,7 +291,7 @@ export default function Messaging() {
                         </div>
                         <div className="flex justify-end">
                           <div className="bg-red-600 text-white p-3 rounded-lg shadow-sm max-w-[70%]">
-                            <p className="text-sm">We're open 6 AM - 9 PM today! See you soon!</p>
+                            <p className="text-sm">We&apos;re open 6 AM - 9 PM today! See you soon!</p>
                             <p className="text-xs text-red-100 mt-1">10:32 AM • Sent</p>
                           </div>
                         </div>
