@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { X, CreditCard, Calendar, MessageSquare, FileText, Upload, Download, Trash2, Plus, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
-import { getPersonById, getPersonTransactions, getPersonBookings, getPersonCommunications, getPersonTimeline, getAllClasses, getPaymentMethodsByMember, addPaymentMethod } from '@/lib/dataStore';
+import { getPersonById, getPersonTransactions, getPersonBookings, getPersonCommunications, getPersonTimeline, getAllClasses, getPaymentMethodsByMember, addPaymentMethod, updateBillingAddress } from '@/lib/dataStore';
 import { Member, ClassPackClient, DropInClient } from '@/lib/types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -402,7 +402,18 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                       </div>
                     </div>
                     <button
-                      onClick={() => alert('Billing address saved!')}
+                      onClick={() => {
+                        if (billingAddress.street && billingAddress.city && billingAddress.state && billingAddress.zip) {
+                          const success = updateBillingAddress(personId, billingAddress);
+                          if (success) {
+                            alert('Billing address saved successfully!');
+                          } else {
+                            alert('Failed to save billing address');
+                          }
+                        } else {
+                          alert('Please fill in all address fields');
+                        }
+                      }}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 w-fit"
                     >
                       <MapPin size={16} />

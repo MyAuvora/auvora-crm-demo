@@ -1186,3 +1186,124 @@ export function getCohortAnalysis(location: string): CohortData[] {
   
   return cohorts.sort((a, b) => b.cohortMonth.localeCompare(a.cohortMonth));
 }
+
+export function updateBillingAddress(personId: string, address: { street: string; city: string; state: string; zip: string }): boolean {
+  const s = getStore();
+  
+  let person: (Member | ClassPackClient | DropInClient | Lead) | undefined = s.members.find(m => m.id === personId);
+  if (!person) {
+    person = s.classPackClients.find(c => c.id === personId);
+  }
+  if (!person) {
+    person = s.dropInClients.find(d => d.id === personId);
+  }
+  if (!person) {
+    person = s.leads.find(l => l.id === personId);
+  }
+  
+  if (person) {
+    (person as Member & { billingAddress?: typeof address }).billingAddress = address;
+    saveStore(s);
+    const location = 'location' in person ? person.location : 'unknown';
+    addAuditLog('update_billing_address', 'person', personId, `Updated billing address`, location);
+    return true;
+  }
+  
+  return false;
+}
+
+export function addClass(classData: Omit<Class, 'id' | 'bookedCount' | 'attendees'>): Class {
+  const s = getStore();
+  const newClass: Class = {
+    ...classData,
+    id: `class-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    bookedCount: 0,
+    attendees: [],
+  };
+  s.classes.push(newClass);
+  saveStore(s);
+  addAuditLog('add_class', 'class', newClass.id, `Created class: ${newClass.name}`, newClass.location);
+  return newClass;
+}
+
+export function updateClass(classId: string, updates: Partial<Omit<Class, 'id' | 'bookedCount'>>): boolean {
+  const s = getStore();
+  const classIndex = s.classes.findIndex(c => c.id === classId);
+  
+  if (classIndex !== -1) {
+    s.classes[classIndex] = {
+      ...s.classes[classIndex],
+      ...updates,
+    };
+    saveStore(s);
+    addAuditLog('update_class', 'class', classId, `Updated class: ${s.classes[classIndex].name}`, s.classes[classIndex].location);
+    return true;
+  }
+  
+  return false;
+}
+
+export function deleteClass(classId: string): boolean {
+  const s = getStore();
+  const classIndex = s.classes.findIndex(c => c.id === classId);
+  
+  if (classIndex !== -1) {
+    const className = s.classes[classIndex].name;
+    const location = s.classes[classIndex].location;
+    s.classes.splice(classIndex, 1);
+    
+    s.bookings = s.bookings.filter(b => b.classId !== classId);
+    s.waitlist = s.waitlist.filter(w => w.classId !== classId);
+    
+    saveStore(s);
+    addAuditLog('delete_class', 'class', classId, `Deleted class: ${className}`, location);
+    return true;
+  }
+  
+  return false;
+}
+
+export function addStaff(staffData: Omit<Staff, 'id'>): Staff {
+  const s = getStore();
+  const newStaff: Staff = {
+    ...staffData,
+    id: `staff-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  };
+  s.staff.push(newStaff);
+  saveStore(s);
+  addAuditLog('add_staff', 'staff', newStaff.id, `Added staff: ${newStaff.name}`, newStaff.location);
+  return newStaff;
+}
+
+export function updateStaff(staffId: string, updates: Partial<Omit<Staff, 'id'>>): boolean {
+  const s = getStore();
+  const staffIndex = s.staff.findIndex(st => st.id === staffId);
+  
+  if (staffIndex !== -1) {
+    s.staff[staffIndex] = {
+      ...s.staff[staffIndex],
+      ...updates,
+    };
+    saveStore(s);
+    addAuditLog('update_staff', 'staff', staffId, `Updated staff: ${s.staff[staffIndex].name}`, s.staff[staffIndex].location);
+    return true;
+  }
+  
+  return false;
+}
+
+export function deleteStaff(staffId: string): boolean {
+  const s = getStore();
+  const staffIndex = s.staff.findIndex(st => st.id === staffId);
+  
+  if (staffIndex !== -1) {
+    const staffName = s.staff[staffIndex].name;
+    const location = s.staff[staffIndex].location;
+    s.staff.splice(staffIndex, 1);
+    saveStore(s);
+    addAuditLog('delete_staff', 'staff', staffId, `Deleted staff: ${staffName}`, location);
+    return true;
+  }
+  
+  return false;
+}

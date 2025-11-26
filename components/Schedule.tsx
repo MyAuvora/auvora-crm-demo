@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllClasses, getAllStaff, getAllBookings, getAllWaitlist } from '@/lib/dataStore';
+import { getAllClasses, getAllStaff, getAllBookings, getAllWaitlist, addClass, updateClass, deleteClass } from '@/lib/dataStore';
 import { X, UserPlus, ClipboardList, Plus, Edit2 } from 'lucide-react';
 import BookingModal from './BookingModal';
 import CheckInModal from './CheckInModal';
@@ -18,6 +18,24 @@ export default function Schedule() {
   const [editingClass, setEditingClass] = useState<Class | null>(null);
   const [, setRefreshTrigger] = useState(0);
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
+  
+  const [newClass, setNewClass] = useState({
+    name: '',
+    dayOfWeek: 'Monday',
+    time: '6:00 AM',
+    duration: 60,
+    capacity: 20,
+    coachId: '',
+  });
+  
+  const [editForm, setEditForm] = useState({
+    name: '',
+    dayOfWeek: 'Monday',
+    time: '6:00 AM',
+    duration: 60,
+    capacity: 20,
+    coachId: '',
+  });
 
   const locationClasses = getAllClasses().filter(c => c.location === location);
   const locationStaff = getAllStaff().filter(s => s.location === location);
@@ -47,7 +65,82 @@ export default function Schedule() {
 
   const handleEditClass = (cls: Class) => {
     setEditingClass(cls);
+    setEditForm({
+      name: cls.name,
+      dayOfWeek: cls.dayOfWeek,
+      time: cls.time,
+      duration: cls.duration,
+      capacity: cls.capacity,
+      coachId: cls.coachId,
+    });
     setShowEditClassModal(true);
+  };
+  
+  const handleSaveNewClass = () => {
+    if (!newClass.name || !newClass.coachId) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    addClass({
+      name: newClass.name,
+      type: location === 'athletic-club' ? 'fitness' : 'dance',
+      dayOfWeek: newClass.dayOfWeek as 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday',
+      time: newClass.time,
+      duration: newClass.duration,
+      capacity: newClass.capacity,
+      coachId: newClass.coachId,
+      location,
+    });
+    
+    setNewClass({
+      name: '',
+      dayOfWeek: 'Monday',
+      time: '6:00 AM',
+      duration: 60,
+      capacity: 20,
+      coachId: '',
+    });
+    setShowAddClassModal(false);
+    handleRefresh();
+  };
+  
+  const handleSaveEditClass = () => {
+    if (!editingClass || !editForm.name || !editForm.coachId) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    const currentBookings = getClassBookingCount(editingClass.id);
+    if (editForm.capacity < currentBookings) {
+      alert(`Cannot reduce capacity below current bookings (${currentBookings})`);
+      return;
+    }
+    
+    updateClass(editingClass.id, {
+      name: editForm.name,
+      dayOfWeek: editForm.dayOfWeek as 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday',
+      time: editForm.time,
+      duration: editForm.duration,
+      capacity: editForm.capacity,
+      coachId: editForm.coachId,
+    });
+    
+    setShowEditClassModal(false);
+    setEditingClass(null);
+    handleRefresh();
+  };
+  
+  const handleDeleteClass = (classId: string) => {
+    if (confirm('Are you sure you want to delete this class? All bookings and waitlist entries will be removed.')) {
+      deleteClass(classId);
+      setShowEditClassModal(false);
+      setEditingClass(null);
+      if (selectedClass?.id === classId) {
+        setSelectedClass(null);
+      }
+      handleRefresh();
+    }
   };
 
   return (
@@ -349,13 +442,88 @@ export default function Schedule() {
               </button>
             </div>
             <div className="p-6">
-              <p className="text-gray-600 mb-4">Add class functionality coming soon. This will allow you to create new recurring classes with instructor, time, capacity, and other details.</p>
-              <button
-                onClick={() => setShowAddClassModal(false)}
-                className="w-full px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              >
-                Close
-              </button>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Class Name *</label>
+                  <input
+                    type="text"
+                    value={newClass.name}
+                    onChange={(e) => setNewClass({ ...newClass, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    placeholder="e.g., HIIT Training"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Day *</label>
+                    <select 
+                      value={newClass.dayOfWeek} 
+                      onChange={(e) => setNewClass({ ...newClass, dayOfWeek: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    >
+                      {daysOfWeek.map(day => <option key={day} value={day}>{day}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Time *</label>
+                    <select 
+                      value={newClass.time} 
+                      onChange={(e) => setNewClass({ ...newClass, time: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    >
+                      {timeSlots.map(time => <option key={time} value={time}>{time}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Duration (min) *</label>
+                    <input
+                      type="number"
+                      value={newClass.duration}
+                      onChange={(e) => setNewClass({ ...newClass, duration: parseInt(e.target.value) || 60 })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      min="15"
+                      step="15"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Capacity *</label>
+                    <input
+                      type="number"
+                      value={newClass.capacity}
+                      onChange={(e) => setNewClass({ ...newClass, capacity: parseInt(e.target.value) || 20 })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      min="1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Instructor *</label>
+                  <select 
+                    value={newClass.coachId} 
+                    onChange={(e) => setNewClass({ ...newClass, coachId: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="">Select instructor...</option>
+                    {locationStaff.map(staff => <option key={staff.id} value={staff.id}>{staff.name}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleSaveNewClass}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Create Class
+                </button>
+                <button
+                  onClick={() => setShowAddClassModal(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -373,62 +541,83 @@ export default function Schedule() {
             <div className="p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Class Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Class Name *</label>
                   <input
                     type="text"
-                    defaultValue={editingClass.name}
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Day</label>
-                    <select defaultValue={editingClass.dayOfWeek} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Day *</label>
+                    <select 
+                      value={editForm.dayOfWeek} 
+                      onChange={(e) => setEditForm({ ...editForm, dayOfWeek: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    >
                       {daysOfWeek.map(day => <option key={day} value={day}>{day}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
-                    <select defaultValue={editingClass.time} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Time *</label>
+                    <select 
+                      value={editForm.time} 
+                      onChange={(e) => setEditForm({ ...editForm, time: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    >
                       {timeSlots.map(time => <option key={time} value={time}>{time}</option>)}
                     </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Duration (min)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Duration (min) *</label>
                     <input
                       type="number"
-                      defaultValue={editingClass.duration}
+                      value={editForm.duration}
+                      onChange={(e) => setEditForm({ ...editForm, duration: parseInt(e.target.value) || 60 })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      min="15"
+                      step="15"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Capacity *</label>
                     <input
                       type="number"
-                      defaultValue={editingClass.capacity}
+                      value={editForm.capacity}
+                      onChange={(e) => setEditForm({ ...editForm, capacity: parseInt(e.target.value) || 20 })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      min="1"
                     />
+                    <p className="text-xs text-gray-500 mt-1">Current bookings: {getClassBookingCount(editingClass.id)}</p>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Instructor</label>
-                  <select defaultValue={editingClass.coachId} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Instructor *</label>
+                  <select 
+                    value={editForm.coachId} 
+                    onChange={(e) => setEditForm({ ...editForm, coachId: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
                     {locationStaff.map(staff => <option key={staff.id} value={staff.id}>{staff.name}</option>)}
                   </select>
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={() => {
-                    alert('Class updated! (Full save functionality coming soon)');
-                    setShowEditClassModal(false);
-                    setEditingClass(null);
-                  }}
+                  onClick={handleSaveEditClass}
                   className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
                   Save Changes
+                </button>
+                <button
+                  onClick={() => handleDeleteClass(editingClass.id)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Delete
                 </button>
                 <button
                   onClick={() => { setShowEditClassModal(false); setEditingClass(null); }}

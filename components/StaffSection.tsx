@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { staff, classes } from '@/data/seedData';
+import { getAllStaff, getAllClasses, addStaff, updateStaff, deleteStaff } from '@/lib/dataStore';
 import { UserCog, Award, Plus, Edit2, X } from 'lucide-react';
 import { Staff } from '@/lib/types';
 
@@ -11,9 +11,24 @@ export default function StaffSection() {
   const [showAddStaffModal, setShowAddStaffModal] = useState(false);
   const [showEditStaffModal, setShowEditStaffModal] = useState(false);
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
+  const [, setRefreshTrigger] = useState(0);
+  
+  const [newStaff, setNewStaff] = useState({
+    name: '',
+    email: '',
+    role: 'coach' as 'coach' | 'instructor' | 'front-desk',
+    specialties: '',
+  });
+  
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    role: 'coach' as 'coach' | 'instructor' | 'front-desk',
+    specialties: '',
+  });
 
-  const locationStaff = staff.filter(s => s.location === location);
-  const locationClasses = classes.filter(c => c.location === location);
+  const locationStaff = getAllStaff().filter(s => s.location === location);
+  const locationClasses = getAllClasses().filter(c => c.location === location);
 
   const getStaffMetrics = (staffId: string) => {
     const staffClasses = locationClasses.filter(c => c.coachId === staffId);
@@ -27,7 +42,110 @@ export default function StaffSection() {
 
   const handleEditStaff = (staffMember: Staff) => {
     setEditingStaff(staffMember);
+    setEditForm({
+      name: staffMember.name,
+      email: staffMember.email,
+      role: staffMember.role,
+      specialties: staffMember.specialties?.join(', ') || staffMember.styles?.join(', ') || '',
+    });
     setShowEditStaffModal(true);
+  };
+  
+  const handleRefresh = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+  
+  const handleSaveNewStaff = () => {
+    if (!newStaff.name || !newStaff.email) {
+      alert('Please fill in name and email');
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newStaff.email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+    
+    const specialtiesArray = newStaff.specialties
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+    
+    const staffData: Omit<Staff, 'id'> = {
+      name: newStaff.name,
+      email: newStaff.email,
+      role: newStaff.role,
+      location,
+    };
+    
+    if (location === 'athletic-club' && specialtiesArray.length > 0) {
+      staffData.specialties = specialtiesArray;
+    } else if (location === 'dance-studio' && specialtiesArray.length > 0) {
+      staffData.styles = specialtiesArray;
+    }
+    
+    addStaff(staffData);
+    
+    setNewStaff({
+      name: '',
+      email: '',
+      role: 'coach',
+      specialties: '',
+    });
+    setShowAddStaffModal(false);
+    handleRefresh();
+  };
+  
+  const handleSaveEditStaff = () => {
+    if (!editingStaff || !editForm.name || !editForm.email) {
+      alert('Please fill in name and email');
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(editForm.email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+    
+    const specialtiesArray = editForm.specialties
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+    
+    const updates: Partial<Omit<Staff, 'id'>> = {
+      name: editForm.name,
+      email: editForm.email,
+      role: editForm.role,
+    };
+    
+    if (location === 'athletic-club' && specialtiesArray.length > 0) {
+      updates.specialties = specialtiesArray;
+    } else if (location === 'dance-studio' && specialtiesArray.length > 0) {
+      updates.styles = specialtiesArray;
+    }
+    
+    updateStaff(editingStaff.id, updates);
+    
+    setShowEditStaffModal(false);
+    setEditingStaff(null);
+    handleRefresh();
+  };
+  
+  const handleDeleteStaff = (staffId: string) => {
+    const staffClasses = locationClasses.filter(c => c.coachId === staffId);
+    if (staffClasses.length > 0) {
+      alert(`Cannot delete staff member who is assigned to ${staffClasses.length} class(es). Please reassign or delete those classes first.`);
+      return;
+    }
+    
+    if (confirm('Are you sure you want to delete this staff member?')) {
+      deleteStaff(staffId);
+      setShowEditStaffModal(false);
+      setEditingStaff(null);
+      handleRefresh();
+    }
   };
 
   return (
@@ -147,44 +265,53 @@ export default function StaffSection() {
             <div className="p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                   <input
                     type="text"
+                    value={newStaff.name}
+                    onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
                     placeholder="John Doe"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
                   <input
                     type="email"
+                    value={newStaff.email}
+                    onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
                     placeholder="john@example.com"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+                  <select 
+                    value={newStaff.role}
+                    onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value as 'coach' | 'instructor' | 'front-desk' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
                     <option value="coach">Coach</option>
                     <option value="instructor">Instructor</option>
                     <option value="front-desk">Front Desk</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Specialties (comma-separated)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {location === 'athletic-club' ? 'Specialties' : 'Dance Styles'} (comma-separated)
+                  </label>
                   <input
                     type="text"
-                    placeholder="strength, conditioning, beginners"
+                    value={newStaff.specialties}
+                    onChange={(e) => setNewStaff({ ...newStaff, specialties: e.target.value })}
+                    placeholder={location === 'athletic-club' ? 'strength, conditioning, beginners' : 'ballet, hip-hop, contemporary'}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={() => {
-                    alert('Staff member added! (Full save functionality coming soon)');
-                    setShowAddStaffModal(false);
-                  }}
+                  onClick={handleSaveNewStaff}
                   className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
                   Add Staff Member
@@ -213,48 +340,59 @@ export default function StaffSection() {
             <div className="p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                   <input
                     type="text"
-                    defaultValue={editingStaff.name}
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
                   <input
                     type="email"
-                    defaultValue={editingStaff.email}
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                  <select defaultValue={editingStaff.role} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+                  <select 
+                    value={editForm.role}
+                    onChange={(e) => setEditForm({ ...editForm, role: e.target.value as 'coach' | 'instructor' | 'front-desk' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
                     <option value="coach">Coach</option>
                     <option value="instructor">Instructor</option>
                     <option value="front-desk">Front Desk</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Specialties (comma-separated)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {location === 'athletic-club' ? 'Specialties' : 'Dance Styles'} (comma-separated)
+                  </label>
                   <input
                     type="text"
-                    defaultValue={editingStaff.specialties?.join(', ') || editingStaff.styles?.join(', ') || ''}
+                    value={editForm.specialties}
+                    onChange={(e) => setEditForm({ ...editForm, specialties: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={() => {
-                    alert('Staff member updated! (Full save functionality coming soon)');
-                    setShowEditStaffModal(false);
-                    setEditingStaff(null);
-                  }}
+                  onClick={handleSaveEditStaff}
                   className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
                   Save Changes
+                </button>
+                <button
+                  onClick={() => handleDeleteStaff(editingStaff.id)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Delete
                 </button>
                 <button
                   onClick={() => { setShowEditStaffModal(false); setEditingStaff(null); }}

@@ -75,7 +75,7 @@ export interface Class {
   id: string;
   name: string;
   type: string;
-  duration: 30 | 60;
+  duration: number;
   dayOfWeek: string;
   time: string;
   coachId: string;
