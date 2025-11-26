@@ -20,7 +20,7 @@ export default function LeadsMembers() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sourceFilter, setSourceFilter] = useState<string>('all');
   const [membershipFilter, setMembershipFilter] = useState<string>('all');
-  const [zipFilter, setZipFilter] = useState<string>('all');
+  const [packTypeFilter, setPackTypeFilter] = useState<string>('all');
   const [selectedItem, setSelectedItem] = useState<Lead | Member | ClassPackClient | DropInClient | null>(null);
   const [showFreezeModal, setShowFreezeModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -84,8 +84,7 @@ export default function LeadsMembers() {
     const matchesMembership = membershipFilter === 'all' || 
                              (member.type === 'membership' && 'membershipType' in member && member.membershipType === membershipFilter) ||
                              (member.type === 'drop-in' && membershipFilter === 'drop-in');
-    const matchesZip = zipFilter === 'all' || member.zipCode === zipFilter;
-    return matchesSearch && matchesMembership && matchesZip;
+    return matchesSearch && matchesMembership;
   });
 
   const classPacksWithType = locationPackClients.map(c => ({ ...c, type: 'pack' as const }));
@@ -93,11 +92,9 @@ export default function LeadsMembers() {
   const filteredClassPacks = classPacksWithType.filter(pack => {
     const matchesSearch = pack.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          pack.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesZip = zipFilter === 'all' || pack.zipCode === zipFilter;
-    return matchesSearch && matchesZip;
+    const matchesPackType = packTypeFilter === 'all' || pack.packType === packTypeFilter;
+    return matchesSearch && matchesPackType;
   });
-
-  const uniqueZips = Array.from(new Set([...membersWithDropIn.map(m => m.zipCode), ...classPacksWithType.map(c => c.zipCode)])).sort();
 
   return (
     <div className="space-y-6">
@@ -185,45 +182,33 @@ export default function LeadsMembers() {
             )}
 
             {activeTab === 'members' && (
-              <>
-                <select
-                  value={membershipFilter}
-                  onChange={(e) => setMembershipFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                >
-                  <option value="all">All Types</option>
-                  {location === 'athletic-club' && (
-                    <>
-                      <option value="1x-week">1x/week</option>
-                      <option value="2x-week">2x/week</option>
-                      <option value="unlimited">Unlimited</option>
-                    </>
-                  )}
-                  <option value="drop-in">Drop-In</option>
-                </select>
-                <select
-                  value={zipFilter}
-                  onChange={(e) => setZipFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                >
-                  <option value="all">All Zip Codes</option>
-                  {uniqueZips.map(zip => (
-                    <option key={zip} value={zip}>{zip}</option>
-                  ))}
-                </select>
-              </>
+              <select
+                value={membershipFilter}
+                onChange={(e) => setMembershipFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+              >
+                <option value="all">All Types</option>
+                {location === 'athletic-club' && (
+                  <>
+                    <option value="1x-week">1x/week</option>
+                    <option value="2x-week">2x/week</option>
+                    <option value="unlimited">Unlimited</option>
+                  </>
+                )}
+                <option value="drop-in">Drop-In</option>
+              </select>
             )}
 
             {activeTab === 'class-packs' && (
               <select
-                value={zipFilter}
-                onChange={(e) => setZipFilter(e.target.value)}
+                value={packTypeFilter}
+                onChange={(e) => setPackTypeFilter(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
               >
-                <option value="all">All Zip Codes</option>
-                {uniqueZips.map(zip => (
-                  <option key={zip} value={zip}>{zip}</option>
-                ))}
+                <option value="all">All Pack Types</option>
+                <option value="5-pack">5-Pack</option>
+                <option value="10-pack">10-Pack</option>
+                <option value="20-pack">20-Pack</option>
               </select>
             )}
           </div>
