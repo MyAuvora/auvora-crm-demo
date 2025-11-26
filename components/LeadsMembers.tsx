@@ -11,6 +11,7 @@ import CancelModal from './CancelModal';
 import AddNoteModal from './AddNoteModal';
 import AddTaskModal from './AddTaskModal';
 import SendTextModal from './SendTextModal';
+import ProfileTabs from './ProfileTabs';
 
 type Tab = 'leads' | 'members' | 'class-packs';
 
@@ -30,6 +31,7 @@ export default function LeadsMembers() {
   const [showSendTextModal, setShowSendTextModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showProfileTabs, setShowProfileTabs] = useState(false);
   
   useEffect(() => {
     if (deepLink) {
@@ -427,7 +429,10 @@ export default function LeadsMembers() {
                       </td>
                       <td 
                         className="px-4 py-3 text-sm text-gray-900 cursor-pointer"
-                        onClick={() => setSelectedItem(lead)}
+                        onClick={() => {
+                          setSelectedItem(lead);
+                          setShowProfileTabs(true);
+                        }}
                       >
                         {lead.name}
                       </td>
@@ -474,7 +479,10 @@ export default function LeadsMembers() {
                         </td>
                         <td 
                           className="px-4 py-3 text-sm text-gray-900 cursor-pointer"
-                          onClick={() => setSelectedItem(member)}
+                          onClick={() => {
+                            setSelectedItem(member);
+                            setShowProfileTabs(true);
+                          }}
                         >
                           <div className="flex items-center gap-2">
                             {member.name}
@@ -583,7 +591,10 @@ export default function LeadsMembers() {
                         </td>
                         <td 
                           className="px-4 py-3 text-sm text-gray-900 cursor-pointer"
-                          onClick={() => setSelectedItem(pack)}
+                          onClick={() => {
+                            setSelectedItem(pack);
+                            setShowProfileTabs(true);
+                          }}
                         >
                           <div className="flex items-center gap-2">
                             {pack.name}
@@ -939,6 +950,20 @@ export default function LeadsMembers() {
           )}
         </div>
       </div>
+      
+      {showProfileTabs && selectedItem && (
+        <ProfileTabs
+          personId={selectedItem.id}
+          onClose={() => {
+            setShowProfileTabs(false);
+            setSelectedItem(null);
+          }}
+          onSendText={() => {
+            setShowProfileTabs(false);
+            setShowSendTextModal(true);
+          }}
+        />
+      )}
     </div>
   );
 }

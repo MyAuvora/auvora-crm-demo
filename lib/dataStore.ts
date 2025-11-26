@@ -200,7 +200,8 @@ function generateSampleBookings(): Booking[] {
   const classes = seedClasses;
   const members = seedMembers;
   const packClients = seedClassPackClients;
-  const allClients = [...members, ...packClients];
+  const dropInClients = seedDropInClients;
+  const allClients = [...members, ...packClients, ...dropInClients];
   
   const today = new Date();
   const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][today.getDay()];
@@ -751,6 +752,149 @@ export function getVisitsInLastNDays(personId: string, days: number): number {
          b.checkedInAt &&
          new Date(b.checkedInAt) >= cutoffDate
   ).length;
+}
+
+export function getPersonById(personId: string): { person: Member | ClassPackClient | DropInClient | Lead; type: 'member' | 'class-pack' | 'drop-in' | 'lead' } | null {
+  const member = getAllMembers().find(m => m.id === personId);
+  if (member) return { person: member, type: 'member' };
+  
+  const packClient = getAllClassPackClients().find(c => c.id === personId);
+  if (packClient) return { person: packClient, type: 'class-pack' };
+  
+  const dropInClient = getAllDropInClients().find(d => d.id === personId);
+  if (dropInClient) return { person: dropInClient, type: 'drop-in' };
+  
+  const lead = getAllLeads().find(l => l.id === personId);
+  if (lead) return { person: lead, type: 'lead' };
+  
+  return null;
+}
+
+export function getPersonTransactions(personId: string): Transaction[] {
+  const transactions = getAllTransactions();
+  const personData = getPersonById(personId);
+  
+  if (!personData) return [];
+  
+  return transactions.filter(t => 
+    t.memberId === personId || 
+    (t.memberName && t.memberName === personData.person.name)
+  ).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+}
+
+export function getPersonBookings(personId: string): Booking[] {
+  const bookings = getAllBookings();
+  return bookings.filter(b => b.memberId === personId)
+    .sort((a, b) => new Date(b.bookedAt).getTime() - new Date(a.bookedAt).getTime());
+}
+
+export function getPersonCommunications(personId: string): CommunicationLog[] {
+  const comms = getCommunicationLogs();
+  return comms.filter(c => c.recipientId === personId)
+    .sort((a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime());
+}
+
+export function getPersonTimeline(personId: string): Array<{
+  id: string;
+  timestamp: string;
+  type: 'booking' | 'check-in' | 'transaction' | 'note' | 'task' | 'communication' | 'audit';
+  title: string;
+  description: string;
+  icon?: string;
+}> {
+  const events: Array<{
+    id: string;
+    timestamp: string;
+    type: 'booking' | 'check-in' | 'transaction' | 'note' | 'task' | 'communication' | 'audit';
+    title: string;
+    description: string;
+    icon?: string;
+  }> = [];
+  
+  const bookings = getPersonBookings(personId);
+  bookings.forEach(b => {
+    if (b.status === 'checked-in' && b.checkedInAt) {
+      events.push({
+        id: `checkin-${b.id}`,
+        timestamp: b.checkedInAt,
+        type: 'check-in',
+        title: 'Checked in to class',
+        description: b.memberName,
+        icon: '✓'
+      });
+    } else if (b.status === 'booked') {
+      events.push({
+        id: `booking-${b.id}`,
+        timestamp: b.bookedAt,
+        type: 'booking',
+        title: 'Booked class',
+        description: b.memberName,
+        icon: '📅'
+      });
+    }
+  });
+  
+  const transactions = getPersonTransactions(personId);
+  transactions.forEach(t => {
+    events.push({
+      id: `txn-${t.id}`,
+      timestamp: t.timestamp,
+      type: 'transaction',
+      title: 'Purchase',
+      description: t.items.map(i => i.productName).join(', '),
+      icon: '💳'
+    });
+  });
+  
+  const comms = getPersonCommunications(personId);
+  comms.forEach(c => {
+    events.push({
+      id: `comm-${c.id}`,
+      timestamp: c.sentAt,
+      type: 'communication',
+      title: c.type === 'sms' ? 'Text message sent' : 'Email sent',
+      description: c.template,
+      icon: '💬'
+    });
+  });
+  
+  const notes = getLeadNotes().filter(n => n.leadId === personId);
+  notes.forEach(n => {
+    events.push({
+      id: `note-${n.id}`,
+      timestamp: n.createdAt,
+      type: 'note',
+      title: 'Note added',
+      description: n.note,
+      icon: '📝'
+    });
+  });
+  
+  const tasks = getLeadTasks().filter(t => t.leadId === personId);
+  tasks.forEach(t => {
+    events.push({
+      id: `task-${t.id}`,
+      timestamp: t.completedAt || t.dueDate,
+      type: 'task',
+      title: t.completed ? 'Task completed' : 'Task created',
+      description: t.description,
+      icon: t.completed ? '✅' : '📋'
+    });
+  });
+  
+  const auditLogs = getAllAuditLog().filter(a => a.entityId === personId);
+  auditLogs.forEach(a => {
+    events.push({
+      id: `audit-${a.id}`,
+      timestamp: a.timestamp,
+      type: 'audit',
+      title: a.action,
+      description: a.details,
+      icon: '🔔'
+    });
+  });
+  
+  return events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 }
 
 export function resetData() {
