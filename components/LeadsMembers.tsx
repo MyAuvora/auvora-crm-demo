@@ -12,11 +12,12 @@ import AddNoteModal from './AddNoteModal';
 import AddTaskModal from './AddTaskModal';
 import SendTextModal from './SendTextModal';
 import ProfileTabs from './ProfileTabs';
+import { hasPermission } from '@/lib/permissions';
 
 type Tab = 'leads' | 'members' | 'class-packs';
 
 export default function LeadsMembers() {
-  const { location, deepLink, setDeepLink } = useApp();
+  const { location, deepLink, setDeepLink, userRole } = useApp();
   const [activeTab, setActiveTab] = useState<Tab>('leads');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -295,59 +296,67 @@ export default function LeadsMembers() {
             <div className="mb-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
               <h3 className="text-sm font-medium text-gray-900 mb-3">Bulk Actions ({selectedRows.size} selected)</h3>
               <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => {
-                    alert(`Sending message to ${selectedRows.size} people`);
-                    setShowBulkActions(false);
-                    setSelectedRows(new Set());
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                >
-                  <MessageSquare size={16} />
-                  Send Message
-                </button>
-                <button
-                  onClick={() => {
-                    alert(`Adding task for ${selectedRows.size} people`);
-                    setShowBulkActions(false);
-                    setSelectedRows(new Set());
-                  }}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
-                >
-                  <Plus size={16} />
-                  Add Task
-                </button>
-                <button
-                  onClick={() => {
-                    alert(`Tagging ${selectedRows.size} people`);
-                    setShowBulkActions(false);
-                    setSelectedRows(new Set());
-                  }}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
-                >
-                  <Plus size={16} />
-                  Add Tag
-                </button>
-                <button
-                  onClick={() => {
-                    const csv = 'Name,Email,Phone\n' + Array.from(selectedRows).map(id => {
-                      const person = [...locationMembers, ...locationPackClients, ...locationDropInClients, ...locationLeads].find(p => p.id === id);
-                      return person ? `${person.name},${person.email},${person.phone}` : '';
-                    }).filter(Boolean).join('\n');
-                    const blob = new Blob([csv], { type: 'text/csv' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'export.csv';
-                    a.click();
-                    setShowBulkActions(false);
-                    setSelectedRows(new Set());
-                  }}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center gap-2"
-                >
-                  <X size={16} />
-                  Export CSV
-                </button>
+                {hasPermission(userRole, 'bulk:message') && (
+                  <button
+                    onClick={() => {
+                      alert(`Sending message to ${selectedRows.size} people`);
+                      setShowBulkActions(false);
+                      setSelectedRows(new Set());
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                  >
+                    <MessageSquare size={16} />
+                    Send Message
+                  </button>
+                )}
+                {hasPermission(userRole, 'bulk:edit') && (
+                  <>
+                    <button
+                      onClick={() => {
+                        alert(`Adding task for ${selectedRows.size} people`);
+                        setShowBulkActions(false);
+                        setSelectedRows(new Set());
+                      }}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                    >
+                      <Plus size={16} />
+                      Add Task
+                    </button>
+                    <button
+                      onClick={() => {
+                        alert(`Tagging ${selectedRows.size} people`);
+                        setShowBulkActions(false);
+                        setSelectedRows(new Set());
+                      }}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                    >
+                      <Plus size={16} />
+                      Add Tag
+                    </button>
+                  </>
+                )}
+                {hasPermission(userRole, 'bulk:export') && (
+                  <button
+                    onClick={() => {
+                      const csv = 'Name,Email,Phone\n' + Array.from(selectedRows).map(id => {
+                        const person = [...locationMembers, ...locationPackClients, ...locationDropInClients, ...locationLeads].find(p => p.id === id);
+                        return person ? `${person.name},${person.email},${person.phone}` : '';
+                      }).filter(Boolean).join('\n');
+                      const blob = new Blob([csv], { type: 'text/csv' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'export.csv';
+                      a.click();
+                      setShowBulkActions(false);
+                      setSelectedRows(new Set());
+                    }}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <X size={16} />
+                    Export CSV
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setShowBulkActions(false);
@@ -745,13 +754,15 @@ export default function LeadsMembers() {
                       <Snowflake size={16} />
                       Freeze Membership
                     </button>
-                    <button
-                      onClick={() => setShowCancelModal(true)}
-                      className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
-                    >
-                      <XCircle size={16} />
-                      Cancel Membership
-                    </button>
+                    {hasPermission(userRole, 'member:cancel') && (
+                      <button
+                        onClick={() => setShowCancelModal(true)}
+                        className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                      >
+                        <XCircle size={16} />
+                        Cancel Membership
+                      </button>
+                    )}
                   </div>
                 )}
                 

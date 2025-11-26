@@ -5,6 +5,7 @@ import { useApp } from '@/lib/context';
 import { getAllProducts, getAllMembers, getAllClassPackClients, createTransaction, getAllTransactions, Transaction, createInvoice, getAllInvoices, Invoice, refundInvoice, getRefundsByInvoice, Refund } from '@/lib/dataStore';
 import { ShoppingCart, AlertTriangle, Receipt, Tag, FileText, DollarSign, X } from 'lucide-react';
 import { Product } from '@/lib/types';
+import { hasPermission, getPermissionError } from '@/lib/permissions';
 
 type CartItem = {
   product: Product;
@@ -12,7 +13,7 @@ type CartItem = {
 };
 
 export default function POS() {
-  const { location } = useApp();
+  const { location, userRole } = useApp();
   const [activeTab, setActiveTab] = useState<'pos' | 'inventory' | 'transactions' | 'invoices'>('pos');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
@@ -179,6 +180,11 @@ export default function POS() {
   };
 
   const handleRefund = () => {
+    if (!hasPermission(userRole, 'refund:process')) {
+      alert(getPermissionError('refund:process'));
+      return;
+    }
+
     if (!selectedInvoice || !refundAmount || !refundReason) {
       alert('Please enter refund amount and reason');
       return;
@@ -664,7 +670,7 @@ export default function POS() {
                         >
                           <FileText size={16} className="inline" /> View
                         </button>
-                        {inv.status !== 'refunded' && inv.amountRefunded < inv.total && (
+                        {inv.status !== 'refunded' && inv.amountRefunded < inv.total && hasPermission(userRole, 'refund:process') && (
                           <button
                             onClick={() => {
                               setSelectedInvoice(inv);
