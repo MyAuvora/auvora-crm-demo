@@ -66,21 +66,50 @@ export default function POS() {
 
   const applyPromoCode = () => {
     const code = promoCode.toUpperCase();
+    
     if (code === 'SAVE10') {
       setDiscount(0.10);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 2000);
+      return;
     } else if (code === 'SAVE20') {
       setDiscount(0.20);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 2000);
+      return;
     } else if (code === 'WELCOME') {
       setDiscount(0.15);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 2000);
-    } else {
-      alert('Invalid promo code');
+      return;
     }
+    
+    try {
+      const promoCodes = JSON.parse(localStorage.getItem('promoCodes') || '{}');
+      if (promoCodes[code]) {
+        const promoData = promoCodes[code];
+        
+        if (promoData.status !== 'active') {
+          alert(`Promo code "${code}" is not currently active (Status: ${promoData.status})`);
+          return;
+        }
+        
+        const today = new Date().toISOString().split('T')[0];
+        if (today < promoData.startDate || today > promoData.endDate) {
+          alert(`Promo code "${code}" is not valid for today's date`);
+          return;
+        }
+        
+        setDiscount(promoData.discount);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking promo codes:', error);
+    }
+    
+    alert('Invalid promo code');
   };
 
   const getTotal = () => {

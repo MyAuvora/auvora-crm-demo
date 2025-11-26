@@ -16,7 +16,9 @@ export default function Promotions() {
     status: 'planned' as 'planned' | 'active' | 'ended',
     startDate: '',
     endDate: '',
-    description: ''
+    description: '',
+    promoCode: '',
+    discountPercent: ''
   });
 
   const locationPromotions = promotions.filter(p => p.location === location);
@@ -28,20 +30,25 @@ export default function Promotions() {
       status: 'planned',
       startDate: '',
       endDate: '',
-      description: ''
+      description: '',
+      promoCode: '',
+      discountPercent: ''
     });
     setEditingPromo(null);
     setShowCreateModal(true);
   };
 
   const handleEdit = (promo: Promotion) => {
+    const promoWithCode = promo as Promotion & { promoCode?: string; discountPercent?: number };
     setFormData({
       name: promo.name,
       type: promo.type,
       status: promo.status,
       startDate: promo.startDate,
       endDate: promo.endDate,
-      description: ''
+      description: '',
+      promoCode: promoWithCode.promoCode || '',
+      discountPercent: promoWithCode.discountPercent?.toString() || ''
     });
     setEditingPromo(promo);
     setShowCreateModal(true);
@@ -53,9 +60,45 @@ export default function Promotions() {
       return;
     }
 
+    if (formData.promoCode && !formData.discountPercent) {
+      alert('Please enter a discount percentage for the promo code');
+      return;
+    }
+
+    if (formData.discountPercent && !formData.promoCode) {
+      alert('Please enter a promo code for the discount');
+      return;
+    }
+
+    if (formData.promoCode && formData.promoCode.length < 3) {
+      alert('Promo code must be at least 3 characters');
+      return;
+    }
+
+    if (formData.discountPercent) {
+      const discount = parseFloat(formData.discountPercent);
+      if (isNaN(discount) || discount <= 0 || discount > 100) {
+        alert('Discount percentage must be between 1 and 100');
+        return;
+      }
+    }
+
+    if (formData.promoCode && formData.discountPercent) {
+      const promoCodes = JSON.parse(localStorage.getItem('promoCodes') || '{}');
+      promoCodes[formData.promoCode.toUpperCase()] = {
+        code: formData.promoCode.toUpperCase(),
+        discount: parseFloat(formData.discountPercent) / 100,
+        promotionName: formData.name,
+        status: formData.status,
+        startDate: formData.startDate,
+        endDate: formData.endDate
+      };
+      localStorage.setItem('promoCodes', JSON.stringify(promoCodes));
+    }
+
     const message = editingPromo 
-      ? `Promotion "${formData.name}" has been updated successfully!`
-      : `New promotion "${formData.name}" has been created successfully!\n\nThis promotion will now appear in:\n• POS system for sales\n• Reports for tracking\n• Dashboard metrics`;
+      ? `Promotion "${formData.name}" has been updated successfully!${formData.promoCode ? `\n\nPromo code "${formData.promoCode.toUpperCase()}" is now ${formData.status === 'active' ? 'active' : formData.status} and can be used in POS.` : ''}`
+      : `New promotion "${formData.name}" has been created successfully!\n\nThis promotion will now appear in:\n• POS system for sales\n• Reports for tracking\n• Dashboard metrics${formData.promoCode ? `\n\nPromo code "${formData.promoCode.toUpperCase()}" (${formData.discountPercent}% off) is now available in POS!` : ''}`;
     
     alert(message);
     setShowCreateModal(false);
@@ -65,7 +108,9 @@ export default function Promotions() {
       status: 'planned',
       startDate: '',
       endDate: '',
-      description: ''
+      description: '',
+      promoCode: '',
+      discountPercent: ''
     });
     setEditingPromo(null);
   };
@@ -136,6 +181,22 @@ export default function Promotions() {
               <div className="pt-3 border-t border-gray-200">
                 <p className="text-sm text-gray-600 mb-1">POS Item Name</p>
                 <p className="text-sm font-medium text-gray-900">{promo.name} - Special Offer</p>
+                {(() => {
+                  const promoWithCode = promo as Promotion & { promoCode?: string; discountPercent?: number };
+                  return promoWithCode.promoCode && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600 mb-1">Promo Code</p>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-mono font-bold rounded">
+                          {promoWithCode.promoCode}
+                        </span>
+                        <span className="text-xs text-gray-600">
+                          {promoWithCode.discountPercent}% off
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className="pt-3 border-t border-gray-200 flex gap-2">
@@ -260,6 +321,43 @@ export default function Promotions() {
                     rows={4}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
                   />
+                </div>
+
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <h3 className="text-sm font-semibold text-yellow-900 mb-3">Promo Code (Optional)</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Promo Code
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.promoCode}
+                        onChange={(e) => setFormData({ ...formData, promoCode: e.target.value.toUpperCase() })}
+                        placeholder="e.g., SUMMER25"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 font-mono"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Will be auto-capitalized</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Discount %
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={formData.discountPercent}
+                        onChange={(e) => setFormData({ ...formData, discountPercent: e.target.value })}
+                        placeholder="e.g., 25"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">1-100%</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-yellow-800 mt-3">
+                    <strong>Note:</strong> This promo code will be immediately available in the POS system for checkout.
+                  </p>
                 </div>
 
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
