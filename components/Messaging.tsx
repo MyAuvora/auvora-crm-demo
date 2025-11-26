@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllMembers, getAllClassPackClients, getAllLeads } from '@/lib/dataStore';
-import { Send, MessageSquare, Clock, Search } from 'lucide-react';
+import { getAllMembers, getAllClassPackClients, getAllLeads, getAllDropInClients, logCommunication } from '@/lib/dataStore';
+import { Send, MessageSquare, Clock, Search, Inbox, User } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -26,42 +26,55 @@ const messageTemplates: MessageTemplate[] = [
   {
     id: 'welcome-member',
     name: 'Welcome New Member',
-    message: 'Welcome to The Lab Tampa! We\'re excited to have you join our fitness family. Your first class is scheduled for [DATE] at [TIME]. See you soon!',
+    message: 'Welcome to The Lab Tampa, {{name}}! We\'re excited to have you join our fitness family. Your {{membership}} membership is now active. See you soon!',
     category: 'welcome'
   },
   {
     id: 'class-reminder',
     name: 'Class Reminder',
-    message: 'Hi [NAME]! Just a friendly reminder about your class tomorrow at [TIME]. Can\'t wait to see you there!',
+    message: 'Hi {{name}}! Just a friendly reminder about your class tomorrow at {{time}}. Can\'t wait to see you there!',
     category: 'reminder'
   },
   {
     id: 'missed-class',
     name: 'Missed Class Follow-up',
-    message: 'Hey [NAME], we missed you at class today! Everything okay? Let us know if you need to reschedule.',
+    message: 'Hey {{name}}, we missed you at class today! Everything okay? Let us know if you need to reschedule.',
     category: 'follow-up'
   },
   {
     id: 'promotion',
     name: 'Special Promotion',
-    message: 'Special offer for you! Get 20% off your next class pack purchase this week only. Reply YES to claim your discount!',
+    message: 'Hi {{name}}! Special offer for you! Get 20% off your next class pack purchase this week only. Reply YES to claim your discount!',
     category: 'promotion'
   },
   {
     id: 'trial-followup',
     name: 'Trial Class Follow-up',
-    message: 'Thanks for trying out The Lab Tampa! How was your experience? We\'d love to have you join us as a member. Reply to learn about our membership options!',
+    message: 'Thanks for trying out The Lab Tampa, {{name}}! How was your experience? We\'d love to have you join us as a member. Reply to learn about our membership options!',
     category: 'follow-up'
+  },
+  {
+    id: 'pack-refill',
+    name: 'Class Pack Refill Reminder',
+    message: 'Hi {{name}}! You have {{remaining}} classes left in your pack. Time to refill? Reply YES and we\'ll help you out!',
+    category: 'reminder'
+  },
+  {
+    id: 'payment-reminder',
+    name: 'Payment Reminder',
+    message: 'Hi {{name}}, your payment of ${{amount}} is due on {{date}}. Please update your payment method to avoid any interruption to your membership.',
+    category: 'reminder'
   }
 ];
 
 export default function Messaging() {
   const { location } = useApp();
-  const [activeTab, setActiveTab] = useState<'compose' | 'history' | 'templates'>('compose');
+  const [activeTab, setActiveTab] = useState<'compose' | 'history' | 'templates' | 'inbox'>('inbox');
   const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
   const [messageText, setMessageText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [recipientType, setRecipientType] = useState<'all' | 'members' | 'leads'>('all');
+  const [selectedContact, setSelectedContact] = useState<string | null>(null);
   const [messageHistory] = useState<Message[]>(() => {
     const now = Date.now();
     return [
@@ -88,12 +101,14 @@ export default function Messaging() {
 
   const locationMembers = getAllMembers().filter(m => m.location === location);
   const locationPackClients = getAllClassPackClients().filter(c => c.location === location);
+  const locationDropIns = getAllDropInClients().filter(d => d.location === location);
   const locationLeads = getAllLeads().filter(l => l.location === location);
 
   const allRecipients = [
-    ...locationMembers.map(m => ({ id: m.id, name: m.name, type: 'member' as const, phone: m.phone })),
-    ...locationPackClients.map(c => ({ id: c.id, name: c.name, type: 'member' as const, phone: c.phone })),
-    ...locationLeads.map(l => ({ id: l.id, name: l.name, type: 'lead' as const, phone: l.phone }))
+    ...locationMembers.map(m => ({ id: m.id, name: m.name, type: 'member' as const, phone: m.phone, email: m.email })),
+    ...locationPackClients.map(c => ({ id: c.id, name: c.name, type: 'member' as const, phone: c.phone, email: c.email })),
+    ...locationDropIns.map(d => ({ id: d.id, name: d.name, type: 'member' as const, phone: d.phone, email: d.email })),
+    ...locationLeads.map(l => ({ id: l.id, name: l.name, type: 'lead' as const, phone: l.phone, email: l.email }))
   ];
 
   const filteredRecipients = allRecipients.filter(r => {
@@ -110,6 +125,21 @@ export default function Messaging() {
       alert('Please select recipients and enter a message');
       return;
     }
+
+    selectedRecipients.forEach(recipientId => {
+      const recipient = allRecipients.find(r => r.id === recipientId);
+      if (recipient) {
+        logCommunication({
+          recipientId: recipient.id,
+          recipientName: recipient.name,
+          type: 'sms',
+          template: 'Custom Message',
+          message: messageText,
+          status: 'sent',
+          location
+        });
+      }
+    });
 
     alert(`Message sent to ${selectedRecipients.length} recipient(s):\n\n"${messageText}"\n\nNote: This is a demo - no actual messages were sent.`);
     setMessageText('');
@@ -148,6 +178,17 @@ export default function Messaging() {
         <div className="border-b border-gray-200">
           <div className="flex">
             <button
+              onClick={() => setActiveTab('inbox')}
+              className={`px-6 py-3 font-medium flex items-center gap-2 ${
+                activeTab === 'inbox'
+                  ? 'text-red-600 border-b-2 border-red-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Inbox size={20} />
+              Inbox
+            </button>
+            <button
               onClick={() => setActiveTab('compose')}
               className={`px-6 py-3 font-medium flex items-center gap-2 ${
                 activeTab === 'compose'
@@ -184,6 +225,114 @@ export default function Messaging() {
         </div>
 
         <div className="p-6">
+          {activeTab === 'inbox' && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">2-Way SMS Inbox</h3>
+              <div className="grid grid-cols-3 gap-4 h-[600px]">
+                {/* Contact List */}
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="bg-gray-50 p-3 border-b border-gray-200">
+                    <input
+                      type="text"
+                      placeholder="Search contacts..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                    />
+                  </div>
+                  <div className="overflow-y-auto h-[calc(100%-60px)]">
+                    {allRecipients.slice(0, 20).map((contact) => (
+                      <button
+                        key={contact.id}
+                        onClick={() => setSelectedContact(contact.id)}
+                        className={`w-full p-3 text-left border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                          selectedContact === contact.id ? 'bg-red-50 border-l-4 border-l-red-600' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                            <User size={20} className="text-gray-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 truncate">{contact.name}</p>
+                            <p className="text-xs text-gray-600 truncate">{contact.phone}</p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Message Thread */}
+                <div className="col-span-2 border border-gray-200 rounded-lg overflow-hidden flex flex-col">
+                  {selectedContact ? (
+                    <>
+                      <div className="bg-gray-50 p-4 border-b border-gray-200">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                            <User size={20} className="text-gray-600" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-900">
+                              {allRecipients.find(r => r.id === selectedContact)?.name}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {allRecipients.find(r => r.id === selectedContact)?.phone}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-3">
+                        {/* Sample messages */}
+                        <div className="flex justify-start">
+                          <div className="bg-white p-3 rounded-lg shadow-sm max-w-[70%] border border-gray-200">
+                            <p className="text-sm text-gray-900">Hi! What are your hours today?</p>
+                            <p className="text-xs text-gray-500 mt-1">10:30 AM</p>
+                          </div>
+                        </div>
+                        <div className="flex justify-end">
+                          <div className="bg-red-600 text-white p-3 rounded-lg shadow-sm max-w-[70%]">
+                            <p className="text-sm">We're open 6 AM - 9 PM today! See you soon!</p>
+                            <p className="text-xs text-red-100 mt-1">10:32 AM • Sent</p>
+                          </div>
+                        </div>
+                        <div className="flex justify-start">
+                          <div className="bg-white p-3 rounded-lg shadow-sm max-w-[70%] border border-gray-200">
+                            <p className="text-sm text-gray-900">Perfect, thanks!</p>
+                            <p className="text-xs text-gray-500 mt-1">10:33 AM</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 border-t border-gray-200 bg-white">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Type a message..."
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                          />
+                          <button className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
+                            <Send size={18} />
+                            Send
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Note: This is a demo inbox. Real 2-way SMS requires Twilio/SMS gateway integration.
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      <div className="text-center">
+                        <MessageSquare size={48} className="mx-auto mb-3 text-gray-400" />
+                        <p>Select a contact to view conversation</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'compose' && (
             <div className="space-y-6">
               <div>
@@ -323,6 +472,10 @@ export default function Messaging() {
                       </div>
                     </div>
                     <p className="text-sm text-gray-700 mb-3">{template.message}</p>
+                    <div className="text-xs text-gray-500 mb-3">
+                      <p className="font-medium">Available tokens:</p>
+                      <p>{'{{name}}, {{membership}}, {{time}}, {{remaining}}, {{amount}}, {{date}}'}</p>
+                    </div>
                     <button
                       onClick={() => handleTemplateSelect(template)}
                       className="w-full bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
