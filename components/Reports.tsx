@@ -1,8 +1,8 @@
 'use client';
 
 import { useApp } from '@/lib/context';
-import { getAllMembers, getAllClassPackClients, getAllLeads, getAllTransactions, getAllBookings, getAllClasses } from '@/lib/dataStore';
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { getAllMembers, getAllClassPackClients, getAllLeads, getAllTransactions, getAllBookings, getAllClasses, getCohortAnalysis } from '@/lib/dataStore';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { TrendingUp, DollarSign, Users, Target } from 'lucide-react';
 
 export default function Reports() {
@@ -76,6 +76,8 @@ export default function Reports() {
     }
   });
   const promoData = Object.entries(promoRevenue).map(([code, revenue]) => ({ name: code, revenue }));
+
+  const cohortData = getCohortAnalysis(location);
 
   return (
     <div className="space-y-6">
@@ -252,6 +254,86 @@ export default function Reports() {
               <Bar dataKey="revenue" fill="#10B981" name="Revenue ($)" />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      )}
+
+      {cohortData.length > 0 && (
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Cohort Analysis - Member Retention</h2>
+          <p className="text-sm text-gray-600 mb-4">Track how well you retain members over time by their join month</p>
+          
+          <div className="overflow-x-auto mb-6">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cohort Month</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Members</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">1 Month</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">3 Months</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">6 Months</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Revenue</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {cohortData.slice(0, 12).map((cohort) => (
+                  <tr key={cohort.cohortMonth} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {cohort.cohortMonth}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      {cohort.memberCount}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        cohort.retention1Month >= 80 ? 'bg-green-100 text-green-700' :
+                        cohort.retention1Month >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {cohort.retention1Month.toFixed(0)}%
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        cohort.retention3Month >= 70 ? 'bg-green-100 text-green-700' :
+                        cohort.retention3Month >= 50 ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {cohort.retention3Month.toFixed(0)}%
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        cohort.retention6Month >= 60 ? 'bg-green-100 text-green-700' :
+                        cohort.retention6Month >= 40 ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {cohort.retention6Month.toFixed(0)}%
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                      ${cohort.totalRevenue.toFixed(0)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Retention Trends</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={cohortData.slice(0, 12).reverse()}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="cohortMonth" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="retention1Month" stroke="#10B981" name="1 Month %" strokeWidth={2} />
+                <Line type="monotone" dataKey="retention3Month" stroke="#F59E0B" name="3 Months %" strokeWidth={2} />
+                <Line type="monotone" dataKey="retention6Month" stroke="#DC2626" name="6 Months %" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
     </div>

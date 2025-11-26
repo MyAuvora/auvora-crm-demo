@@ -1113,3 +1113,76 @@ export function createPaymentPlan(data: Omit<PaymentPlan, 'id'>): PaymentPlan {
 export function getPaymentPlansByMember(memberId: string): PaymentPlan[] {
   return getAllPaymentPlans().filter(pp => pp.memberId === memberId);
 }
+
+export interface CohortData {
+  cohortMonth: string;
+  memberCount: number;
+  retention1Month: number;
+  retention3Month: number;
+  retention6Month: number;
+  totalRevenue: number;
+}
+
+export function getCohortAnalysis(location: string): CohortData[] {
+  const members = getAllMembers().filter(m => m.location === location);
+  const invoices = getAllInvoices().filter(inv => inv.location === location);
+  
+  const cohortMap = new Map<string, { members: typeof members; revenue: number }>();
+  
+  members.forEach(member => {
+    const joinDate = new Date(member.joinDate);
+    const cohortKey = `${joinDate.getFullYear()}-${String(joinDate.getMonth() + 1).padStart(2, '0')}`;
+    
+    if (!cohortMap.has(cohortKey)) {
+      cohortMap.set(cohortKey, { members: [], revenue: 0 });
+    }
+    
+    cohortMap.get(cohortKey)!.members.push(member);
+  });
+  
+  invoices.forEach(invoice => {
+    if (invoice.memberId) {
+      const member = members.find(m => m.id === invoice.memberId);
+      if (member) {
+        const joinDate = new Date(member.joinDate);
+        const cohortKey = `${joinDate.getFullYear()}-${String(joinDate.getMonth() + 1).padStart(2, '0')}`;
+        
+        if (cohortMap.has(cohortKey)) {
+          cohortMap.get(cohortKey)!.revenue += invoice.total - invoice.amountRefunded;
+        }
+      }
+    }
+  });
+  
+  const now = new Date();
+  const cohorts: CohortData[] = [];
+  
+  cohortMap.forEach((data, cohortMonth) => {
+    const [year, month] = cohortMonth.split('-').map(Number);
+    
+    const monthsSinceCohort = (now.getFullYear() - year) * 12 + (now.getMonth() - (month - 1));
+    
+    const activeAfter1Month = monthsSinceCohort >= 1 ? 
+      data.members.filter(m => m.status === 'active' || new Date(m.joinDate).getTime() > new Date(year, month, 1).getTime()).length : 
+      data.members.length;
+    
+    const activeAfter3Months = monthsSinceCohort >= 3 ?
+      data.members.filter(m => m.status === 'active' || new Date(m.joinDate).getTime() > new Date(year, month + 2, 1).getTime()).length :
+      data.members.length;
+    
+    const activeAfter6Months = monthsSinceCohort >= 6 ?
+      data.members.filter(m => m.status === 'active' || new Date(m.joinDate).getTime() > new Date(year, month + 5, 1).getTime()).length :
+      data.members.length;
+    
+    cohorts.push({
+      cohortMonth,
+      memberCount: data.members.length,
+      retention1Month: data.members.length > 0 ? (activeAfter1Month / data.members.length) * 100 : 0,
+      retention3Month: data.members.length > 0 ? (activeAfter3Months / data.members.length) * 100 : 0,
+      retention6Month: data.members.length > 0 ? (activeAfter6Months / data.members.length) * 100 : 0,
+      totalRevenue: data.revenue,
+    });
+  });
+  
+  return cohorts.sort((a, b) => b.cohortMonth.localeCompare(a.cohortMonth));
+}
