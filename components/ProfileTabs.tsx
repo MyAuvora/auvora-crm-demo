@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, CreditCard, Calendar, MessageSquare, FileText, Upload, Download, Trash2, Plus, MapPin } from 'lucide-react';
+import { ArrowLeft, CreditCard, Calendar, MessageSquare, FileText, Upload, Download, Trash2, Plus, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { getPersonById, getPersonTransactions, getPersonBookings, getPersonCommunications, getPersonTimeline, getAllClasses, getPaymentMethodsByMember, addPaymentMethod, updateBillingAddress } from '@/lib/dataStore';
 import { Member, ClassPackClient, DropInClient } from '@/lib/types';
@@ -51,23 +51,30 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
   }));
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">{person.name}</h2>
-            <p className="text-sm text-gray-600">{person.email} • {person.phone}</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-6 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Back"
+              >
+                <ArrowLeft size={24} />
+              </button>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">{person.name}</h2>
+                <p className="text-sm text-gray-600">{person.email} • {person.phone}</p>
+              </div>
+            </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg"
-          >
-            <X size={24} />
-          </button>
         </div>
-        
-        <div className="border-b border-gray-200">
-          <div className="flex gap-4 px-6">
+      </div>
+      
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-4">
             <button
               onClick={() => setActiveTab('account')}
               className={`px-4 py-3 font-medium ${
@@ -140,8 +147,9 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
             </button>
           </div>
         </div>
-        
-        <div className="flex-1 overflow-y-auto p-6">
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {activeTab === 'account' && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
@@ -741,7 +749,6 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
               )}
             </div>
           )}
-        </div>
       </div>
     </div>
   );
