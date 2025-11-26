@@ -227,6 +227,16 @@ export default function POS() {
                         </button>
                       </>
                     )}
+                    <button 
+                      onClick={() => {
+                        const dropInProduct = locationProducts.find(p => p.id.includes('drop-in'));
+                        if (dropInProduct) addToCart(dropInProduct);
+                      }}
+                      className="p-4 border border-blue-300 bg-blue-50 rounded-lg hover:border-blue-600 hover:bg-blue-100 transition-colors text-left"
+                    >
+                      <p className="font-medium text-gray-900">Drop-In Class</p>
+                      <p className="text-lg font-bold text-blue-600 mt-2">$20</p>
+                    </button>
                     <button className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left">
                       <p className="font-medium text-gray-900">5-pack</p>
                       <p className="text-lg font-bold text-red-600 mt-2">$75</p>

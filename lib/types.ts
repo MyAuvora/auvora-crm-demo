@@ -2,6 +2,7 @@ export type Location = 'athletic-club' | 'dance-studio';
 
 export type MembershipType = '1x-week' | '2x-week' | 'unlimited';
 export type ClassPackType = '5-pack' | '10-pack' | '20-pack';
+export type ClientType = 'membership' | 'class-pack' | 'drop-in';
 
 export type LeadStatus = 'new-lead' | 'trial-booked' | 'trial-showed' | 'joined' | 'trial-no-join' | 'cancelled';
 export type LeadSource = 'website' | 'instagram' | 'facebook' | 'walk-in';
@@ -34,6 +35,18 @@ export interface ClassPackClient {
   zipCode: string;
   location: Location;
   purchaseDate: string;
+}
+
+export interface DropInClient {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  totalVisits: number;
+  lastVisit: string;
+  zipCode: string;
+  location: Location;
+  firstVisit: string;
 }
 
 export interface Lead {

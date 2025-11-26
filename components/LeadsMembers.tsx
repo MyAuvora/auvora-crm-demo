@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllLeads, getAllMembers, getAllClassPackClients, updateLeadStatus, getLeadNotes, getLeadTasks } from '@/lib/dataStore';
+import { getAllLeads, getAllMembers, getAllClassPackClients, getAllDropInClients, updateLeadStatus, getLeadNotes, getLeadTasks } from '@/lib/dataStore';
 import { Search, X, Snowflake, XCircle, Plus, MessageSquare } from 'lucide-react';
-import { Member, ClassPackClient, Lead } from '@/lib/types';
+import { Member, ClassPackClient, DropInClient, Lead } from '@/lib/types';
 import FreezeModal from './FreezeModal';
 import CancelModal from './CancelModal';
 import AddNoteModal from './AddNoteModal';
@@ -21,7 +21,7 @@ export default function LeadsMembers() {
   const [sourceFilter, setSourceFilter] = useState<string>('all');
   const [membershipFilter, setMembershipFilter] = useState<string>('all');
   const [zipFilter, setZipFilter] = useState<string>('all');
-  const [selectedItem, setSelectedItem] = useState<Lead | Member | ClassPackClient | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Lead | Member | ClassPackClient | DropInClient | null>(null);
   const [showFreezeModal, setShowFreezeModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showAddNoteModal, setShowAddNoteModal] = useState(false);
@@ -32,7 +32,7 @@ export default function LeadsMembers() {
     if (deepLink) {
       const handleDeepLink = () => {
         if (deepLink.type === 'member') {
-          const allMembers = [...getAllMembers(), ...getAllClassPackClients()];
+          const allMembers = [...getAllMembers(), ...getAllClassPackClients(), ...getAllDropInClients()];
           const member = allMembers.find(m => m.id === deepLink.id);
           if (member) {
             setActiveTab('members');
@@ -55,6 +55,7 @@ export default function LeadsMembers() {
   const locationLeads = getAllLeads().filter(l => l.location === location);
   const locationMembers = getAllMembers().filter(m => m.location === location);
   const locationPackClients = getAllClassPackClients().filter(c => c.location === location);
+  const locationDropInClients = getAllDropInClients().filter(c => c.location === location);
 
   const filteredLeads = locationLeads.filter(lead => {
     const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -64,16 +65,19 @@ export default function LeadsMembers() {
     return matchesSearch && matchesStatus && matchesSource;
   });
 
-  const allMembers = location === 'athletic-club' 
-    ? [...locationMembers.map(m => ({ ...m, type: 'membership' as const })), ...locationPackClients.map(c => ({ ...c, type: 'pack' as const }))]
-    : locationPackClients.map(c => ({ ...c, type: 'pack' as const }));
+  const allMembers = [
+    ...locationMembers.map(m => ({ ...m, type: 'membership' as const })),
+    ...locationPackClients.map(c => ({ ...c, type: 'pack' as const })),
+    ...locationDropInClients.map(c => ({ ...c, type: 'drop-in' as const }))
+  ];
 
   const filteredMembers = allMembers.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          member.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesMembership = membershipFilter === 'all' || 
                              (member.type === 'membership' && 'membershipType' in member && member.membershipType === membershipFilter) ||
-                             (member.type === 'pack' && membershipFilter === 'pack');
+                             (member.type === 'pack' && membershipFilter === 'pack') ||
+                             (member.type === 'drop-in' && membershipFilter === 'drop-in');
     const matchesZip = zipFilter === 'all' || member.zipCode === zipFilter;
     return matchesSearch && matchesMembership && matchesZip;
   });
@@ -171,6 +175,7 @@ export default function LeadsMembers() {
                     </>
                   )}
                   <option value="pack">Class Pack</option>
+                  <option value="drop-in">Drop-In</option>
                 </select>
                 <select
                   value={zipFilter}
@@ -241,7 +246,9 @@ export default function LeadsMembers() {
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {member.type === 'membership' 
                           ? ('membershipType' in member ? member.membershipType : '')
-                          : ('packType' in member ? `${member.packType} (${member.remainingClasses}/${member.totalClasses} left)` : '')
+                          : member.type === 'pack'
+                          ? ('packType' in member ? `${member.packType} (${member.remainingClasses}/${member.totalClasses} left)` : '')
+                          : 'Drop-In'
                         }
                       </td>
                       <td className="px-4 py-3 text-sm">
@@ -345,7 +352,7 @@ export default function LeadsMembers() {
                   </div>
                 )}
                 
-                {activeTab === 'members' && 'type' in selectedItem && selectedItem.type === 'class-pack' && (
+                {activeTab === 'members' && 'type' in selectedItem && (selectedItem.type === 'pack' || selectedItem.type === 'drop-in') && (
                   <div className="mb-4 flex gap-2 flex-wrap">
                     <button
                       onClick={() => setShowSendTextModal(true)}
@@ -418,7 +425,9 @@ export default function LeadsMembers() {
                         <p className="text-gray-900 font-medium">
                           {'type' in selectedItem && selectedItem.type === 'membership' 
                             ? ('membershipType' in selectedItem ? selectedItem.membershipType : '')
-                            : ('packType' in selectedItem ? selectedItem.packType : '')
+                            : 'type' in selectedItem && selectedItem.type === 'pack'
+                            ? ('packType' in selectedItem ? selectedItem.packType : '')
+                            : 'Drop-In'
                           }
                         </p>
                       </div>
@@ -445,7 +454,7 @@ export default function LeadsMembers() {
                             <p className="text-gray-900 font-medium capitalize">{'status' in selectedItem ? selectedItem.status : 'Active'}</p>
                           </div>
                         </>
-                      ) : (
+                      ) : 'type' in selectedItem && selectedItem.type === 'pack' ? (
                         <>
                           <div>
                             <p className="text-sm text-gray-600">Classes Remaining</p>
@@ -454,6 +463,21 @@ export default function LeadsMembers() {
                           <div>
                             <p className="text-sm text-gray-600">Purchase Date</p>
                             <p className="text-gray-900 font-medium">{'purchaseDate' in selectedItem ? selectedItem.purchaseDate : ''}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <p className="text-sm text-gray-600">Total Visits</p>
+                            <p className="text-gray-900 font-medium">{'totalVisits' in selectedItem ? selectedItem.totalVisits : ''}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">First Visit</p>
+                            <p className="text-gray-900 font-medium">{'firstVisit' in selectedItem ? selectedItem.firstVisit : ''}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Last Visit</p>
+                            <p className="text-gray-900 font-medium">{'lastVisit' in selectedItem ? selectedItem.lastVisit : ''}</p>
                           </div>
                         </>
                       )}

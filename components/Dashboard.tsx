@@ -161,6 +161,7 @@ export default function Dashboard() {
     const categories: { [key: string]: number } = {
       'Memberships': 0,
       'Class Packs': 0,
+      'Drop-In': 0,
       'Retail': 0
     };
     
@@ -169,7 +170,8 @@ export default function Dashboard() {
         const product = allProducts.find(p => p.id === item.productId);
         const category = product?.category || 
           (item.productId.includes('membership') ? 'membership' : 
-           item.productId.includes('pack') ? 'class-pack' : 'retail');
+           item.productId.includes('pack') ? 'class-pack' :
+           item.productId.includes('drop-in') ? 'drop-in' : 'retail');
         
         const amount = item.price * item.quantity;
         
@@ -177,6 +179,8 @@ export default function Dashboard() {
           categories['Memberships'] += amount;
         } else if (category === 'class-pack') {
           categories['Class Packs'] += amount;
+        } else if (category === 'drop-in') {
+          categories['Drop-In'] += amount;
         } else {
           categories['Retail'] += amount;
         }
@@ -186,6 +190,7 @@ export default function Dashboard() {
     return [
       { name: 'Memberships', value: categories['Memberships'], color: '#AC1305' },
       { name: 'Class Packs', value: categories['Class Packs'], color: '#EAB308' },
+      { name: 'Drop-In', value: categories['Drop-In'], color: '#3B82F6' },
       { name: 'Retail', value: categories['Retail'], color: '#10B981' }
     ].filter(item => item.value > 0);
   };
@@ -204,6 +209,7 @@ export default function Dashboard() {
         let matches = false;
         if (category === 'Memberships' && itemCategory === 'membership') matches = true;
         if (category === 'Class Packs' && itemCategory === 'class-pack') matches = true;
+        if (category === 'Drop-In' && itemCategory === 'drop-in') matches = true;
         if (category === 'Retail' && itemCategory === 'retail') matches = true;
         
         if (matches) {

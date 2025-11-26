@@ -1,7 +1,7 @@
 'use client';
 
-import { Member, ClassPackClient, Lead, Staff, Class, Promotion, Product } from './types';
-import { members as seedMembers, classPackClients as seedClassPackClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts } from '@/data/seedData';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product } from './types';
+import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts } from '@/data/seedData';
 
 const STORAGE_VERSION = 1;
 const STORAGE_KEY = 'auvora-crm-data';
@@ -103,6 +103,7 @@ interface DataStore {
   version: number;
   members: Member[];
   classPackClients: ClassPackClient[];
+  dropInClients: DropInClient[];
   leads: Lead[];
   staff: Staff[];
   classes: Class[];
@@ -117,7 +118,7 @@ interface DataStore {
   leadTasks: LeadTask[];
   leadNotes: LeadNote[];
   communicationLogs: CommunicationLog[];
-  weeklyUsage: Record<string, { weekStart: string; count: number }>; // memberId -> usage
+  weeklyUsage: Record<string, { weekStart: string; count: number }>;
 }
 
 let store: DataStore | null = null;
@@ -144,6 +145,7 @@ function generateSampleRevenue(): Transaction[] {
     { id: 'pack-5', name: '5-Class Pack', price: 75, category: 'class-pack' },
     { id: 'pack-10', name: '10-Class Pack', price: 140, category: 'class-pack' },
     { id: 'pack-20', name: '20-Class Pack', price: 260, category: 'class-pack' },
+    { id: 'drop-in', name: 'Drop-In Class', price: 20, category: 'drop-in' },
     { id: 'retail-water', name: 'Water Bottle', price: 3, category: 'retail' },
     { id: 'retail-shirt', name: 'T-Shirt', price: 25, category: 'retail' },
   ];
@@ -267,6 +269,7 @@ function initializeStore(): DataStore {
       version: STORAGE_VERSION,
       members: seedMembers,
       classPackClients: seedClassPackClients,
+      dropInClients: seedDropInClients,
       leads: seedLeads,
       staff: seedStaff,
       classes: seedClasses,
@@ -307,6 +310,11 @@ function initializeStore(): DataStore {
           needsSave = true;
         }
         
+        if (!parsed.dropInClients || parsed.dropInClients.length === 0) {
+          parsed.dropInClients = seedDropInClients;
+          needsSave = true;
+        }
+        
         if (needsSave) {
           saveStore(parsed);
         }
@@ -322,6 +330,7 @@ function initializeStore(): DataStore {
     version: STORAGE_VERSION,
     members: seedMembers,
     classPackClients: seedClassPackClients,
+    dropInClients: seedDropInClients,
     leads: seedLeads,
     staff: seedStaff,
     classes: seedClasses,
@@ -381,6 +390,10 @@ export function getAllMembers() {
 
 export function getAllClassPackClients() {
   return getStore().classPackClients;
+}
+
+export function getAllDropInClients() {
+  return getStore().dropInClients;
 }
 
 export function getAllLeads() {

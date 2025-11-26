@@ -1,4 +1,4 @@
-import { Member, ClassPackClient, Lead, Staff, Class, Promotion, Product } from '@/lib/types';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product } from '@/lib/types';
 
 const tampaZipCodes = ['33602', '33603', '33606', '33607', '33609', '33611', '33612', '33613', '33614', '33615'];
 
@@ -112,6 +112,50 @@ export function generateClassPackClients(): ClassPackClient[] {
       zipCode: randomItem(tampaZipCodes),
       location: 'dance-studio',
       purchaseDate: randomDate(90)
+    });
+  }
+  
+  return clients;
+}
+
+export function generateDropInClients(): DropInClient[] {
+  const clients: DropInClient[] = [];
+  
+  for (let i = 0; i < 30; i++) {
+    const name = generateName();
+    const firstVisit = randomDate(180);
+    const lastVisit = randomDate(30);
+    const totalVisits = Math.floor(Math.random() * 15) + 1;
+    
+    clients.push({
+      id: `dropin-ac-${i + 1}`,
+      name,
+      email: generateEmail(name),
+      phone: generatePhone(),
+      totalVisits,
+      lastVisit,
+      zipCode: randomItem(tampaZipCodes),
+      location: 'athletic-club',
+      firstVisit
+    });
+  }
+  
+  for (let i = 0; i < 20; i++) {
+    const name = generateName();
+    const firstVisit = randomDate(180);
+    const lastVisit = randomDate(30);
+    const totalVisits = Math.floor(Math.random() * 12) + 1;
+    
+    clients.push({
+      id: `dropin-ds-${i + 1}`,
+      name,
+      email: generateEmail(name),
+      phone: generatePhone(),
+      totalVisits,
+      lastVisit,
+      zipCode: randomItem(tampaZipCodes),
+      location: 'dance-studio',
+      firstVisit
     });
   }
   
@@ -337,6 +381,7 @@ export function generateProducts(): Product[] {
 
 export const members = generateMembers();
 export const classPackClients = generateClassPackClients();
+export const dropInClients = generateDropInClients();
 export const leads = generateLeads();
 export const staff = generateStaff();
 export const classes = generateClasses();
