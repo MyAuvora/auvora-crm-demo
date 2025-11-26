@@ -282,15 +282,45 @@ export default function POS() {
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {location === 'athletic-club' && (
                       <>
-                        <button className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left">
+                        <button 
+                          onClick={() => {
+                            const membershipProduct = locationProducts.find(p => p.id.includes('membership-1x'));
+                            if (membershipProduct) {
+                              addToCart(membershipProduct);
+                            } else {
+                              addToCart({ id: 'membership-1x-temp', name: '1x/week Membership', category: 'Membership', price: 99, stock: 999, location });
+                            }
+                          }}
+                          className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                        >
                           <p className="font-medium text-gray-900">1x/week</p>
                           <p className="text-lg font-bold text-red-600 mt-2">$99/mo</p>
                         </button>
-                        <button className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left">
+                        <button 
+                          onClick={() => {
+                            const membershipProduct = locationProducts.find(p => p.id.includes('membership-2x'));
+                            if (membershipProduct) {
+                              addToCart(membershipProduct);
+                            } else {
+                              addToCart({ id: 'membership-2x-temp', name: '2x/week Membership', category: 'Membership', price: 149, stock: 999, location });
+                            }
+                          }}
+                          className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                        >
                           <p className="font-medium text-gray-900">2x/week</p>
                           <p className="text-lg font-bold text-red-600 mt-2">$149/mo</p>
                         </button>
-                        <button className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left">
+                        <button 
+                          onClick={() => {
+                            const membershipProduct = locationProducts.find(p => p.id.includes('membership-unlimited'));
+                            if (membershipProduct) {
+                              addToCart(membershipProduct);
+                            } else {
+                              addToCart({ id: 'membership-unlimited-temp', name: 'Unlimited Membership', category: 'Membership', price: 199, stock: 999, location });
+                            }
+                          }}
+                          className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                        >
                           <p className="font-medium text-gray-900">Unlimited</p>
                           <p className="text-lg font-bold text-red-600 mt-2">$199/mo</p>
                         </button>
@@ -306,15 +336,45 @@ export default function POS() {
                       <p className="font-medium text-gray-900">Drop-In Class</p>
                       <p className="text-lg font-bold text-blue-600 mt-2">$20</p>
                     </button>
-                    <button className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left">
+                    <button 
+                      onClick={() => {
+                        const packProduct = locationProducts.find(p => p.id.includes('5-pack'));
+                        if (packProduct) {
+                          addToCart(packProduct);
+                        } else {
+                          addToCart({ id: '5-pack-temp', name: '5-pack', category: 'Class Pack', price: 75, stock: 999, location });
+                        }
+                      }}
+                      className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                    >
                       <p className="font-medium text-gray-900">5-pack</p>
                       <p className="text-lg font-bold text-red-600 mt-2">$75</p>
                     </button>
-                    <button className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left">
+                    <button 
+                      onClick={() => {
+                        const packProduct = locationProducts.find(p => p.id.includes('10-pack'));
+                        if (packProduct) {
+                          addToCart(packProduct);
+                        } else {
+                          addToCart({ id: '10-pack-temp', name: '10-pack', category: 'Class Pack', price: 140, stock: 999, location });
+                        }
+                      }}
+                      className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                    >
                       <p className="font-medium text-gray-900">10-pack</p>
                       <p className="text-lg font-bold text-red-600 mt-2">$140</p>
                     </button>
-                    <button className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left">
+                    <button 
+                      onClick={() => {
+                        const packProduct = locationProducts.find(p => p.id.includes('20-pack'));
+                        if (packProduct) {
+                          addToCart(packProduct);
+                        } else {
+                          addToCart({ id: '20-pack-temp', name: '20-pack', category: 'Class Pack', price: 260, stock: 999, location });
+                        }
+                      }}
+                      className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                    >
                       <p className="font-medium text-gray-900">20-pack</p>
                       <p className="text-lg font-bold text-red-600 mt-2">$260</p>
                     </button>
