@@ -75,7 +75,7 @@ export function generateClassPackClients(): ClassPackClient[] {
   const clients: ClassPackClient[] = [];
   const packTypes: ('5-pack' | '10-pack' | '20-pack')[] = ['5-pack', '10-pack', '20-pack'];
   
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 20; i++) {
     const name = generateName();
     const packType = randomItem(packTypes);
     const totalClasses = parseInt(packType.split('-')[0]);
@@ -95,7 +95,7 @@ export function generateClassPackClients(): ClassPackClient[] {
     });
   }
   
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 15; i++) {
     const name = generateName();
     const packType = randomItem(packTypes);
     const totalClasses = parseInt(packType.split('-')[0]);

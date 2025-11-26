@@ -11,7 +11,7 @@ import AddNoteModal from './AddNoteModal';
 import AddTaskModal from './AddTaskModal';
 import SendTextModal from './SendTextModal';
 
-type Tab = 'leads' | 'members';
+type Tab = 'leads' | 'members' | 'class-packs';
 
 export default function LeadsMembers() {
   const { location, deepLink, setDeepLink } = useApp();
@@ -32,11 +32,19 @@ export default function LeadsMembers() {
     if (deepLink) {
       const handleDeepLink = () => {
         if (deepLink.type === 'member') {
-          const allMembers = [...getAllMembers(), ...getAllClassPackClients(), ...getAllDropInClients()];
-          const member = allMembers.find(m => m.id === deepLink.id);
+          const member = getAllMembers().find(m => m.id === deepLink.id);
+          const packClient = getAllClassPackClients().find(c => c.id === deepLink.id);
+          const dropInClient = getAllDropInClients().find(d => d.id === deepLink.id);
+          
           if (member) {
             setActiveTab('members');
             setSelectedItem(member);
+          } else if (packClient) {
+            setActiveTab('class-packs');
+            setSelectedItem(packClient);
+          } else if (dropInClient) {
+            setActiveTab('members');
+            setSelectedItem(dropInClient);
           }
         } else if (deepLink.type === 'lead') {
           const lead = getAllLeads().find(l => l.id === deepLink.id);
@@ -65,24 +73,31 @@ export default function LeadsMembers() {
     return matchesSearch && matchesStatus && matchesSource;
   });
 
-  const allMembers = [
+  const membersWithDropIn = [
     ...locationMembers.map(m => ({ ...m, type: 'membership' as const })),
-    ...locationPackClients.map(c => ({ ...c, type: 'pack' as const })),
     ...locationDropInClients.map(c => ({ ...c, type: 'drop-in' as const }))
   ];
 
-  const filteredMembers = allMembers.filter(member => {
+  const filteredMembers = membersWithDropIn.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          member.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesMembership = membershipFilter === 'all' || 
                              (member.type === 'membership' && 'membershipType' in member && member.membershipType === membershipFilter) ||
-                             (member.type === 'pack' && membershipFilter === 'pack') ||
                              (member.type === 'drop-in' && membershipFilter === 'drop-in');
     const matchesZip = zipFilter === 'all' || member.zipCode === zipFilter;
     return matchesSearch && matchesMembership && matchesZip;
   });
 
-  const uniqueZips = Array.from(new Set(allMembers.map(m => m.zipCode))).sort();
+  const classPacksWithType = locationPackClients.map(c => ({ ...c, type: 'pack' as const }));
+  
+  const filteredClassPacks = classPacksWithType.filter(pack => {
+    const matchesSearch = pack.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         pack.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesZip = zipFilter === 'all' || pack.zipCode === zipFilter;
+    return matchesSearch && matchesZip;
+  });
+
+  const uniqueZips = Array.from(new Set([...membersWithDropIn.map(m => m.zipCode), ...classPacksWithType.map(c => c.zipCode)])).sort();
 
   return (
     <div className="space-y-6">
@@ -112,7 +127,17 @@ export default function LeadsMembers() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Members ({allMembers.length})
+              Members ({membersWithDropIn.length})
+            </button>
+            <button
+              onClick={() => { setActiveTab('class-packs'); setSelectedItem(null); }}
+              className={`px-6 py-3 font-medium ${
+                activeTab === 'class-packs'
+                  ? 'text-red-600 border-b-2 border-red-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Class Packs ({locationPackClients.length})
             </button>
           </div>
         </div>
@@ -174,7 +199,6 @@ export default function LeadsMembers() {
                       <option value="unlimited">Unlimited</option>
                     </>
                   )}
-                  <option value="pack">Class Pack</option>
                   <option value="drop-in">Drop-In</option>
                 </select>
                 <select
@@ -188,6 +212,19 @@ export default function LeadsMembers() {
                   ))}
                 </select>
               </>
+            )}
+
+            {activeTab === 'class-packs' && (
+              <select
+                value={zipFilter}
+                onChange={(e) => setZipFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+              >
+                <option value="all">All Zip Codes</option>
+                {uniqueZips.map(zip => (
+                  <option key={zip} value={zip}>{zip}</option>
+                ))}
+              </select>
             )}
           </div>
 
@@ -246,8 +283,6 @@ export default function LeadsMembers() {
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {member.type === 'membership' 
                           ? ('membershipType' in member ? member.membershipType : '')
-                          : member.type === 'pack'
-                          ? ('packType' in member ? `${member.packType} (${member.remainingClasses}/${member.totalClasses} left)` : '')
                           : 'Drop-In'
                         }
                       </td>
@@ -262,6 +297,24 @@ export default function LeadsMembers() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">{member.zipCode}</td>
+                    </tr>
+                  ))}
+                  {activeTab === 'class-packs' && filteredClassPacks.map(pack => (
+                    <tr
+                      key={pack.id}
+                      onClick={() => setSelectedItem(pack)}
+                      className="hover:bg-gray-50 cursor-pointer"
+                    >
+                      <td className="px-4 py-3 text-sm text-gray-900">{pack.name}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {pack.packType} ({pack.remainingClasses}/{pack.totalClasses} left)
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                          Active
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{pack.zipCode}</td>
                     </tr>
                   ))}
                 </tbody>
