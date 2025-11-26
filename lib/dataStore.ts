@@ -298,7 +298,18 @@ function initializeStore(): DataStore {
         if (parsed.transactions.length === 0 || !parsed.transactions.some((t: Transaction) => t.id.startsWith('txn-sample-'))) {
           parsed.transactions = [...parsed.transactions, ...generateSampleRevenue()];
           needsSave = true;
+        } else {
+          const hasDropInTransactions = parsed.transactions.some((t: Transaction) => 
+            t.items.some(item => item.productId.includes('drop-in'))
+          );
+          
+          if (!hasDropInTransactions) {
+            parsed.transactions = parsed.transactions.filter((t: Transaction) => !t.id.startsWith('txn-sample-'));
+            parsed.transactions = [...parsed.transactions, ...generateSampleRevenue()];
+            needsSave = true;
+          }
         }
+        
         if (parsed.bookings.length === 0 || !parsed.bookings.some((b: Booking) => b.id.startsWith('booking-sample-'))) {
           parsed.bookings = [...parsed.bookings, ...generateSampleBookings()];
           needsSave = true;

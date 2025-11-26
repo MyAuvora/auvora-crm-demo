@@ -204,7 +204,8 @@ export default function Dashboard() {
         const product = allProducts.find(p => p.id === item.productId);
         const itemCategory = product?.category || 
           (item.productId.includes('membership') ? 'membership' : 
-           item.productId.includes('pack') ? 'class-pack' : 'retail');
+           item.productId.includes('pack') ? 'class-pack' :
+           item.productId.includes('drop-in') ? 'drop-in' : 'retail');
         
         let matches = false;
         if (category === 'Memberships' && itemCategory === 'membership') matches = true;
