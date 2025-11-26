@@ -3,7 +3,7 @@
 import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product } from './types';
 import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts } from '@/data/seedData';
 
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 const STORAGE_KEY = 'auvora-crm-data';
 
 export interface Booking {
@@ -99,6 +99,67 @@ export interface CommunicationLog {
   status: 'sent' | 'failed';
 }
 
+export interface Invoice {
+  id: string;
+  memberId?: string;
+  memberName: string;
+  accountId?: string;
+  items: InvoiceItem[];
+  subtotal: number;
+  discount: number;
+  tax: number;
+  total: number;
+  amountPaid: number;
+  amountRefunded: number;
+  status: 'paid' | 'refunded' | 'partial' | 'due' | 'overdue';
+  promoCode?: string;
+  timestamp: string;
+  dueDate?: string;
+  location: string;
+}
+
+export interface InvoiceItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+  total: number;
+}
+
+export interface Refund {
+  id: string;
+  invoiceId: string;
+  amount: number;
+  reason: string;
+  refundedAt: string;
+  refundedBy?: string;
+  location: string;
+}
+
+export interface PaymentMethod {
+  id: string;
+  memberId: string;
+  brand: string;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+  isDefault: boolean;
+  addedAt: string;
+}
+
+export interface PaymentPlan {
+  id: string;
+  memberId: string;
+  invoiceId: string;
+  totalAmount: number;
+  installments: number;
+  frequency: 'weekly' | 'biweekly' | 'monthly';
+  amountPaid: number;
+  nextDue: string;
+  status: 'active' | 'completed' | 'defaulted';
+  createdAt: string;
+}
+
 interface DataStore {
   version: number;
   members: Member[];
@@ -119,6 +180,10 @@ interface DataStore {
   leadNotes: LeadNote[];
   communicationLogs: CommunicationLog[];
   weeklyUsage: Record<string, { weekStart: string; count: number }>;
+  invoices: Invoice[];
+  refunds: Refund[];
+  paymentMethods: PaymentMethod[];
+  paymentPlans: PaymentPlan[];
 }
 
 let store: DataStore | null = null;
@@ -286,6 +351,10 @@ function initializeStore(): DataStore {
       leadNotes: [],
       communicationLogs: [],
       weeklyUsage: {},
+      invoices: [],
+      refunds: [],
+      paymentMethods: [],
+      paymentPlans: [],
     };
   }
 
@@ -293,6 +362,12 @@ function initializeStore(): DataStore {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored) as DataStore;
+      
+      if (!parsed.invoices) parsed.invoices = [];
+      if (!parsed.refunds) parsed.refunds = [];
+      if (!parsed.paymentMethods) parsed.paymentMethods = [];
+      if (!parsed.paymentPlans) parsed.paymentPlans = [];
+      
       if (parsed.version === STORAGE_VERSION) {
         let needsSave = false;
         
@@ -358,6 +433,10 @@ function initializeStore(): DataStore {
     leadNotes: [],
     communicationLogs: [],
     weeklyUsage: {},
+    invoices: [],
+    refunds: [],
+    paymentMethods: [],
+    paymentPlans: [],
   };
 
   saveStore(initialStore);
@@ -903,4 +982,134 @@ export function resetData() {
     store = null;
     store = initializeStore();
   }
+}
+
+export function getAllInvoices(): Invoice[] {
+  return getStore().invoices;
+}
+
+export function getAllRefunds(): Refund[] {
+  return getStore().refunds;
+}
+
+export function getAllPaymentMethods(): PaymentMethod[] {
+  return getStore().paymentMethods;
+}
+
+export function getAllPaymentPlans(): PaymentPlan[] {
+  return getStore().paymentPlans;
+}
+
+export function createInvoice(data: Omit<Invoice, 'id'>): Invoice {
+  const s = getStore();
+  const newInvoice: Invoice = {
+    ...data,
+    id: `inv-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  };
+  s.invoices.push(newInvoice);
+  saveStore(s);
+  
+  addAuditLog(
+    'Invoice Created',
+    'invoice',
+    newInvoice.id,
+    `Invoice ${newInvoice.id} created for ${newInvoice.memberName} - $${newInvoice.total.toFixed(2)}`,
+    newInvoice.location
+  );
+  
+  return newInvoice;
+}
+
+export function getInvoicesByMember(memberId: string): Invoice[] {
+  return getAllInvoices().filter(inv => inv.memberId === memberId);
+}
+
+export function getInvoiceById(invoiceId: string): Invoice | undefined {
+  return getAllInvoices().find(inv => inv.id === invoiceId);
+}
+
+export function refundInvoice(invoiceId: string, amount: number, reason: string, refundedBy?: string): Refund {
+  const s = getStore();
+  const invoice = s.invoices.find(inv => inv.id === invoiceId);
+  
+  if (!invoice) {
+    throw new Error('Invoice not found');
+  }
+  
+  const refund: Refund = {
+    id: `ref-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    invoiceId,
+    amount,
+    reason,
+    refundedAt: new Date().toISOString(),
+    refundedBy,
+    location: invoice.location,
+  };
+  
+  s.refunds.push(refund);
+  
+  invoice.amountRefunded += amount;
+  if (invoice.amountRefunded >= invoice.total) {
+    invoice.status = 'refunded';
+  } else if (invoice.amountRefunded > 0) {
+    invoice.status = 'partial';
+  }
+  
+  saveStore(s);
+  
+  addAuditLog(
+    'Invoice Refunded',
+    'invoice',
+    invoiceId,
+    `Refund of $${amount.toFixed(2)} issued for invoice ${invoiceId}. Reason: ${reason}`,
+    invoice.location
+  );
+  
+  return refund;
+}
+
+export function getRefundsByInvoice(invoiceId: string): Refund[] {
+  return getAllRefunds().filter(ref => ref.invoiceId === invoiceId);
+}
+
+export function addPaymentMethod(data: Omit<PaymentMethod, 'id'>): PaymentMethod {
+  const s = getStore();
+  
+  if (data.isDefault) {
+    s.paymentMethods.forEach(pm => {
+      if (pm.memberId === data.memberId) {
+        pm.isDefault = false;
+      }
+    });
+  }
+  
+  const newMethod: PaymentMethod = {
+    ...data,
+    id: `pm-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  };
+  
+  s.paymentMethods.push(newMethod);
+  saveStore(s);
+  
+  return newMethod;
+}
+
+export function getPaymentMethodsByMember(memberId: string): PaymentMethod[] {
+  return getAllPaymentMethods().filter(pm => pm.memberId === memberId);
+}
+
+export function createPaymentPlan(data: Omit<PaymentPlan, 'id'>): PaymentPlan {
+  const s = getStore();
+  const newPlan: PaymentPlan = {
+    ...data,
+    id: `pp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  };
+  s.paymentPlans.push(newPlan);
+  saveStore(s);
+  
+  return newPlan;
+}
+
+export function getPaymentPlansByMember(memberId: string): PaymentPlan[] {
+  return getAllPaymentPlans().filter(pp => pp.memberId === memberId);
 }

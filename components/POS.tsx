@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllProducts, getAllMembers, getAllClassPackClients, createTransaction, getAllTransactions, Transaction } from '@/lib/dataStore';
-import { ShoppingCart, AlertTriangle, Receipt, Tag } from 'lucide-react';
+import { getAllProducts, getAllMembers, getAllClassPackClients, createTransaction, getAllTransactions, Transaction, createInvoice, getAllInvoices, Invoice, refundInvoice, getRefundsByInvoice, Refund } from '@/lib/dataStore';
+import { ShoppingCart, AlertTriangle, Receipt, Tag, FileText, DollarSign, X } from 'lucide-react';
 import { Product } from '@/lib/types';
 
 type CartItem = {
@@ -13,7 +13,7 @@ type CartItem = {
 
 export default function POS() {
   const { location } = useApp();
-  const [activeTab, setActiveTab] = useState<'pos' | 'inventory' | 'transactions'>('pos');
+  const [activeTab, setActiveTab] = useState<'pos' | 'inventory' | 'transactions' | 'invoices'>('pos');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
   const [promoCode, setPromoCode] = useState('');
@@ -21,10 +21,15 @@ export default function POS() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [lastTransaction, setLastTransaction] = useState<Transaction | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refundAmount, setRefundAmount] = useState('');
+  const [refundReason, setRefundReason] = useState('');
 
   const locationProducts = getAllProducts().filter(p => p.location === location);
   const allMembers = [...getAllMembers(), ...getAllClassPackClients()].filter(m => m.location === location);
   const transactions = getAllTransactions().filter(t => t.location === location);
+  const invoices = getAllInvoices().filter(inv => inv.location === location);
 
   const addToCart = (product: Product) => {
     const existing = cart.find(item => item.product.id === product.id);
@@ -111,7 +116,30 @@ export default function POS() {
       location,
     });
 
+    const invoice = createInvoice({
+      memberId: selectedMember || undefined,
+      memberName: member?.name || 'Guest',
+      items: cart.map(item => ({
+        productId: item.product.id,
+        productName: item.product.name,
+        quantity: item.quantity,
+        price: item.product.price,
+        total: item.product.price * item.quantity,
+      })),
+      subtotal,
+      discount: discountAmount,
+      tax,
+      total,
+      amountPaid: total,
+      amountRefunded: 0,
+      status: 'paid',
+      promoCode: promoCode || undefined,
+      timestamp: new Date().toISOString(),
+      location,
+    });
+
     setLastTransaction(transaction);
+    setSelectedInvoice(invoice);
     setShowReceipt(true);
     setShowSuccess(true);
     setCart([]);
@@ -119,6 +147,37 @@ export default function POS() {
     setPromoCode('');
     setDiscount(0);
     setTimeout(() => setShowSuccess(false), 3000);
+  };
+
+  const handleRefund = () => {
+    if (!selectedInvoice || !refundAmount || !refundReason) {
+      alert('Please enter refund amount and reason');
+      return;
+    }
+
+    const amount = parseFloat(refundAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid refund amount');
+      return;
+    }
+
+    const maxRefund = selectedInvoice.total - selectedInvoice.amountRefunded;
+    if (amount > maxRefund) {
+      alert(`Maximum refund amount is $${maxRefund.toFixed(2)}`);
+      return;
+    }
+
+    try {
+      refundInvoice(selectedInvoice.id, amount, refundReason, 'Owner');
+      setShowRefundModal(false);
+      setRefundAmount('');
+      setRefundReason('');
+      setSelectedInvoice(null);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch {
+      alert('Error processing refund');
+    }
   };
 
   return (
@@ -160,6 +219,16 @@ export default function POS() {
               }`}
             >
               Transactions
+            </button>
+            <button
+              onClick={() => setActiveTab('invoices')}
+              className={`px-6 py-3 font-medium ${
+                activeTab === 'invoices'
+                  ? 'text-red-600 border-b-2 border-red-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Invoices
             </button>
           </div>
         </div>
@@ -447,67 +516,244 @@ export default function POS() {
         )}
       </div>
 
-      {showReceipt && lastTransaction && (
+      {activeTab === 'invoices' && (
+        <div className="p-6">
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-gray-900">All Invoices</h3>
+            <p className="text-sm text-gray-600">View and manage invoices</p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice #</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {invoices.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                      No invoices yet
+                    </td>
+                  </tr>
+                ) : (
+                  invoices.map((inv) => (
+                    <tr key={inv.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {inv.id.substring(0, 12)}...
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{inv.memberName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {new Date(inv.timestamp).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        ${inv.total.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          inv.status === 'paid' ? 'bg-green-100 text-green-700' :
+                          inv.status === 'refunded' ? 'bg-red-100 text-red-700' :
+                          inv.status === 'partial' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-gray-100 text-gray-700'
+                        }`}>
+                          {inv.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <button
+                          onClick={() => {
+                            setSelectedInvoice(inv);
+                            setShowReceipt(true);
+                          }}
+                          className="text-blue-600 hover:text-blue-700 mr-3"
+                        >
+                          <FileText size={16} className="inline" /> View
+                        </button>
+                        {inv.status !== 'refunded' && inv.amountRefunded < inv.total && (
+                          <button
+                            onClick={() => {
+                              setSelectedInvoice(inv);
+                              setShowRefundModal(true);
+                            }}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <DollarSign size={16} className="inline" /> Refund
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {showRefundModal && selectedInvoice && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
             <div className="bg-red-600 text-white p-4 flex justify-between items-center rounded-t-lg">
-              <h2 className="text-xl font-bold">Receipt</h2>
-              <button onClick={() => setShowReceipt(false)} className="hover:bg-red-700 p-1 rounded">
-                ×
+              <h2 className="text-xl font-bold">Process Refund</h2>
+              <button onClick={() => setShowRefundModal(false)} className="hover:bg-red-700 p-1 rounded">
+                <X size={20} />
               </button>
             </div>
 
             <div className="p-6">
-              <div className="text-center mb-4">
-                <h3 className="text-lg font-bold text-gray-900">The LAB Tampa</h3>
-                <p className="text-sm text-gray-600">{location === 'athletic-club' ? 'Athletic Club' : 'Dance Studio'}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {new Date(lastTransaction.timestamp).toLocaleString()}
+              <div className="mb-4">
+                <p className="text-sm text-gray-600">Invoice: {selectedInvoice.id.substring(0, 12)}...</p>
+                <p className="text-sm text-gray-600">Customer: {selectedInvoice.memberName}</p>
+                <p className="text-sm text-gray-600">Total: ${selectedInvoice.total.toFixed(2)}</p>
+                <p className="text-sm text-gray-600">Already Refunded: ${selectedInvoice.amountRefunded.toFixed(2)}</p>
+                <p className="text-sm font-medium text-gray-900 mt-2">
+                  Max Refund: ${(selectedInvoice.total - selectedInvoice.amountRefunded).toFixed(2)}
                 </p>
               </div>
 
-              <div className="border-t border-b border-gray-200 py-4 mb-4">
-                <p className="text-sm text-gray-600 mb-2">Customer: <span className="font-medium text-gray-900">{lastTransaction.memberName}</span></p>
-                
-                <div className="space-y-2 mt-4">
-                  {lastTransaction.items.map((item, idx: number) => (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <span className="text-gray-900">{item.quantity}x {item.productName}</span>
-                      <span className="text-gray-900">${(item.price * item.quantity).toFixed(2)}</span>
-                    </div>
-                  ))}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Refund Amount</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={refundAmount}
+                    onChange={(e) => setRefundAmount(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+                  <textarea
+                    value={refundReason}
+                    onChange={(e) => setRefundReason(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    rows={3}
+                    placeholder="Enter refund reason..."
+                  />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="text-gray-900">${lastTransaction.subtotal.toFixed(2)}</span>
-                </div>
-                {lastTransaction.discount > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-green-600">Discount</span>
-                    <span className="text-green-600">-${lastTransaction.discount.toFixed(2)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax</span>
-                  <span className="text-gray-900">${lastTransaction.tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between pt-2 border-t border-gray-300">
-                  <span className="font-bold text-gray-900">Total</span>
-                  <span className="font-bold text-red-600">${lastTransaction.total.toFixed(2)}</span>
-                </div>
-              </div>
-
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex justify-end gap-3">
                 <button
-                  onClick={() => setShowReceipt(false)}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                  onClick={() => setShowRefundModal(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
                 >
-                  Close
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRefund}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Process Refund
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showReceipt && (selectedInvoice || lastTransaction) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="bg-red-600 text-white p-4 flex justify-between items-center rounded-t-lg">
+              <h2 className="text-xl font-bold">{selectedInvoice ? 'Invoice' : 'Receipt'}</h2>
+              <button onClick={() => { setShowReceipt(false); setSelectedInvoice(null); }} className="hover:bg-red-700 p-1 rounded">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {(() => {
+                const data = selectedInvoice || lastTransaction;
+                if (!data) return null;
+                
+                const refunds = selectedInvoice ? getRefundsByInvoice(selectedInvoice.id) : [];
+                
+                return (
+                  <>
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-bold text-gray-900">The LAB Tampa</h3>
+                      <p className="text-sm text-gray-600">{location === 'athletic-club' ? 'Athletic Club' : 'Dance Studio'}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(data.timestamp).toLocaleString()}
+                      </p>
+                      {selectedInvoice && (
+                        <p className="text-xs text-gray-500 mt-1">Invoice: {selectedInvoice.id.substring(0, 12)}...</p>
+                      )}
+                    </div>
+
+                    <div className="border-t border-b border-gray-200 py-4 mb-4">
+                      <p className="text-sm text-gray-600 mb-2">Customer: <span className="font-medium text-gray-900">{data.memberName}</span></p>
+                      
+                      <div className="space-y-2 mt-4">
+                        {data.items.map((item: { quantity: number; productName: string; price: number }, idx: number) => (
+                          <div key={idx} className="flex justify-between text-sm">
+                            <span className="text-gray-900">{item.quantity}x {item.productName}</span>
+                            <span className="text-gray-900">${(item.price * item.quantity).toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Subtotal</span>
+                        <span className="text-gray-900">${data.subtotal.toFixed(2)}</span>
+                      </div>
+                      {data.discount > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-green-600">Discount</span>
+                          <span className="text-green-600">-${data.discount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Tax</span>
+                        <span className="text-gray-900">${data.tax.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between pt-2 border-t border-gray-300">
+                        <span className="font-bold text-gray-900">Total</span>
+                        <span className="font-bold text-red-600">${data.total.toFixed(2)}</span>
+                      </div>
+                      
+                      {selectedInvoice && refunds.length > 0 && (
+                        <>
+                          <div className="pt-2 border-t border-gray-300 mt-2">
+                            <p className="text-sm font-medium text-gray-700 mb-2">Refunds:</p>
+                            {refunds.map((refund: Refund) => (
+                              <div key={refund.id} className="flex justify-between text-sm text-red-600 mb-1">
+                                <span>{new Date(refund.refundedAt).toLocaleDateString()} - {refund.reason}</span>
+                                <span>-${refund.amount.toFixed(2)}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex justify-between pt-2 border-t border-gray-300 font-bold">
+                            <span className="text-gray-900">Net Total</span>
+                            <span className="text-gray-900">${(selectedInvoice.total - selectedInvoice.amountRefunded).toFixed(2)}</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                      <button
+                        onClick={() => { setShowReceipt(false); setSelectedInvoice(null); }}
+                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
