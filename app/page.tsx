@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useApp, Section } from '@/lib/context';
-import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor, MessageSquare, Share2, DollarSign, Search } from 'lucide-react';
+import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor, MessageSquare, Share2, DollarSign, Search, Settings as SettingsIcon } from 'lucide-react';
 import Dashboard from '@/components/Dashboard';
 import LeadsMembers from '@/components/LeadsMembers';
 import LeadPipeline from '@/components/LeadPipeline';
@@ -14,6 +14,7 @@ import Promotions from '@/components/Promotions';
 import Messaging from '@/components/Messaging';
 import SocialMedia from '@/components/SocialMedia';
 import QuickBooksIntegration from '@/components/QuickBooksIntegration';
+import Settings from '@/components/Settings';
 import AuvoraChat from '@/components/AuvoraChat';
 import CommandPalette from '@/components/CommandPalette';
 
@@ -62,6 +63,7 @@ export default function CRMApp() {
     { id: 'messaging' as Section, label: 'Messaging', icon: MessageSquare, roles: ['owner', 'manager', 'front-desk'] },
     { id: 'social-media' as Section, label: 'Social Media', icon: Share2, roles: ['owner', 'manager'] },
     { id: 'quickbooks' as Section, label: 'QuickBooks', icon: DollarSign, roles: ['owner', 'manager'] },
+    { id: 'settings' as Section, label: 'Settings', icon: SettingsIcon, roles: ['owner'] },
     { id: 'kiosk' as Section, label: 'Kiosk Mode', icon: Monitor, roles: ['front-desk'] },
   ];
   
@@ -169,6 +171,7 @@ export default function CRMApp() {
           {activeSection === 'messaging' && <Messaging />}
           {activeSection === 'social-media' && <SocialMedia />}
           {activeSection === 'quickbooks' && <QuickBooksIntegration />}
+          {activeSection === 'settings' && <Settings />}
           {activeSection === 'kiosk' && <div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Kiosk Mode</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>}
         </main>
       </div>
