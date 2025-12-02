@@ -16,6 +16,9 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
   const [showShiftModal, setShowShiftModal] = useState(false);
   const [editingShift, setEditingShift] = useState<StaffShift | null>(null);
   const [, setRefreshTrigger] = useState(0);
+  const [dragStart, setDragStart] = useState<{ day: string; time: string } | null>(null);
+  const [dragEnd, setDragEnd] = useState<{ day: string; time: string } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const allShifts = getAllStaffShifts();
   const locationShifts = allShifts.filter(s => s.location === location);
@@ -30,6 +33,83 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
 
   const handleRefresh = () => {
     setRefreshTrigger(prev => prev + 1);
+  };
+
+  const handleMouseDown = (day: string, time: string) => {
+    if (!canManageSchedule) return;
+    setIsDragging(true);
+    setDragStart({ day, time });
+    setDragEnd({ day, time });
+  };
+
+  const handleMouseEnter = (day: string, time: string) => {
+    if (!isDragging || !dragStart) return;
+    if (day === dragStart.day) {
+      setDragEnd({ day, time });
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging || !dragStart || !dragEnd) {
+      setIsDragging(false);
+      setDragStart(null);
+      setDragEnd(null);
+      return;
+    }
+
+    const startTimeIndex = timeSlots.indexOf(dragStart.time);
+    const endTimeIndex = timeSlots.indexOf(dragEnd.time);
+    
+    if (startTimeIndex !== -1 && endTimeIndex !== -1 && dragStart.day === dragEnd.day) {
+      const minIndex = Math.min(startTimeIndex, endTimeIndex);
+      const maxIndex = Math.max(startTimeIndex, endTimeIndex);
+      
+      const startTime = timeSlots[minIndex];
+      const endTime = timeSlots[maxIndex + 1] || timeSlots[maxIndex];
+      
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+      
+      const dayIndex = daysOfWeek.indexOf(dragStart.day);
+      const shiftDate = new Date(startOfWeek);
+      shiftDate.setDate(startOfWeek.getDate() + dayIndex);
+      
+      setEditingShift({
+        id: '',
+        location,
+        templateType: 'front-desk',
+        recurrence: { 
+          type: 'none',
+          startTime,
+          endTime
+        },
+        date: shiftDate.toISOString().split('T')[0],
+        startTime,
+        endTime,
+        status: 'scheduled',
+        createdBy: 'system',
+        createdAt: new Date().toISOString(),
+      } as StaffShift);
+      setShowShiftModal(true);
+    }
+
+    setIsDragging(false);
+    setDragStart(null);
+    setDragEnd(null);
+  };
+
+  const isCellSelected = (day: string, time: string) => {
+    if (!isDragging || !dragStart || !dragEnd || day !== dragStart.day) return false;
+    
+    const startTimeIndex = timeSlots.indexOf(dragStart.time);
+    const endTimeIndex = timeSlots.indexOf(dragEnd.time);
+    const currentTimeIndex = timeSlots.indexOf(time);
+    
+    const minIndex = Math.min(startTimeIndex, endTimeIndex);
+    const maxIndex = Math.max(startTimeIndex, endTimeIndex);
+    
+    return currentTimeIndex >= minIndex && currentTimeIndex <= maxIndex;
   };
 
   const handleEditShift = (shift: StaffShift, e: React.MouseEvent) => {
@@ -162,7 +242,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Staff Schedule</h2>
@@ -223,8 +303,17 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
                   </td>
                   {daysOfWeek.map(day => {
                     const dayShifts = getShiftsForDayAndTime(day, time);
+                    const isSelected = isCellSelected(day, time);
                     return (
-                      <td key={day} className="px-1 py-1 border-r border-gray-200 last:border-r-0 align-top">
+                      <td 
+                        key={day} 
+                        className={`px-1 py-1 border-r border-gray-200 last:border-r-0 align-top cursor-pointer transition-colors ${
+                          isSelected ? 'bg-blue-100' : 'hover:bg-gray-50'
+                        }`}
+                        onMouseDown={() => handleMouseDown(day, time)}
+                        onMouseEnter={() => handleMouseEnter(day, time)}
+                        onMouseUp={handleMouseUp}
+                      >
                         {dayShifts.map(shift => (
                           <div
                             key={shift.id}
