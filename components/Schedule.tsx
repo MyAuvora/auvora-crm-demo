@@ -206,7 +206,11 @@ export default function Schedule() {
         </div>
       </div>
 
-      {!selectedClass ? (
+      {scheduleType === 'staff' ? (
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <p className="text-gray-600">Staff scheduling coming soon...</p>
+        </div>
+      ) : !selectedClass ? (
         <>
           {viewMode === 'calendar' ? (
             <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
