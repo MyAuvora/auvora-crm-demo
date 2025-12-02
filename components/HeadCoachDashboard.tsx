@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useApp } from '@/lib/context';
 import { 
   Users, TrendingUp, Calendar, CheckCircle, XCircle, Clock,
-  ArrowUpDown, ChevronDown, ChevronUp, Plus, Trash2
+  ArrowUpDown, ChevronDown, ChevronUp, Plus, Trash2, X
 } from 'lucide-react';
 import { 
   getAllCoachStats, 
@@ -16,13 +16,20 @@ import {
   updateTimeOffRequest,
   getAllClasses,
   getAllStaff,
-  deleteClass
+  deleteClass,
+  getPersonById,
+  getAllLeads,
+  getAllBookings
 } from '@/lib/dataStore';
 import { format, startOfWeek, startOfMonth, startOfYear } from 'date-fns';
+import ProfileTabs from './ProfileTabs';
+import SendTextModal from './SendTextModal';
 
 type TimeRange = 'WTD' | 'MTD' | 'YTD';
 type SortField = 'name' | 'conversionRate' | 'averageClassSize';
 type SortDirection = 'asc' | 'desc';
+
+type DrillDownType = 'leads' | 'bookings' | 'classes' | null;
 
 export default function HeadCoachDashboard() {
   const { location } = useApp();
@@ -31,6 +38,11 @@ export default function HeadCoachDashboard() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [expandedCoach, setExpandedCoach] = useState<string | null>(null);
   const [showScheduleManager, setShowScheduleManager] = useState(false);
+  const [drillDownModal, setDrillDownModal] = useState<{ type: DrillDownType; coachId: string; coachName: string } | null>(null);
+  const [showProfileTabs, setShowProfileTabs] = useState(false);
+  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const [showSendTextModal, setShowSendTextModal] = useState(false);
+  const [textRecipient, setTextRecipient] = useState<{ name: string; phone: string } | null>(null);
 
   const dateRanges = useMemo(() => {
     const now = new Date();
@@ -101,6 +113,54 @@ export default function HeadCoachDashboard() {
       deleteClass(classId);
       window.location.reload();
     }
+  };
+
+  const handlePersonClick = (personId: string) => {
+    setSelectedPersonId(personId);
+    setShowProfileTabs(true);
+  };
+
+  const getCoachLeadsDetails = (coachId: string) => {
+    const { start, end } = dateRanges[timeRange];
+    const allLeads = getAllLeads();
+    
+    const coachStat = coachStats.find(c => c.coachId === coachId);
+    if (!coachStat) return [];
+    
+    const leadSample = allLeads.slice(0, coachStat.totalLeads).map((lead, index) => ({
+      lead,
+      converted: index < coachStat.convertedLeads,
+      interactionDate: start
+    }));
+    
+    return leadSample;
+  };
+
+  const getCoachBookingsDetails = (coachId: string) => {
+    const { start, end } = dateRanges[timeRange];
+    const coachClasses = classes.filter(c => c.coachId === coachId);
+    const allBookings = getAllBookings();
+    
+    const bookings = allBookings.filter(b => 
+      coachClasses.some(c => c.id === b.classId) &&
+      b.status !== 'cancelled' &&
+      b.bookedAt >= start &&
+      b.bookedAt <= end
+    );
+    
+    return bookings.map(booking => {
+      const cls = coachClasses.find(c => c.id === booking.classId);
+      return {
+        ...booking,
+        className: cls?.name || 'Unknown Class',
+        classTime: cls?.time || '',
+        classDayOfWeek: cls?.dayOfWeek || ''
+      };
+    });
+  };
+
+  const getCoachClassesDetails = (coachId: string) => {
+    return classes.filter(c => c.coachId === coachId);
   };
 
   return (
@@ -239,15 +299,30 @@ export default function HeadCoachDashboard() {
                         <div className="grid grid-cols-3 gap-4">
                           <div>
                             <p className="text-sm font-medium text-gray-600">Total Classes</p>
-                            <p className="text-lg font-bold text-gray-900">{coach.totalClasses}</p>
+                            <button
+                              onClick={() => setDrillDownModal({ type: 'classes', coachId: coach.coachId, coachName: coach.coachName })}
+                              className="text-lg font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                            >
+                              {coach.totalClasses}
+                            </button>
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-600">Total Bookings</p>
-                            <p className="text-lg font-bold text-gray-900">{coach.totalBookings}</p>
+                            <button
+                              onClick={() => setDrillDownModal({ type: 'bookings', coachId: coach.coachId, coachName: coach.coachName })}
+                              className="text-lg font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                            >
+                              {coach.totalBookings}
+                            </button>
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-600">Leads Worked With</p>
-                            <p className="text-lg font-bold text-gray-900">{coach.totalLeads}</p>
+                            <button
+                              onClick={() => setDrillDownModal({ type: 'leads', coachId: coach.coachId, coachName: coach.coachName })}
+                              className="text-lg font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                            >
+                              {coach.totalLeads}
+                            </button>
                           </div>
                         </div>
                       </td>
@@ -468,6 +543,180 @@ export default function HeadCoachDashboard() {
           </div>
         )}
       </div>
+
+      {/* Drill-Down Modal */}
+      {drillDownModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl h-[66vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {drillDownModal.coachName} - {
+                    drillDownModal.type === 'leads' ? 'Leads Worked With' :
+                    drillDownModal.type === 'bookings' ? 'Total Bookings' :
+                    'Total Classes'
+                  }
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">{timeRange} Performance</p>
+              </div>
+              <button
+                onClick={() => setDrillDownModal(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6">
+              {drillDownModal.type === 'leads' && (
+                <div className="space-y-3">
+                  {getCoachLeadsDetails(drillDownModal.coachId).map(({ lead, converted, interactionDate }) => (
+                    <div
+                      key={lead.id}
+                      className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handlePersonClick(lead.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <p className="font-semibold text-gray-900">{lead.name}</p>
+                            {converted ? (
+                              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                                Converted
+                              </span>
+                            ) : (
+                              <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded">
+                                Not Converted
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">{lead.email}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Interaction: {format(new Date(interactionDate), 'MMM d, yyyy')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {getCoachLeadsDetails(drillDownModal.coachId).length === 0 && (
+                    <p className="text-center text-gray-500 py-8">No leads found for this time period</p>
+                  )}
+                </div>
+              )}
+
+              {drillDownModal.type === 'bookings' && (
+                <div className="space-y-3">
+                  {getCoachBookingsDetails(drillDownModal.coachId).map((booking) => (
+                    <div
+                      key={booking.id}
+                      className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handlePersonClick(booking.memberId)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900">{booking.memberName}</p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {booking.className} • {booking.classDayOfWeek} at {booking.classTime}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`px-2 py-1 text-xs font-medium rounded ${
+                              booking.status === 'checked-in' ? 'bg-green-100 text-green-800' :
+                              booking.status === 'booked' ? 'bg-blue-100 text-blue-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {booking.status === 'checked-in' ? 'Checked In' : 
+                               booking.status === 'booked' ? 'Booked' : booking.status}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {format(new Date(booking.bookedAt), 'MMM d, yyyy')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {getCoachBookingsDetails(drillDownModal.coachId).length === 0 && (
+                    <p className="text-center text-gray-500 py-8">No bookings found for this time period</p>
+                  )}
+                </div>
+              )}
+
+              {drillDownModal.type === 'classes' && (
+                <div className="space-y-3">
+                  {getCoachClassesDetails(drillDownModal.coachId).map((cls) => (
+                    <div
+                      key={cls.id}
+                      className="border border-gray-200 rounded-lg p-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900">{cls.name}</p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {cls.dayOfWeek} at {cls.time}
+                          </p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs text-gray-500">
+                              Capacity: {cls.bookedCount}/{cls.capacity}
+                            </span>
+                            <span className={`px-2 py-1 text-xs font-medium rounded ${
+                              (cls.bookedCount / cls.capacity) * 100 >= 90 ? 'bg-red-100 text-red-800' :
+                              (cls.bookedCount / cls.capacity) * 100 >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-green-100 text-green-800'
+                            }`}>
+                              {Math.round((cls.bookedCount / cls.capacity) * 100)}% Full
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {getCoachClassesDetails(drillDownModal.coachId).length === 0 && (
+                    <p className="text-center text-gray-500 py-8">No classes assigned to this coach</p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Modal */}
+      {showProfileTabs && selectedPersonId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[66vh] overflow-hidden flex flex-col">
+            <ProfileTabs
+              personId={selectedPersonId}
+              onClose={() => {
+                setShowProfileTabs(false);
+                setSelectedPersonId(null);
+              }}
+              onSendText={() => {
+                const personData = getPersonById(selectedPersonId);
+                if (personData) {
+                  const { person } = personData;
+                  setTextRecipient({
+                    name: person.name,
+                    phone: person.phone || '(555) 123-4567'
+                  });
+                  setShowSendTextModal(true);
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Send Text Modal */}
+      {showSendTextModal && textRecipient && (
+        <SendTextModal
+          recipientName={textRecipient.name}
+          recipientPhone={textRecipient.phone}
+          onClose={() => {
+            setShowSendTextModal(false);
+            setTextRecipient(null);
+          }}
+        />
+      )}
     </div>
   );
 }
