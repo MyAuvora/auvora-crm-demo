@@ -28,7 +28,22 @@ export default function FrontDeskDashboard() {
   const classes = getAllClasses();
   const staff = getAllStaff();
   
-  const currentStaff = staff.find(s => s.role === userRole && s.location === location);
+  const locationFrontDesk = staff.filter(s => s.role === 'front-desk' && s.location === location);
+  
+  const defaultFrontDeskId = locationFrontDesk.find(fd => fd.id === 'staff-3')?.id || locationFrontDesk[0]?.id || '';
+  const [selectedFrontDeskId, setSelectedFrontDeskId] = useState(defaultFrontDeskId);
+  
+  const currentStaff = staff.find(s => s.id === selectedFrontDeskId);
+  
+  if (!currentStaff || locationFrontDesk.length === 0) {
+    return (
+      <div className="p-8">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-yellow-800">Front desk staff profile not found. Please contact an administrator.</p>
+        </div>
+      </div>
+    );
+  }
 
   const todayTransactions = transactions.filter(t => {
     const txDate = new Date(t.timestamp);
@@ -237,6 +252,28 @@ export default function FrontDeskDashboard() {
           }}
         />
       )}
+
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Front Desk Dashboard</h1>
+          <p className="text-gray-600 mt-1">Manage daily operations and track performance</p>
+        </div>
+        
+        {locationFrontDesk.length > 1 && (
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">Viewing:</label>
+            <select
+              value={selectedFrontDeskId}
+              onChange={(e) => setSelectedFrontDeskId(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+            >
+              {locationFrontDesk.map(fd => (
+                <option key={fd.id} value={fd.id}>{fd.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
 
       {/* Metric Detail Modal */}
       {details && (
