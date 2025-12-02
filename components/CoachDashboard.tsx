@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { 
   getAllClasses, 
@@ -8,8 +8,7 @@ import {
   getAllStaff,
   getCoachConversionStats,
   createSubstitutionRequest,
-  createTimeOffRequest,
-  getStaffSettings
+  createTimeOffRequest
 } from '@/lib/dataStore';
 import { Calendar, Users, TrendingUp, Clock, UserX, ArrowLeftRight } from 'lucide-react';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
@@ -81,6 +80,7 @@ export default function CoachDashboard() {
 
   const handleClassClick = (cls: { id: string; name: string; time: string; dayOfWeek: string }) => {
     setSelectedClassForSub(cls);
+    setShowSubstitutionModal(true);
   };
 
   const handlePersonClick = (personId: string) => {
@@ -253,7 +253,7 @@ export default function CoachDashboard() {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <Clock size={24} className="text-red-600" />
-            <h2 className="text-xl font-bold text-gray-900">This Week's Schedule</h2>
+            <h2 className="text-xl font-bold text-gray-900">This Week&apos;s Schedule</h2>
           </div>
         </div>
         <div className="p-6">
@@ -268,21 +268,48 @@ export default function CoachDashboard() {
                     {dayClasses.map(cls => (
                       <div
                         key={cls.id}
-                        className="ml-4 border border-gray-200 rounded-lg p-3 hover:border-red-300 transition-colors cursor-pointer"
-                        onClick={() => handleClassClick(cls)}
+                        className="ml-4 border border-gray-200 rounded-lg p-3 hover:border-red-300 transition-colors"
                       >
                         <div className="flex items-center justify-between">
                           <div>
                             <span className="font-medium text-gray-900">{cls.name}</span>
                             <span className="text-sm text-gray-600 ml-3">{cls.time} • {cls.duration} min</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-700">
-                              {cls.bookedCount}/{cls.capacity}
-                            </span>
-                            <Users size={16} className="text-gray-500" />
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-gray-700">
+                                {cls.bookedCount}/{cls.capacity}
+                              </span>
+                              <Users size={16} className="text-gray-500" />
+                            </div>
+                            <button
+                              onClick={() => handleClassClick(cls)}
+                              className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 flex items-center gap-1.5 text-sm"
+                            >
+                              <ArrowLeftRight size={14} />
+                              Request Sub
+                            </button>
                           </div>
                         </div>
+                        {cls.bookings && cls.bookings.length > 0 && (
+                          <div className="mt-2 pt-2 border-t border-gray-200">
+                            <p className="text-xs font-medium text-gray-600 mb-1.5">Booked:</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {cls.bookings.map((booking: { id: string; memberId: string; memberName: string; status: string }) => (
+                                <button
+                                  key={booking.id}
+                                  onClick={() => handlePersonClick(booking.memberId)}
+                                  className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs hover:bg-gray-200"
+                                >
+                                  {booking.memberName}
+                                  {booking.status === 'checked-in' && (
+                                    <span className="ml-1 text-green-600">✓</span>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -302,7 +329,7 @@ export default function CoachDashboard() {
             </div>
             <div className="p-6">
               <p className="text-sm text-gray-700 mb-4">
-                Choose how you'd like to handle this class:
+                Choose how you&apos;d like to handle this class:
               </p>
               <div className="space-y-3">
                 <button

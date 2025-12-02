@@ -273,28 +273,55 @@ function generateSampleBookings(): Booking[] {
   const members = seedMembers;
   const packClients = seedClassPackClients;
   const dropInClients = seedDropInClients;
+  const leads = seedLeads;
   const allClients = [...members, ...packClients, ...dropInClients];
   
   const today = new Date();
   const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][today.getDay()];
-  const todayClasses = classes.filter(c => c.dayOfWeek === dayOfWeek);
   
-  todayClasses.forEach(cls => {
-    const numBookings = Math.min(Math.floor(Math.random() * (cls.capacity - 2)) + 3, cls.capacity);
-    const locationClients = allClients.filter(c => c.location === cls.location);
+  classes.forEach(cls => {
+    const isToday = cls.dayOfWeek === dayOfWeek;
+    const isPastClass = !isToday;
     
-    for (let i = 0; i < numBookings && i < locationClients.length; i++) {
-      const client = locationClients[i];
-      const isCheckedIn = Math.random() > 0.3;
+    const fillRate = 0.4 + Math.random() * 0.3;
+    const numBookings = Math.floor(cls.capacity * fillRate);
+    
+    const locationClients = allClients.filter(c => c.location === cls.location);
+    const locationLeads = leads.filter(l => l.location === cls.location && (l.status === 'trial-booked' || l.status === 'trial-showed'));
+    
+    const numLeadBookings = Math.floor(numBookings * 0.15);
+    const numMemberBookings = numBookings - numLeadBookings;
+    
+    const shuffledClients = [...locationClients].sort(() => Math.random() - 0.5);
+    const shuffledLeads = [...locationLeads].sort(() => Math.random() - 0.5);
+    
+    for (let i = 0; i < numMemberBookings && i < shuffledClients.length; i++) {
+      const client = shuffledClients[i];
+      const isCheckedIn = isToday ? Math.random() > 0.6 : (isPastClass ? Math.random() > 0.2 : false);
       
       bookings.push({
-        id: `booking-sample-${cls.id}-${i}`,
+        id: `booking-${cls.id}-m-${i}`,
         classId: cls.id,
         memberId: client.id,
         memberName: client.name,
         status: isCheckedIn ? 'checked-in' : 'booked',
-        bookedAt: new Date(today.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-        checkedInAt: isCheckedIn ? new Date(today.getTime() - 60 * 60 * 1000).toISOString() : undefined,
+        bookedAt: new Date(today.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        checkedInAt: isCheckedIn ? new Date(today.getTime() - Math.random() * 3 * 60 * 60 * 1000).toISOString() : undefined,
+      });
+    }
+    
+    for (let i = 0; i < numLeadBookings && i < shuffledLeads.length; i++) {
+      const lead = shuffledLeads[i];
+      const isCheckedIn = isToday ? Math.random() > 0.7 : (isPastClass ? Math.random() > 0.3 : false);
+      
+      bookings.push({
+        id: `booking-${cls.id}-l-${i}`,
+        classId: cls.id,
+        memberId: lead.id,
+        memberName: lead.name,
+        status: isCheckedIn ? 'checked-in' : 'booked',
+        bookedAt: new Date(today.getTime() - Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString(),
+        checkedInAt: isCheckedIn ? new Date(today.getTime() - Math.random() * 2 * 60 * 60 * 1000).toISOString() : undefined,
       });
     }
   });

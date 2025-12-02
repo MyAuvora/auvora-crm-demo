@@ -246,66 +246,58 @@ export function generateClasses(): Class[] {
   const coaches = generateStaff().filter(s => s.role === 'coach');
   const instructors = generateStaff().filter(s => s.role === 'instructor');
   
-  const athleticClassNames = ['Circuit Training', 'HIIT Blast', 'Strength & Conditioning', 'Bootcamp', 'Core Power', 'Cardio Burn', 'Total Body'];
-  const danceClassTypes = ['Zumba', 'Salsa', 'Hip-Hop'];
+  const athleticClassNames = ['Circuit Training', 'HIIT Blast', 'Strength & Conditioning', 'Bootcamp', 'Core Power', 'Cardio Burn', 'Total Body', 'Functional Fitness', 'Athletic Performance', 'CrossFit'];
+  const danceClassTypes = ['Zumba', 'Salsa', 'Hip-Hop', 'Contemporary', 'Ballet', 'Jazz', 'Bachata', 'Ballroom'];
   
-  const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const athleticTimes = ['6:00 AM', '7:00 AM', '9:00 AM', '12:00 PM', '5:00 PM', '6:00 PM', '7:00 PM'];
-  const saturdayTimes = ['9:00 AM', '10:00 AM'];
-  const danceTimes = ['6:00 PM', '7:00 PM', '8:00 PM'];
+  const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  
+  const athleticTimes = [
+    '5:30 AM', '6:00 AM', '6:30 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', 
+    '11:00 AM', '12:00 PM', '1:00 PM', '4:30 PM', '5:00 PM', '5:30 PM', '6:00 PM', 
+    '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM'
+  ];
+  const danceTimes = ['5:00 PM', '6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM', '8:30 PM'];
   
   let classId = 1;
   
-  weekdays.forEach(day => {
-    athleticTimes.forEach(time => {
-      const coach = randomItem(coaches);
-      const duration = Math.random() > 0.5 ? 30 : 60;
+  const acCoaches = coaches.filter(c => c.location === 'athletic-club');
+  allDays.forEach(day => {
+    const timesForDay = day === 'Saturday' || day === 'Sunday' 
+      ? ['8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM']
+      : athleticTimes;
+    
+    timesForDay.forEach(time => {
+      const coach = randomItem(acCoaches);
+      const className = randomItem(athleticClassNames);
+      const duration = className === 'HIIT Blast' || className === 'Core Power' ? 30 : 60;
       const capacity = 20;
-      const bookedCount = Math.floor(Math.random() * capacity);
       
       classes.push({
         id: `class-ac-${classId++}`,
-        name: randomItem(athleticClassNames),
-        type: 'Circuit Training',
+        name: className,
+        type: className,
         duration,
         dayOfWeek: day,
         time,
         coachId: coach.id,
         capacity,
         location: 'athletic-club',
-        bookedCount,
+        bookedCount: 0,
         attendees: []
       });
     });
   });
   
-  saturdayTimes.forEach(time => {
-    const coach = randomItem(coaches);
-    const duration = Math.random() > 0.5 ? 30 : 60;
-    const capacity = 20;
-    const bookedCount = Math.floor(Math.random() * capacity);
+  const dsInstructors = instructors.filter(i => i.location === 'dance-studio');
+  allDays.forEach(day => {
+    const timesForDay = day === 'Saturday' || day === 'Sunday'
+      ? ['10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM']
+      : danceTimes;
     
-    classes.push({
-      id: `class-ac-${classId++}`,
-      name: randomItem(athleticClassNames),
-      type: 'Circuit Training',
-      duration,
-      dayOfWeek: 'Saturday',
-      time,
-      coachId: coach.id,
-      capacity,
-      location: 'athletic-club',
-      bookedCount,
-      attendees: []
-    });
-  });
-  
-  weekdays.forEach(day => {
-    danceTimes.forEach(time => {
-      const instructor = randomItem(instructors);
+    timesForDay.forEach(time => {
+      const instructor = randomItem(dsInstructors);
       const classType = randomItem(danceClassTypes);
       const capacity = 25;
-      const bookedCount = Math.floor(Math.random() * capacity);
       
       classes.push({
         id: `class-ds-${classId++}`,
@@ -317,7 +309,7 @@ export function generateClasses(): Class[] {
         coachId: instructor.id,
         capacity,
         location: 'dance-studio',
-        bookedCount,
+        bookedCount: 0,
         attendees: []
       });
     });
