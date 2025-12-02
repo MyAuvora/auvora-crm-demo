@@ -391,16 +391,20 @@ export default function CoachDashboard() {
       )}
 
       {showProfileTabs && selectedPersonId && (
-        <ProfileTabs
-          personId={selectedPersonId}
-          onClose={() => {
-            setShowProfileTabs(false);
-            setSelectedPersonId(null);
-          }}
-          onSendText={() => {
-            setShowProfileTabs(false);
-          }}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[66vh] overflow-hidden flex flex-col">
+            <ProfileTabs
+              personId={selectedPersonId}
+              onClose={() => {
+                setShowProfileTabs(false);
+                setSelectedPersonId(null);
+              }}
+              onSendText={() => {
+                setShowProfileTabs(false);
+              }}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
