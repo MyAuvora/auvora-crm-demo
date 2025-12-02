@@ -10,7 +10,7 @@ import { Class, Member } from '@/lib/types';
 import { useToast } from '@/lib/useToast';
 
 export default function FrontDeskDashboard() {
-  const { location, navigateToMember, navigateToLead, userRole } = useApp();
+  const { location, navigateToMember, navigateToLead, userRole, selectedStaffId, setSelectedStaffId } = useApp();
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -31,7 +31,11 @@ export default function FrontDeskDashboard() {
   const locationFrontDesk = staff.filter(s => s.role === 'front-desk' && s.location === location);
   
   const defaultFrontDeskId = locationFrontDesk.find(fd => fd.id === 'staff-3')?.id || locationFrontDesk[0]?.id || '';
-  const [selectedFrontDeskId, setSelectedFrontDeskId] = useState(defaultFrontDeskId);
+  const selectedFrontDeskId = selectedStaffId || defaultFrontDeskId;
+  
+  if (selectedStaffId !== selectedFrontDeskId) {
+    setSelectedStaffId(selectedFrontDeskId);
+  }
   
   const currentStaff = staff.find(s => s.id === selectedFrontDeskId);
   
@@ -264,7 +268,7 @@ export default function FrontDeskDashboard() {
             <label className="text-sm font-medium text-gray-700">Viewing:</label>
             <select
               value={selectedFrontDeskId}
-              onChange={(e) => setSelectedFrontDeskId(e.target.value)}
+              onChange={(e) => setSelectedStaffId(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
             >
               {locationFrontDesk.map(fd => (

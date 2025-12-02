@@ -24,6 +24,8 @@ interface AppContextType {
   setDeepLink: (link: DeepLink | null) => void;
   navigateToMember: (memberId: string) => void;
   navigateToLead: (leadId: string) => void;
+  selectedStaffId: string | null;
+  setSelectedStaffId: (staffId: string | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -34,6 +36,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<UserRole>('owner');
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [deepLink, setDeepLink] = useState<DeepLink | null>(null);
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
 
   const navigateToMember = (memberId: string) => {
     setDeepLink({ type: 'member', id: memberId });
@@ -58,7 +61,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       deepLink,
       setDeepLink,
       navigateToMember,
-      navigateToLead
+      navigateToLead,
+      selectedStaffId,
+      setSelectedStaffId
     }}>
       {children}
     </AppContext.Provider>

@@ -18,7 +18,7 @@ import SendTextModal from './SendTextModal';
 import PersonStatusBadge from './PersonStatusBadge';
 
 export default function CoachDashboard() {
-  const { location } = useApp();
+  const { location, selectedStaffId, setSelectedStaffId } = useApp();
   const [showProfileTabs, setShowProfileTabs] = useState(false);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [showSubstitutionModal, setShowSubstitutionModal] = useState(false);
@@ -31,7 +31,11 @@ export default function CoachDashboard() {
   const locationCoaches = staff.filter(s => s.role === 'coach' && s.location === location);
   
   const defaultCoachId = locationCoaches.find(c => c.id === 'coach-1')?.id || locationCoaches[0]?.id || '';
-  const [selectedCoachId, setSelectedCoachId] = useState(defaultCoachId);
+  const selectedCoachId = selectedStaffId || defaultCoachId;
+  
+  if (selectedStaffId !== selectedCoachId) {
+    setSelectedStaffId(selectedCoachId);
+  }
   
   const currentCoach = staff.find(s => s.id === selectedCoachId);
   
@@ -151,7 +155,7 @@ export default function CoachDashboard() {
               <label className="text-sm font-medium text-gray-700">Viewing as:</label>
               <select
                 value={selectedCoachId}
-                onChange={(e) => setSelectedCoachId(e.target.value)}
+                onChange={(e) => setSelectedStaffId(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm"
               >
                 {locationCoaches.map(coach => (

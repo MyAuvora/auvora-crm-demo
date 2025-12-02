@@ -13,7 +13,7 @@ import { hasPermission } from '@/lib/permissions';
 import PersonStatusBadge from './PersonStatusBadge';
 
 export default function Schedule() {
-  const { location, userRole } = useApp();
+  const { location, userRole, selectedStaffId } = useApp();
   const [scheduleType, setScheduleType] = useState<'classes' | 'staff'>('classes');
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -213,12 +213,18 @@ export default function Schedule() {
           {(userRole === 'owner' || userRole === 'manager') ? (
             <StaffScheduleCalendar />
           ) : (() => {
-            const staff = getAllStaff().find(s => 
+            const allStaff = getAllStaff();
+            const staffList = allStaff.filter(s => 
               s.location === location && 
               (userRole === 'coach' ? s.role === 'coach' : 
                userRole === 'head-coach' ? s.role === 'head-coach' : 
                s.role === 'front-desk')
             );
+            
+            const staff = selectedStaffId 
+              ? allStaff.find(s => s.id === selectedStaffId)
+              : staffList[0];
+            
             return staff ? (
               <StaffScheduleView 
                 staffId={staff.id}
