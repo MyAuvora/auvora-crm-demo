@@ -7,6 +7,25 @@ import { StaffShift, Location } from '@/lib/types';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { hasPermission } from '@/lib/permissions';
 
+const parseLocalDate = (dateStr: string) => {
+  return new Date(dateStr + 'T12:00:00');
+};
+
+const formatLocalDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const timeToMinutes = (time: string) => {
+  const [timePart, period] = time.split(' ');
+  let [hours, minutes] = timePart.split(':').map(Number);
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+  return hours * 60 + minutes;
+};
+
 interface StaffScheduleCalendarProps {
   onShiftClick?: (shift: StaffShift) => void;
 }
@@ -93,7 +112,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
           startTime,
           endTime
         },
-        date: shiftDate.toISOString().split('T')[0],
+        date: formatLocalDate(shiftDate),
         startTime,
         endTime,
         status: 'scheduled',
@@ -166,7 +185,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
         const shiftDate = new Date(startOfWeek);
         shiftDate.setDate(startOfWeek.getDate() + (dayIndex === 0 ? 6 : dayIndex - 1));
         
-        const dateStr = shiftDate.toISOString().split('T')[0];
+        const dateStr = formatLocalDate(shiftDate);
         if (!shift.recurrence.exDates?.includes(dateStr)) {
           expanded.push({
             ...shift,
@@ -234,17 +253,6 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
   const expandedShifts = expandShiftsForWeek();
   const conflicts = detectConflicts(expandedShifts);
 
-  const parseLocalDate = (dateStr: string) => {
-    return new Date(dateStr + 'T12:00:00');
-  };
-
-  const timeToMinutes = (time: string) => {
-    const [timePart, period] = time.split(' ');
-    let [hours, minutes] = timePart.split(':').map(Number);
-    if (period === 'PM' && hours !== 12) hours += 12;
-    if (period === 'AM' && hours === 12) hours = 0;
-    return hours * 60 + minutes;
-  };
 
   const getShiftsForDayAndTime = (day: string, time: string) => {
     const dayIndex = daysOfWeek.indexOf(day);
