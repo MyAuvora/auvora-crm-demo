@@ -29,6 +29,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
     : locationShifts;
   
   const frontDeskStaff = locationStaff.filter(s => s.role === 'front-desk');
+  const allLocationStaff = locationStaff; // All staff for scheduling
 
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const timeSlots = [
@@ -84,6 +85,8 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
       setEditingShift({
         id: '',
         location,
+        assignedStaffId: selectedStaffId || undefined,
+        assignedStaffName: selectedStaffId ? locationStaff.find(s => s.id === selectedStaffId)?.name : undefined,
         templateType: 'front-desk',
         recurrence: { 
           type: 'none',
@@ -231,17 +234,37 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
   const expandedShifts = expandShiftsForWeek();
   const conflicts = detectConflicts(expandedShifts);
 
+  const timeToMinutes = (time: string) => {
+    const [timePart, period] = time.split(' ');
+    let [hours, minutes] = timePart.split(':').map(Number);
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+    return hours * 60 + minutes;
+  };
+
   const getShiftsForDayAndTime = (day: string, time: string) => {
     const dayIndex = daysOfWeek.indexOf(day);
+    const currentTimeMinutes = timeToMinutes(time);
+    
     return expandedShifts.filter(shift => {
       if (shift.recurrence.type === 'weekly') {
         const shiftDayIndex = shift.recurrence.dayOfWeek;
-        return shiftDayIndex === (dayIndex === 6 ? 0 : dayIndex + 1) && 
-               shift.recurrence.startTime === time;
+        const isDayMatch = shiftDayIndex === (dayIndex === 6 ? 0 : dayIndex + 1);
+        if (!isDayMatch) return false;
+        
+        if (!shift.recurrence.startTime || !shift.recurrence.endTime) return false;
+        const startMinutes = timeToMinutes(shift.recurrence.startTime);
+        const endMinutes = timeToMinutes(shift.recurrence.endTime);
+        return currentTimeMinutes >= startMinutes && currentTimeMinutes < endMinutes;
       } else if (shift.date) {
         const shiftDate = new Date(shift.date);
         const shiftDay = daysOfWeek[shiftDate.getDay() === 0 ? 6 : shiftDate.getDay() - 1];
-        return shiftDay === day && shift.startTime === time;
+        if (shiftDay !== day) return false;
+        
+        if (!shift.startTime || !shift.endTime) return false;
+        const startMinutes = timeToMinutes(shift.startTime);
+        const endMinutes = timeToMinutes(shift.endTime);
+        return currentTimeMinutes >= startMinutes && currentTimeMinutes < endMinutes;
       }
       return false;
     });
@@ -255,7 +278,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
             <h2 className="text-xl font-bold text-gray-900">Staff Schedule</h2>
             <p className="text-sm text-gray-600 mt-1">Weekly staff shift schedule</p>
           </div>
-          {frontDeskStaff.length > 0 && (
+          {allLocationStaff.length > 0 && (
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium text-gray-700">Viewing:</label>
               <select
@@ -264,8 +287,8 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
               >
                 <option value="all">All Staff</option>
-                {frontDeskStaff.map(staff => (
-                  <option key={staff.id} value={staff.id}>{staff.name}</option>
+                {allLocationStaff.map(staff => (
+                  <option key={staff.id} value={staff.id}>{staff.name} ({staff.role})</option>
                 ))}
               </select>
             </div>
