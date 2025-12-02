@@ -8,11 +8,13 @@ import {
   getAllStaff,
   getCoachConversionStats,
   createSubstitutionRequest,
-  createTimeOffRequest
+  createTimeOffRequest,
+  getPersonById
 } from '@/lib/dataStore';
 import { Calendar, Users, TrendingUp, Clock, UserX, ArrowLeftRight } from 'lucide-react';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 import ProfileTabs from './ProfileTabs';
+import SendTextModal from './SendTextModal';
 
 export default function CoachDashboard() {
   const { location } = useApp();
@@ -21,6 +23,8 @@ export default function CoachDashboard() {
   const [showSubstitutionModal, setShowSubstitutionModal] = useState(false);
   const [showTimeOffModal, setShowTimeOffModal] = useState(false);
   const [selectedClassForSub, setSelectedClassForSub] = useState<{ id: string; name: string; time: string; dayOfWeek: string } | null>(null);
+  const [showSendTextModal, setShowSendTextModal] = useState(false);
+  const [textRecipient, setTextRecipient] = useState<{ name: string; phone: string } | null>(null);
   
   const staff = getAllStaff();
   const locationCoaches = staff.filter(s => s.role === 'coach' && s.location === location);
@@ -400,11 +404,30 @@ export default function CoachDashboard() {
                 setSelectedPersonId(null);
               }}
               onSendText={() => {
-                setShowProfileTabs(false);
+                const personData = getPersonById(selectedPersonId);
+                if (personData) {
+                  const { person } = personData;
+                  setTextRecipient({
+                    name: person.name,
+                    phone: person.phone || '(555) 123-4567'
+                  });
+                  setShowSendTextModal(true);
+                }
               }}
             />
           </div>
         </div>
+      )}
+
+      {showSendTextModal && textRecipient && (
+        <SendTextModal
+          recipientName={textRecipient.name}
+          recipientPhone={textRecipient.phone}
+          onClose={() => {
+            setShowSendTextModal(false);
+            setTextRecipient(null);
+          }}
+        />
       )}
     </div>
   );

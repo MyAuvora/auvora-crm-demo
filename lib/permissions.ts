@@ -39,6 +39,11 @@ export const permissions: Record<string, Permission> = {
     description: 'Edit member billing information and payment methods',
   },
   
+  'message:send': {
+    action: 'Send Messages',
+    allowedRoles: ['owner', 'manager', 'head-coach', 'coach', 'front-desk'],
+    description: 'Send individual messages to members and leads',
+  },
   'bulk:message': {
     action: 'Bulk Messaging',
     allowedRoles: ['owner', 'manager'],
