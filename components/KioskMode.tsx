@@ -2,17 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllClasses, getAllBookings, checkInMember, getAllMembers, getAllClassPackClients, getAllDropInClients } from '@/lib/dataStore';
-import { Search, CheckCircle, Clock } from 'lucide-react';
+import { getAllClasses, getAllBookings, getAllMembers, getAllClassPackClients, getAllDropInClients } from '@/lib/dataStore';
+import { Search, Clock } from 'lucide-react';
 import { format } from 'date-fns';
-import PersonStatusBadge from './PersonStatusBadge';
+import { Class } from '@/lib/types';
+import BookingModal from './BookingModal';
 
 export default function KioskMode() {
   const { location } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPerson, setSelectedPerson] = useState<{ id: string; name: string; type: string } | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -27,45 +29,12 @@ export default function KioskMode() {
   const packClients = getAllClassPackClients().filter(c => c.location === location);
   const dropInClients = getAllDropInClients().filter(d => d.location === location);
 
-  const allPeople = [
-    ...members.map(m => ({ id: m.id, name: m.name, type: 'member' as const, email: m.email })),
-    ...packClients.map(c => ({ id: c.id, name: c.name, type: 'pack' as const, email: c.email })),
-    ...dropInClients.map(d => ({ id: d.id, name: d.name, type: 'drop-in' as const, email: d.email }))
-  ];
-
-  const filteredPeople = searchTerm.length >= 2 
-    ? allPeople.filter(p => 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.email.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
-
   const now = new Date();
-  const todayClasses = classes.filter(c => {
-    return true;
-  }).sort((a, b) => {
-    return a.time.localeCompare(b.time);
-  });
-
-  const handleCheckIn = () => {
-    if (!selectedPerson) {
-      setMessage({ type: 'error', text: 'Please search and select a member first' });
-      setTimeout(() => setMessage(null), 3000);
-      return;
-    }
-
-    const result = checkInMember(selectedPerson.id);
-    
-    if (result.success) {
-      setMessage({ type: 'success', text: `✓ ${selectedPerson.name} checked in successfully!` });
-      setSelectedPerson(null);
-      setSearchTerm('');
-      setTimeout(() => setMessage(null), 3000);
-    } else {
-      setMessage({ type: 'error', text: result.message });
-      setTimeout(() => setMessage(null), 3000);
-    }
-  };
+  const todayDayName = format(now, 'EEEE');
+  
+  const todayClasses = classes
+    .filter(c => c.dayOfWeek === todayDayName)
+    .sort((a, b) => a.time.localeCompare(b.time));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-8">
@@ -81,6 +50,21 @@ export default function KioskMode() {
           <p className="text-xl text-gray-400">{format(currentTime, 'EEEE, MMMM d, yyyy')}</p>
         </div>
 
+        {/* Booking Modal */}
+        {selectedClass && (
+          <BookingModal
+            classData={selectedClass}
+            mode="kiosk"
+            onClose={() => setSelectedClass(null)}
+            onSuccess={() => {
+              setRefreshKey(prev => prev + 1);
+              setSelectedClass(null);
+              setMessage({ type: 'success', text: '✓ Check-in successful!' });
+              setTimeout(() => setMessage(null), 3000);
+            }}
+          />
+        )}
+
         {/* Message Display */}
         {message && (
           <div className={`mb-6 p-6 rounded-lg text-center text-2xl font-bold ${
@@ -92,82 +76,13 @@ export default function KioskMode() {
           </div>
         )}
 
-        {/* Search Section */}
-        <div className="bg-gray-800 rounded-lg p-8 mb-8 shadow-2xl">
-          <div className="mb-6">
-            <label className="block text-2xl font-bold text-white mb-4">
-              Search Your Name or Email
-            </label>
-            <div className="relative">
-              <Search className="absolute left-6 top-6 text-gray-400" size={32} />
-              <input
-                type="text"
-                placeholder="Start typing your name or email..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setSelectedPerson(null);
-                }}
-                className="w-full pl-20 pr-6 py-6 text-2xl bg-gray-700 text-white rounded-lg border-2 border-gray-600 focus:outline-none focus:ring-4 focus:ring-red-600 focus:border-red-600"
-                autoFocus
-              />
-            </div>
-          </div>
-
-          {/* Search Results */}
-          {searchTerm.length >= 2 && (
-            <div className="mt-4">
-              {filteredPeople.length === 0 ? (
-                <div className="text-center py-8 text-gray-400 text-xl">
-                  No members found. Please check your spelling or see the front desk.
-                </div>
-              ) : (
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {filteredPeople.map(person => (
-                    <button
-                      key={person.id}
-                      onClick={() => setSelectedPerson(person)}
-                      className={`w-full text-left p-6 rounded-lg transition-all ${
-                        selectedPerson?.id === person.id
-                          ? 'bg-red-600 text-white scale-105'
-                          : 'bg-gray-700 hover:bg-gray-600 text-white'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <PersonStatusBadge personId={person.id} />
-                        <div>
-                          <div className="text-2xl font-bold">{person.name}</div>
-                          <div className="text-lg text-gray-300">{person.email}</div>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {selectedPerson && (
-            <div className="mt-6 p-6 bg-green-900 rounded-lg border-2 border-green-500">
-              <div className="flex items-center gap-3 mb-4">
-                <CheckCircle className="text-green-400" size={32} />
-                <div>
-                  <p className="text-xl text-green-300">Selected:</p>
-                  <p className="text-3xl font-bold text-white">{selectedPerson.name}</p>
-                </div>
-              </div>
-              <p className="text-lg text-green-300">Now select your class below to check in</p>
-            </div>
-          )}
-        </div>
-
         {/* Today's Classes */}
         <div className="bg-gray-800 rounded-lg p-8 shadow-2xl">
-          <h2 className="text-3xl font-bold text-white mb-6">Today&apos;s Classes</h2>
+          <h2 className="text-3xl font-bold text-white mb-6">Today&apos;s Classes - {todayDayName}</h2>
           
           {todayClasses.length === 0 ? (
             <div className="text-center py-12 text-gray-400 text-xl">
-              No classes scheduled for today
+              No classes scheduled for {todayDayName}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -179,13 +94,8 @@ export default function KioskMode() {
                 return (
                   <button
                     key={cls.id}
-                    onClick={() => handleCheckIn(cls.id)}
-                    disabled={!selectedPerson}
-                    className={`p-6 rounded-lg text-left transition-all ${
-                      selectedPerson
-                        ? 'bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 cursor-pointer transform hover:scale-105'
-                        : 'bg-gray-700 cursor-not-allowed opacity-50'
-                    }`}
+                    onClick={() => setSelectedClass(cls)}
+                    className="p-6 rounded-lg text-left transition-all bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 cursor-pointer transform hover:scale-105"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div>
@@ -197,9 +107,6 @@ export default function KioskMode() {
                           <span>{cls.duration} min</span>
                         </div>
                       </div>
-                      {selectedPerson && (
-                        <CheckCircle className="text-white" size={40} />
-                      )}
                     </div>
                     
                     <div className="flex items-center justify-between text-lg">

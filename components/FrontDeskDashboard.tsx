@@ -136,6 +136,7 @@ export default function FrontDeskDashboard() {
       onClick: () => void;
       showProcessButton?: boolean;
     }>;
+    breakdown?: Record<string, number>;
   } | null => {
     switch (metric) {
       case 'new-leads':
@@ -183,6 +184,29 @@ export default function FrontDeskDashboard() {
             };
           })
         };
+      case 'todays-revenue':
+        return {
+          title: "Today's Revenue - All Sales",
+          breakdown: revenueByCategory,
+          items: todayTransactions.map(t => ({
+            id: t.id,
+            name: t.memberName || 'Guest',
+            detail: `${format(new Date(t.timestamp), 'h:mm a')} • ${t.items.map(i => `${i.productName} ($${i.price})`).join(', ')} • Total: $${t.total.toFixed(2)}`,
+            onClick: () => {}
+          }))
+        };
+      case 'my-sales':
+        return {
+          title: "My Sales Today",
+          items: todayTransactions
+            .filter(t => t.sellerId === currentStaff?.id)
+            .map(t => ({
+              id: t.id,
+              name: t.memberName || 'Guest',
+              detail: `${format(new Date(t.timestamp), 'h:mm a')} • ${t.items.map(i => `${i.productName} ($${i.price})`).join(', ')} • Total: $${t.total.toFixed(2)}`,
+              onClick: () => {}
+            }))
+        };
       default:
         return null;
     }
@@ -218,6 +242,23 @@ export default function FrontDeskDashboard() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-6">
+              {/* Breakdown Section for Revenue */}
+              {details.breakdown && (
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                  <p className="text-sm font-semibold text-gray-700 mb-3">Category Breakdown:</p>
+                  <div className="space-y-2">
+                    {Object.entries(details.breakdown).map(([category, amount]) => (
+                      amount > 0 && (
+                        <div key={category} className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">{category}</span>
+                          <span className="font-semibold text-gray-900">${amount.toFixed(2)}</span>
+                        </div>
+                      )
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {details.items.length === 0 ? (
                 <p className="text-center text-gray-500 py-8">No items found</p>
               ) : (
@@ -263,7 +304,10 @@ export default function FrontDeskDashboard() {
       {/* Revenue Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Today's Total Revenue */}
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+        <button
+          onClick={() => setSelectedMetric('todays-revenue')}
+          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
+        >
           <div className="flex items-center gap-3 mb-4">
             <div className="p-3 bg-green-100 rounded-lg">
               <DollarSign className="text-green-600" size={24} />
@@ -273,24 +317,18 @@ export default function FrontDeskDashboard() {
               <p className="text-sm text-gray-600">All sales today</p>
             </div>
           </div>
-          <p className="text-3xl font-bold text-gray-900 mb-4">${todayRevenue.toFixed(2)}</p>
-          
-          <div className="space-y-2">
-            <p className="text-sm font-semibold text-gray-700 mb-2">Breakdown:</p>
-            {Object.entries(revenueByCategory).map(([category, amount]) => (
-              amount > 0 && (
-                <div key={category} className="flex justify-between items-center text-sm">
-                  <span className="text-gray-600">{category}</span>
-                  <span className="font-semibold text-gray-900">${amount.toFixed(2)}</span>
-                </div>
-              )
-            ))}
-          </div>
-        </div>
+          <p className="text-3xl font-bold text-gray-900">${todayRevenue.toFixed(2)}</p>
+          <p className="text-sm text-gray-600 mt-2">
+            {todayTransactions.length} transactions • Click to view details
+          </p>
+        </button>
 
         {/* My Sales Today */}
         {currentStaff && (
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <button
+            onClick={() => setSelectedMetric('my-sales')}
+            className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
+          >
             <div className="flex items-center gap-3 mb-4">
               <div className="p-3 bg-blue-100 rounded-lg">
                 <TrendingUp className="text-blue-600" size={24} />
@@ -302,9 +340,9 @@ export default function FrontDeskDashboard() {
             </div>
             <p className="text-3xl font-bold text-gray-900">${myRevenue.toFixed(2)}</p>
             <p className="text-sm text-gray-600 mt-2">
-              {todayTransactions.filter(t => t.sellerId === currentStaff.id).length} transactions
+              {todayTransactions.filter(t => t.sellerId === currentStaff.id).length} transactions • Click to view details
             </p>
-          </div>
+          </button>
         )}
       </div>
 
