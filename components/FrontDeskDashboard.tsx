@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllTransactions, getAllMembers, getAllLeads, getAllBookings, getAllClasses, getAllStaff } from '@/lib/dataStore';
+import { getAllTransactions, getAllMembers, getAllLeads, getAllBookings, getAllClasses, getAllStaff, getCommissionReport } from '@/lib/dataStore';
 import { DollarSign, Users, UserPlus, Calendar, AlertCircle, TrendingUp } from 'lucide-react';
-import { format, startOfDay, endOfDay } from 'date-fns';
+import { format, startOfDay, endOfDay, startOfMonth, endOfMonth } from 'date-fns';
 
 export default function FrontDeskDashboard() {
   const { location, navigateToMember, navigateToLead, userRole } = useApp();
@@ -276,6 +276,78 @@ export default function FrontDeskDashboard() {
           </div>
         )}
       </div>
+
+      {/* My Commission Report */}
+      {currentStaff && (() => {
+        const monthStart = startOfMonth(today);
+        const monthEnd = endOfMonth(today);
+        const monthReport = getCommissionReport(currentStaff.id, monthStart, monthEnd);
+        
+        if (!monthReport) return null;
+        
+        return (
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">My Commission Report - This Month</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Total Sales:</span>
+                    <span className="font-bold text-gray-900">${monthReport.totalSales.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Transactions:</span>
+                    <span className="font-bold text-gray-900">{monthReport.transactionCount}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Commission Rate:</span>
+                    <span className="font-bold text-gray-900">{(monthReport.commissionRate * 100).toFixed(0)}%</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-3 border-t border-gray-200">
+                    <span className="text-gray-900 font-semibold">Total Commission:</span>
+                    <span className="font-bold text-green-600 text-xl">${monthReport.commissionAmount.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-2">Sales Breakdown:</p>
+                <div className="space-y-2">
+                  {monthReport.categoryBreakdown.memberships > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Memberships</span>
+                      <span className="font-semibold text-gray-900">${monthReport.categoryBreakdown.memberships.toFixed(2)}</span>
+                    </div>
+                  )}
+                  {monthReport.categoryBreakdown.classPacks > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Class Packs</span>
+                      <span className="font-semibold text-gray-900">${monthReport.categoryBreakdown.classPacks.toFixed(2)}</span>
+                    </div>
+                  )}
+                  {monthReport.categoryBreakdown.dropIn > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Drop-In</span>
+                      <span className="font-semibold text-gray-900">${monthReport.categoryBreakdown.dropIn.toFixed(2)}</span>
+                    </div>
+                  )}
+                  {monthReport.categoryBreakdown.retail > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Retail</span>
+                      <span className="font-semibold text-gray-900">${monthReport.categoryBreakdown.retail.toFixed(2)}</span>
+                    </div>
+                  )}
+                  {monthReport.categoryBreakdown.other > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Other</span>
+                      <span className="font-semibold text-gray-900">${monthReport.categoryBreakdown.other.toFixed(2)}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

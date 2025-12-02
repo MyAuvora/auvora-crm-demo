@@ -580,6 +580,114 @@ export function getAllAuditLog() {
   return getStore().auditLog;
 }
 
+export interface CommissionReport {
+  sellerId: string;
+  sellerName: string;
+  sellerRole: string;
+  totalSales: number;
+  transactionCount: number;
+  categoryBreakdown: {
+    memberships: number;
+    classPacks: number;
+    dropIn: number;
+    retail: number;
+    other: number;
+  };
+  commissionRate: number;
+  commissionAmount: number;
+  dateRange: {
+    start: string;
+    end: string;
+  };
+}
+
+export function getCommissionReport(
+  sellerId: string,
+  startDate?: Date,
+  endDate?: Date
+): CommissionReport | null {
+  const store = getStore();
+  const seller = store.staff.find(s => s.id === sellerId);
+  
+  if (!seller) return null;
+  
+  const start = startDate || new Date(new Date().setHours(0, 0, 0, 0));
+  const end = endDate || new Date(new Date().setHours(23, 59, 59, 999));
+  
+  const sellerTransactions = store.transactions.filter(t => {
+    const txDate = new Date(t.timestamp);
+    return t.sellerId === sellerId && txDate >= start && txDate <= end;
+  });
+  
+  const totalSales = sellerTransactions.reduce((sum, t) => sum + t.total, 0);
+  const transactionCount = sellerTransactions.length;
+  
+  const categoryBreakdown = {
+    memberships: 0,
+    classPacks: 0,
+    dropIn: 0,
+    retail: 0,
+    other: 0
+  };
+  
+  sellerTransactions.forEach(t => {
+    t.items.forEach(item => {
+      const productName = item.productName.toLowerCase();
+      const itemTotal = item.price * item.quantity;
+      
+      if (productName.includes('membership') || productName.includes('monthly')) {
+        categoryBreakdown.memberships += itemTotal;
+      } else if (productName.includes('pack') || productName.includes('class pack')) {
+        categoryBreakdown.classPacks += itemTotal;
+      } else if (productName.includes('drop-in') || productName.includes('single class')) {
+        categoryBreakdown.dropIn += itemTotal;
+      } else if (productName.includes('retail') || productName.includes('merchandise') || productName.includes('apparel')) {
+        categoryBreakdown.retail += itemTotal;
+      } else {
+        categoryBreakdown.other += itemTotal;
+      }
+    });
+  });
+  
+  const commissionRate = seller.role === 'front-desk' ? 0.10 : seller.role === 'coach' ? 0.05 : 0;
+  const commissionAmount = totalSales * commissionRate;
+  
+  return {
+    sellerId: seller.id,
+    sellerName: seller.name,
+    sellerRole: seller.role,
+    totalSales,
+    transactionCount,
+    categoryBreakdown,
+    commissionRate,
+    commissionAmount,
+    dateRange: {
+      start: start.toISOString(),
+      end: end.toISOString()
+    }
+  };
+}
+
+export function getAllCommissionReports(
+  location: string,
+  startDate?: Date,
+  endDate?: Date
+): CommissionReport[] {
+  const store = getStore();
+  const locationStaff = store.staff.filter(s => s.location === location);
+  
+  const reports: CommissionReport[] = [];
+  
+  locationStaff.forEach(staff => {
+    const report = getCommissionReport(staff.id, startDate, endDate);
+    if (report && report.totalSales > 0) {
+      reports.push(report);
+    }
+  });
+  
+  return reports.sort((a, b) => b.totalSales - a.totalSales);
+}
+
 export function getMembershipFreezes() {
   return getStore().membershipFreezes;
 }

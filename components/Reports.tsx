@@ -1,12 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllMembers, getAllClassPackClients, getAllLeads, getAllTransactions, getAllBookings, getAllClasses, getCohortAnalysis } from '@/lib/dataStore';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { TrendingUp, DollarSign, Users, Target } from 'lucide-react';
+import CommissionReports from './CommissionReports';
 
 export default function Reports() {
-  const { location } = useApp();
+  const { location, userRole } = useApp();
+  const [activeTab, setActiveTab] = useState<'analytics' | 'commissions'>('analytics');
 
   const locationMembers = getAllMembers().filter(m => m.location === location);
   const locationPackClients = getAllClassPackClients().filter(c => c.location === location);
@@ -78,14 +81,45 @@ export default function Reports() {
   const promoData = Object.entries(promoRevenue).map(([code, revenue]) => ({ name: code, revenue }));
 
   const cohortData = getCohortAnalysis(location);
+  
+  const canViewCommissions = userRole === 'owner' || userRole === 'manager';
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
-        <p className="text-gray-600 mt-1">View business insights and metrics</p>
+      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Reports & Analytics</h1>
+        <p className="text-gray-600">Comprehensive insights into your business performance</p>
+        
+        {canViewCommissions && (
+          <div className="flex gap-2 mt-4">
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                activeTab === 'analytics'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Analytics
+            </button>
+            <button
+              onClick={() => setActiveTab('commissions')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                activeTab === 'commissions'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Commission Reports
+            </button>
+          </div>
+        )}
       </div>
 
+      {activeTab === 'commissions' && canViewCommissions ? (
+        <CommissionReports />
+      ) : (
+        <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
           <div className="flex items-center justify-between">
@@ -335,6 +369,8 @@ export default function Reports() {
             </ResponsiveContainer>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
