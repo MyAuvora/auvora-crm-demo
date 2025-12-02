@@ -387,20 +387,53 @@ function migratePaymentFields(members: Member[]): Member[] {
 }
 
 function migrateTransactionNames(transactions: Transaction[]): Transaction[] {
+  const allMembers = seedMembers;
+  const allPackClients = seedClassPackClients;
+  const allDropInClients = seedDropInClients;
+  const allLeads = seedLeads;
+  const allStaff = seedStaff;
+  
   return transactions.map(t => {
+    const isSampleTransaction = t.id.startsWith('txn-sample-');
     const hasPlaceholderName = t.memberName && /^Member\s+\d+$/.test(t.memberName);
+    const needsFixing = isSampleTransaction && (hasPlaceholderName || !t.memberId);
     
-    if ((hasPlaceholderName || !t.memberName) && t.memberId) {
-      const personData = getPersonById(t.memberId);
-      if (personData) {
-        return {
-          ...t,
-          memberName: personData.person.name
-        };
+    if (!needsFixing) {
+      if (hasPlaceholderName && t.memberId) {
+        const personData = getPersonById(t.memberId);
+        if (personData) {
+          return {
+            ...t,
+            memberName: personData.person.name
+          };
+        }
       }
+      return t;
     }
     
-    return t;
+    const locationPeople = [
+      ...allMembers.filter(m => m.location === t.location),
+      ...allPackClients.filter(c => c.location === t.location),
+      ...allDropInClients.filter(d => d.location === t.location),
+      ...allLeads.filter(l => l.location === t.location)
+    ];
+    
+    const shouldHavePerson = Math.random() > 0.2 && locationPeople.length > 0;
+    const person = shouldHavePerson ? locationPeople[Math.floor(Math.random() * locationPeople.length)] : null;
+    
+    let sellerId = t.sellerId;
+    if (!sellerId) {
+      const locationStaff = allStaff.filter(s => s.location === t.location && s.role === 'front-desk');
+      const seller = locationStaff.length > 0 ? locationStaff[Math.floor(Math.random() * locationStaff.length)] : null;
+      sellerId = seller?.id;
+    }
+    
+    return {
+      ...t,
+      memberId: person?.id || t.memberId,
+      memberName: person?.name || 'Guest',
+      sellerId
+    };
   });
 }
 
