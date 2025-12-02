@@ -13,6 +13,7 @@ import AddTaskModal from './AddTaskModal';
 import SendTextModal from './SendTextModal';
 import ProfileTabs from './ProfileTabs';
 import { hasPermission } from '@/lib/permissions';
+import PersonStatusBadge from './PersonStatusBadge';
 
 type Tab = 'leads' | 'members' | 'class-packs';
 
@@ -443,7 +444,10 @@ export default function LeadsMembers() {
                           setShowProfileTabs(true);
                         }}
                       >
-                        {lead.name}
+                        <div className="flex items-center gap-2">
+                          <PersonStatusBadge personId={lead.id} />
+                          {lead.name}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -494,6 +498,7 @@ export default function LeadsMembers() {
                           }}
                         >
                           <div className="flex items-center gap-2">
+                            <PersonStatusBadge personId={member.id} />
                             {member.name}
                             {engagement?.isAtRisk && (
                               <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">⚠️ At Risk</span>
@@ -606,6 +611,7 @@ export default function LeadsMembers() {
                           }}
                         >
                           <div className="flex items-center gap-2">
+                            <PersonStatusBadge personId={pack.id} />
                             {pack.name}
                             {pack.remainingClasses <= 2 && pack.remainingClasses > 0 && (
                               <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">⚠️ Low</span>

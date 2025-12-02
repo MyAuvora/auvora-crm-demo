@@ -24,6 +24,7 @@ import {
 import { format, startOfWeek, startOfMonth, startOfYear } from 'date-fns';
 import ProfileTabs from './ProfileTabs';
 import SendTextModal from './SendTextModal';
+import PersonStatusBadge from './PersonStatusBadge';
 
 type TimeRange = 'WTD' | 'MTD' | 'YTD';
 type SortField = 'name' | 'conversionRate' | 'averageClassSize';
@@ -579,6 +580,7 @@ export default function HeadCoachDashboard() {
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3">
+                            <PersonStatusBadge personId={lead.id} />
                             <p className="font-semibold text-gray-900">{lead.name}</p>
                             {converted ? (
                               <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
@@ -614,7 +616,10 @@ export default function HeadCoachDashboard() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <p className="font-semibold text-gray-900">{booking.memberName}</p>
+                          <div className="flex items-center gap-2">
+                            <PersonStatusBadge personId={booking.memberId} />
+                            <p className="font-semibold text-gray-900">{booking.memberName}</p>
+                          </div>
                           <p className="text-sm text-gray-600 mt-1">
                             {booking.className} • {booking.classDayOfWeek} at {booking.classTime}
                           </p>

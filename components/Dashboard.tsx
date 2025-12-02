@@ -9,6 +9,7 @@ import { Transaction } from '@/lib/dataStore';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import DashboardOpsFeed from './DashboardOpsFeed';
 import ManagerApprovals from './ManagerApprovals';
+import PersonStatusBadge from './PersonStatusBadge';
 
 export default function Dashboard() {
   const { location, navigateToMember, navigateToLead, userRole } = useApp();
@@ -637,8 +638,9 @@ export default function Dashboard() {
                                   setSelectedClass(null);
                                   navigateToMember(booking.memberId);
                                 }}
-                                className="w-full text-left p-3 bg-green-50 rounded border border-green-200 text-gray-900 hover:bg-green-100 transition-colors"
+                                className="w-full text-left p-3 bg-green-50 rounded border border-green-200 text-gray-900 hover:bg-green-100 transition-colors flex items-center gap-2"
                               >
+                                <PersonStatusBadge personId={booking.memberId} />
                                 {booking.memberName}
                               </button>
                             </li>
@@ -658,8 +660,9 @@ export default function Dashboard() {
                                   setSelectedClass(null);
                                   navigateToMember(booking.memberId);
                                 }}
-                                className="w-full text-left p-3 bg-blue-50 rounded border border-blue-200 text-gray-900 hover:bg-blue-100 transition-colors"
+                                className="w-full text-left p-3 bg-blue-50 rounded border border-blue-200 text-gray-900 hover:bg-blue-100 transition-colors flex items-center gap-2"
                               >
+                                <PersonStatusBadge personId={booking.memberId} />
                                 {booking.memberName}
                               </button>
                             </li>
@@ -679,8 +682,9 @@ export default function Dashboard() {
                                   setSelectedClass(null);
                                   navigateToMember(entry.memberId);
                                 }}
-                                className="w-full text-left p-3 bg-yellow-50 rounded border border-yellow-200 text-gray-900 hover:bg-yellow-100 transition-colors"
+                                className="w-full text-left p-3 bg-yellow-50 rounded border border-yellow-200 text-gray-900 hover:bg-yellow-100 transition-colors flex items-center gap-2"
                               >
+                                <PersonStatusBadge personId={entry.memberId} />
                                 {entry.memberName}
                               </button>
                             </li>

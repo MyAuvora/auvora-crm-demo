@@ -8,6 +8,7 @@ import BookingModal from './BookingModal';
 import CheckInModal from './CheckInModal';
 import { Class } from '@/lib/types';
 import { hasPermission } from '@/lib/permissions';
+import PersonStatusBadge from './PersonStatusBadge';
 
 export default function Schedule() {
   const { location, userRole } = useApp();
@@ -386,7 +387,10 @@ export default function Schedule() {
                       .filter(b => b.classId === selectedClass.id && b.status !== 'cancelled')
                       .map(booking => (
                         <div key={booking.id} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
-                          <span className="text-gray-900">{booking.memberName}</span>
+                          <div className="flex items-center gap-2">
+                            <PersonStatusBadge personId={booking.memberId} />
+                            <span className="text-gray-900">{booking.memberName}</span>
+                          </div>
                           <span className={`text-sm px-2 py-1 rounded ${
                             booking.status === 'checked-in' ? 'bg-green-100 text-green-700' :
                             'bg-blue-100 text-blue-700'

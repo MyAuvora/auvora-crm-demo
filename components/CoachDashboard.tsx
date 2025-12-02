@@ -15,6 +15,7 @@ import { Calendar, Users, TrendingUp, Clock, UserX, ArrowLeftRight } from 'lucid
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 import ProfileTabs from './ProfileTabs';
 import SendTextModal from './SendTextModal';
+import PersonStatusBadge from './PersonStatusBadge';
 
 export default function CoachDashboard() {
   const { location } = useApp();
@@ -256,8 +257,9 @@ export default function CoachDashboard() {
                           <button
                             key={booking.id}
                             onClick={() => handlePersonClick(booking.memberId)}
-                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200"
+                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 flex items-center gap-1.5"
                           >
+                            <PersonStatusBadge personId={booking.memberId} />
                             {booking.memberName}
                             {booking.status === 'checked-in' && (
                               <span className="ml-1 text-green-600">✓</span>
@@ -324,8 +326,9 @@ export default function CoachDashboard() {
                                 <button
                                   key={booking.id}
                                   onClick={() => handlePersonClick(booking.memberId)}
-                                  className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs hover:bg-gray-200"
+                                  className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs hover:bg-gray-200 flex items-center gap-1"
                                 >
+                                  <PersonStatusBadge personId={booking.memberId} className="w-4 h-4 text-[8px]" />
                                   {booking.memberName}
                                   {booking.status === 'checked-in' && (
                                     <span className="ml-1 text-green-600">✓</span>

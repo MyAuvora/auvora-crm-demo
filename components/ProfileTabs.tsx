@@ -7,6 +7,7 @@ import { getPersonById, getPersonTransactions, getPersonBookings, getPersonCommu
 import { Member, ClassPackClient, DropInClient } from '@/lib/types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import TrainingTab from './TrainingTab';
+import PersonStatusBadge from './PersonStatusBadge';
 
 type Tab = 'account' | 'billing' | 'attendance' | 'messages' | 'documents' | 'training' | 'timeline';
 
@@ -64,7 +65,10 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                 <ArrowLeft size={24} />
               </button>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">{person.name}</h2>
+                <div className="flex items-center gap-3">
+                  <PersonStatusBadge personId={personId} />
+                  <h2 className="text-2xl font-bold text-gray-900">{person.name}</h2>
+                </div>
                 <p className="text-sm text-gray-600">{person.email} • {person.phone}</p>
               </div>
             </div>
