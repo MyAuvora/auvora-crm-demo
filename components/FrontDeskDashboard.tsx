@@ -3,12 +3,19 @@
 import { useState, useMemo } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllTransactions, getAllMembers, getAllLeads, getAllBookings, getAllClasses, getAllStaff, getCommissionReport } from '@/lib/dataStore';
-import { DollarSign, Users, UserPlus, Calendar, AlertCircle, TrendingUp } from 'lucide-react';
+import { DollarSign, Users, UserPlus, Calendar, AlertCircle, TrendingUp, CreditCard } from 'lucide-react';
 import { format, startOfDay, endOfDay, startOfMonth, endOfMonth } from 'date-fns';
+import BookingModal from './BookingModal';
+import { Class, Member } from '@/lib/types';
+import { useToast } from '@/lib/useToast';
 
 export default function FrontDeskDashboard() {
   const { location, navigateToMember, navigateToLead, userRole } = useApp();
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [processingPayment, setProcessingPayment] = useState<string | null>(null);
+  const { success: showSuccessToast } = useToast();
 
   const today = new Date();
   const todayStart = startOfDay(today);
@@ -85,7 +92,51 @@ export default function FrontDeskDashboard() {
 
   const todayClasses = classes.filter(c => c.location === location);
 
-  const getMetricDetails = (metric: string) => {
+  const todayCheckInsList = bookings.filter(b => {
+    if (!b.checkedInAt) return false;
+    const checkInDate = new Date(b.checkedInAt);
+    return checkInDate >= todayStart && checkInDate <= todayEnd;
+  });
+
+  const handleProcessPayment = (memberId: string) => {
+    setProcessingPayment(memberId);
+    
+    setTimeout(() => {
+      const member = members.find(m => m.id === memberId);
+      if (member) {
+        const nextPayment = new Date();
+        nextPayment.setMonth(nextPayment.getMonth() + 1);
+        
+        const storedData = localStorage.getItem('auvora-crm-data');
+        if (storedData) {
+          const data = JSON.parse(storedData);
+          const memberIndex = data.members.findIndex((m: Member) => m.id === memberId);
+          if (memberIndex !== -1) {
+            data.members[memberIndex].paymentStatus = 'current';
+            data.members[memberIndex].lastPaymentDate = new Date().toISOString().split('T')[0];
+            data.members[memberIndex].nextPaymentDue = nextPayment.toISOString().split('T')[0];
+            localStorage.setItem('auvora-crm-data', JSON.stringify(data));
+          }
+        }
+        
+        showSuccessToast(`Payment processed for ${member.name}`);
+        setRefreshKey(prev => prev + 1);
+        window.location.reload();
+      }
+      setProcessingPayment(null);
+    }, 1500);
+  };
+
+  const getMetricDetails = (metric: string): {
+    title: string;
+    items: Array<{
+      id: string;
+      name: string;
+      detail: string;
+      onClick: () => void;
+      showProcessButton?: boolean;
+    }>;
+  } | null => {
     switch (metric) {
       case 'new-leads':
         return {
@@ -100,18 +151,37 @@ export default function FrontDeskDashboard() {
             }
           }))
         };
+      case 'check-ins':
+        return {
+          title: "Today's Check-Ins",
+          items: todayCheckInsList.map(b => {
+            const cls = classes.find(c => c.id === b.classId);
+            return {
+              id: b.id,
+              name: b.memberName,
+              detail: `${cls?.name || 'Unknown Class'} • ${b.checkedInAt ? format(new Date(b.checkedInAt), 'h:mm a') : ''}`,
+              onClick: () => {
+                setSelectedMetric(null);
+                const member = members.find(m => m.id === b.memberId);
+                if (member) navigateToMember(member.id);
+              }
+            };
+          })
+        };
       case 'missed-payments':
         return {
-          title: 'Missed Payments',
-          items: missedPayments.map(m => ({
-            id: m.id,
-            name: m.name,
-            detail: `Due: ${m.nextPaymentDue ? format(new Date(m.nextPaymentDue), 'MMM d') : 'Unknown'}`,
-            onClick: () => {
-              setSelectedMetric(null);
-              navigateToMember(m.id);
-            }
-          }))
+          title: 'Missed Payments - Process Payments',
+          items: missedPayments.map(m => {
+            const amount = m.membershipType.includes('unlimited') ? '199' : 
+                          m.membershipType.includes('2x') ? '149' : '99';
+            return {
+              id: m.id,
+              name: m.name,
+              detail: `Due: ${m.nextPaymentDue ? format(new Date(m.nextPaymentDue), 'MMM d') : 'Unknown'} • Amount: $${amount}`,
+              onClick: () => {},
+              showProcessButton: true
+            };
+          })
         };
       default:
         return null;
@@ -122,6 +192,18 @@ export default function FrontDeskDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Booking Modal */}
+      {selectedClass && (
+        <BookingModal
+          classData={selectedClass}
+          onClose={() => setSelectedClass(null)}
+          onSuccess={() => {
+            setRefreshKey(prev => prev + 1);
+            setSelectedClass(null);
+          }}
+        />
+      )}
+
       {/* Metric Detail Modal */}
       {details && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -141,14 +223,30 @@ export default function FrontDeskDashboard() {
               ) : (
                 <div className="space-y-2">
                   {details.items.map(item => (
-                    <button
+                    <div
                       key={item.id}
-                      onClick={item.onClick}
-                      className="w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="p-4 bg-gray-50 rounded-lg"
                     >
-                      <p className="font-semibold text-gray-900">{item.name}</p>
-                      <p className="text-sm text-gray-600 mt-1">{item.detail}</p>
-                    </button>
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={item.onClick}
+                          className="flex-1 text-left hover:bg-gray-100 rounded p-2 -m-2 transition-colors"
+                        >
+                          <p className="font-semibold text-gray-900">{item.name}</p>
+                          <p className="text-sm text-gray-600 mt-1">{item.detail}</p>
+                        </button>
+                        {item.showProcessButton && (
+                          <button
+                            onClick={() => handleProcessPayment(item.id)}
+                            disabled={processingPayment === item.id}
+                            className="ml-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                          >
+                            <CreditCard size={16} />
+                            {processingPayment === item.id ? 'Processing...' : 'Process Payment'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
@@ -223,13 +321,16 @@ export default function FrontDeskDashboard() {
           <p className="text-sm font-semibold text-gray-700">New Leads Today</p>
         </button>
 
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+        <button
+          onClick={() => setSelectedMetric('check-ins')}
+          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
+        >
           <div className="flex items-center justify-between mb-2">
             <Calendar className="text-green-600" size={24} />
             <span className="text-2xl font-bold text-gray-900">{todayCheckIns}</span>
           </div>
           <p className="text-sm font-semibold text-gray-700">Check-Ins Today</p>
-        </div>
+        </button>
 
         <button
           onClick={() => setSelectedMetric('missed-payments')}
@@ -255,7 +356,11 @@ export default function FrontDeskDashboard() {
               const coach = staff.find(s => s.id === cls.coachId);
               
               return (
-                <div key={cls.id} className="border border-gray-200 rounded-lg p-4">
+                <button
+                  key={cls.id}
+                  onClick={() => setSelectedClass(cls)}
+                  className="w-full border border-gray-200 rounded-lg p-4 hover:bg-gray-50 hover:border-red-300 transition-colors text-left"
+                >
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-semibold text-gray-900">{cls.name}</p>
@@ -270,7 +375,7 @@ export default function FrontDeskDashboard() {
                       </p>
                     </div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>

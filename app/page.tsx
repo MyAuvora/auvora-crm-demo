@@ -18,6 +18,7 @@ import Messaging from '@/components/Messaging';
 import SocialMedia from '@/components/SocialMedia';
 import QuickBooksIntegration from '@/components/QuickBooksIntegration';
 import Settings from '@/components/Settings';
+import KioskMode from '@/components/KioskMode';
 import AuvoraChat from '@/components/AuvoraChat';
 import CommandPalette from '@/components/CommandPalette';
 import { ToastContainer } from '@/components/Toast';
@@ -67,7 +68,7 @@ export default function CRMApp() {
     { id: 'pos' as Section, label: 'POS', icon: ShoppingCart, roles: ['owner', 'manager', 'head-coach', 'coach', 'front-desk'] },
     { id: 'reports' as Section, label: 'Reports', icon: TrendingUp, roles: ['owner', 'manager'] },
     { id: 'promotions' as Section, label: 'Promotions', icon: Tag, roles: ['owner', 'manager'] },
-    { id: 'messaging' as Section, label: 'Messaging', icon: MessageSquare, roles: ['owner', 'manager', 'front-desk'] },
+    { id: 'messaging' as Section, label: 'Messaging', icon: MessageSquare, roles: ['owner', 'manager', 'front-desk'], badge: 3 },
     { id: 'social-media' as Section, label: 'Social Media', icon: Share2, roles: ['owner', 'manager'] },
     { id: 'quickbooks' as Section, label: 'QuickBooks', icon: DollarSign, roles: ['owner', 'manager'] },
     { id: 'settings' as Section, label: 'Settings', icon: SettingsIcon, roles: ['owner'] },
@@ -151,7 +152,7 @@ export default function CRMApp() {
                         setActiveSection(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative ${
                         isActive
                           ? 'bg-red-600 text-white'
                           : 'text-gray-700 hover:bg-gray-100'
@@ -159,6 +160,11 @@ export default function CRMApp() {
                     >
                       <Icon size={20} />
                       <span className="font-medium">{item.label}</span>
+                      {item.badge && item.badge > 0 && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                          {item.badge}
+                        </span>
+                      )}
                     </button>
                   </li>
                 );
@@ -185,7 +191,7 @@ export default function CRMApp() {
           {activeSection === 'social-media' && <SocialMedia />}
           {activeSection === 'quickbooks' && <QuickBooksIntegration />}
           {activeSection === 'settings' && <Settings />}
-          {activeSection === 'kiosk' && <div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Kiosk Mode</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>}
+          {activeSection === 'kiosk' && <KioskMode />}
         </main>
       </div>
 
