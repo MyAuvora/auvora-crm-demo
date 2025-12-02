@@ -199,12 +199,31 @@ export function generateLeads(): Lead[] {
 export function generateStaff(): Staff[] {
   const staff: Staff[] = [];
   
+  const headCoachNames = ['Chris Johnson', 'Pat Williams'];
   const coachNames = ['Alex Rivera', 'Jordan Martinez', 'Casey Thompson', 'Morgan Lee', 'Taylor Anderson', 'Jamie Wilson'];
   const frontDeskNames = ['Sam Brown', 'Riley Davis', 'Avery Garcia'];
   const instructorNames = ['Quinn Rodriguez', 'Skylar Hernandez', 'Dakota Lopez', 'Cameron Gonzalez', 'Parker Torres'];
   
   const specialties = ['strength', 'conditioning', 'beginners', 'advanced', 'HIIT', 'endurance'];
   const danceStyles = ['Zumba', 'Salsa', 'Hip-Hop'];
+  
+  staff.push({
+    id: 'head-coach-1',
+    name: headCoachNames[0],
+    email: generateEmail(headCoachNames[0]),
+    role: 'head-coach',
+    location: 'athletic-club',
+    specialties: ['leadership', 'program-design', 'strength', 'conditioning']
+  });
+  
+  staff.push({
+    id: 'head-coach-2',
+    name: headCoachNames[1],
+    email: generateEmail(headCoachNames[1]),
+    role: 'head-coach',
+    location: 'dance-studio',
+    styles: ['choreography', 'performance', 'Salsa', 'Hip-Hop']
+  });
   
   coachNames.forEach((name, i) => {
     staff.push({
@@ -243,8 +262,8 @@ export function generateStaff(): Staff[] {
 
 export function generateClasses(): Class[] {
   const classes: Class[] = [];
-  const coaches = generateStaff().filter(s => s.role === 'coach');
-  const instructors = generateStaff().filter(s => s.role === 'instructor');
+  const coaches = generateStaff().filter(s => s.role === 'coach' || s.role === 'head-coach');
+  const instructors = generateStaff().filter(s => s.role === 'instructor' || s.role === 'head-coach');
   
   const athleticClassNames = ['Circuit Training', 'HIIT Blast', 'Strength & Conditioning', 'Bootcamp', 'Core Power', 'Cardio Burn', 'Total Body', 'Functional Fitness', 'Athletic Performance', 'CrossFit'];
   const danceClassTypes = ['Zumba', 'Salsa', 'Hip-Hop', 'Contemporary', 'Ballet', 'Jazz', 'Bachata', 'Ballroom'];

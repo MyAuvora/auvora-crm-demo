@@ -16,14 +16,14 @@ export default function StaffSection() {
   const [newStaff, setNewStaff] = useState({
     name: '',
     email: '',
-    role: 'coach' as 'coach' | 'instructor' | 'front-desk' | 'manager',
+    role: 'coach' as 'head-coach' | 'coach' | 'instructor' | 'front-desk' | 'manager',
     specialties: '',
   });
   
   const [editForm, setEditForm] = useState({
     name: '',
     email: '',
-    role: 'coach' as 'coach' | 'instructor' | 'front-desk' | 'manager',
+    role: 'coach' as 'head-coach' | 'coach' | 'instructor' | 'front-desk' | 'manager',
     specialties: '',
   });
 
@@ -288,9 +288,10 @@ export default function StaffSection() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
                   <select 
                     value={newStaff.role}
-                    onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value as 'coach' | 'instructor' | 'front-desk' | 'manager' })}
+                    onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value as 'head-coach' | 'coach' | 'instructor' | 'front-desk' | 'manager' })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
+                    <option value="head-coach">Head Coach</option>
                     <option value="coach">Coach</option>
                     <option value="instructor">Instructor</option>
                     <option value="front-desk">Front Desk</option>
@@ -362,9 +363,10 @@ export default function StaffSection() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
                   <select 
                     value={editForm.role}
-                    onChange={(e) => setEditForm({ ...editForm, role: e.target.value as 'coach' | 'instructor' | 'front-desk' | 'manager' })}
+                    onChange={(e) => setEditForm({ ...editForm, role: e.target.value as 'head-coach' | 'coach' | 'instructor' | 'front-desk' | 'manager' })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
+                    <option value="head-coach">Head Coach</option>
                     <option value="coach">Coach</option>
                     <option value="instructor">Instructor</option>
                     <option value="front-desk">Front Desk</option>

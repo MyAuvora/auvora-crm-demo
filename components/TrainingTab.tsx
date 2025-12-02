@@ -34,7 +34,7 @@ const noteTemplates: { type: NoteType; title: string; content: string }[] = [
   { type: 'general', title: 'General Note', content: '' },
 ];
 
-export default function TrainingTab({ memberId, memberName, currentStaffId, currentStaffName }: TrainingTabProps) {
+export default function TrainingTab({ memberId, currentStaffId, currentStaffName }: TrainingTabProps) {
   const [goals, setGoals] = useState<Goal[]>(() => getGoalsByMember(memberId));
   const [notes, setNotes] = useState<Note[]>(() => getNotesByMember(memberId));
   const [showGoalModal, setShowGoalModal] = useState(false);

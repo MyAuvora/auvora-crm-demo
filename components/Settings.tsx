@@ -8,7 +8,6 @@ import { useApp } from '@/lib/context';
 export default function Settings() {
   const { location } = useApp();
   const [activeSection, setActiveSection] = useState<'business' | 'branding' | 'billing' | 'staff' | 'messaging' | 'notifications' | 'security'>('business');
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   const [businessInfo, setBusinessInfo] = useState({
     businessName: 'The Lab Tampa',

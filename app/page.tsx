@@ -5,6 +5,7 @@ import { useApp, Section } from '@/lib/context';
 import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor, MessageSquare, Share2, DollarSign, Search, Settings as SettingsIcon } from 'lucide-react';
 import Dashboard from '@/components/Dashboard';
 import CoachDashboard from '@/components/CoachDashboard';
+import HeadCoachDashboard from '@/components/HeadCoachDashboard';
 import LeadsMembers from '@/components/LeadsMembers';
 import LeadPipeline from '@/components/LeadPipeline';
 import Schedule from '@/components/Schedule';
@@ -49,6 +50,7 @@ export default function CRMApp() {
     switch(role) {
       case 'owner': return 'Owner/Admin';
       case 'manager': return 'Manager';
+      case 'head-coach': return 'Head Coach/Trainer';
       case 'coach': return 'Coach/Trainer';
       case 'front-desk': return 'Front Desk';
       default: return 'Owner/Admin';
@@ -56,12 +58,12 @@ export default function CRMApp() {
   };
 
   const allNavItems = [
-    { id: 'dashboard' as Section, label: 'Dashboard', icon: Home, roles: ['owner', 'manager', 'coach', 'front-desk'] },
+    { id: 'dashboard' as Section, label: 'Dashboard', icon: Home, roles: ['owner', 'manager', 'head-coach', 'coach', 'front-desk'] },
     { id: 'leads-members' as Section, label: 'Leads & Members', icon: Users, roles: ['owner', 'manager', 'front-desk'] },
     { id: 'pipeline' as Section, label: 'Lead Pipeline', icon: GitBranch, roles: ['owner', 'manager'] },
-    { id: 'schedule' as Section, label: 'Schedule', icon: Calendar, roles: ['owner', 'manager', 'coach', 'front-desk'] },
+    { id: 'schedule' as Section, label: 'Schedule', icon: Calendar, roles: ['owner', 'manager', 'head-coach', 'coach', 'front-desk'] },
     { id: 'staff' as Section, label: 'Staff', icon: UserCog, roles: ['owner', 'manager'] },
-    { id: 'pos' as Section, label: 'POS', icon: ShoppingCart, roles: ['owner', 'manager', 'coach', 'front-desk'] },
+    { id: 'pos' as Section, label: 'POS', icon: ShoppingCart, roles: ['owner', 'manager', 'head-coach', 'coach', 'front-desk'] },
     { id: 'reports' as Section, label: 'Reports', icon: TrendingUp, roles: ['owner', 'manager'] },
     { id: 'promotions' as Section, label: 'Promotions', icon: Tag, roles: ['owner', 'manager'] },
     { id: 'messaging' as Section, label: 'Messaging', icon: MessageSquare, roles: ['owner', 'manager', 'front-desk'] },
@@ -112,11 +114,12 @@ export default function CRMApp() {
             
             <select
               value={userRole}
-              onChange={(e) => setUserRole(e.target.value as 'owner' | 'manager' | 'coach' | 'front-desk')}
+              onChange={(e) => setUserRole(e.target.value as 'owner' | 'manager' | 'head-coach' | 'coach' | 'front-desk')}
               className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600"
             >
               <option value="owner">Owner/Admin</option>
               <option value="manager">Manager</option>
+              <option value="head-coach">Head Coach/Trainer</option>
               <option value="coach">Coach/Trainer</option>
               <option value="front-desk">Front Desk</option>
             </select>
@@ -164,7 +167,11 @@ export default function CRMApp() {
         </nav>
 
         <main className="flex-1 p-4 lg:p-8">
-          {activeSection === 'dashboard' && (userRole === 'coach' ? <CoachDashboard /> : <Dashboard />)}
+          {activeSection === 'dashboard' && (
+            userRole === 'head-coach' ? <HeadCoachDashboard /> :
+            userRole === 'coach' ? <CoachDashboard /> : 
+            <Dashboard />
+          )}
           {activeSection === 'leads-members' && <LeadsMembers />}
           {activeSection === 'pipeline' && <LeadPipeline />}
           {activeSection === 'schedule' && <Schedule />}

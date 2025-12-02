@@ -89,18 +89,28 @@ export const permissions: Record<string, Permission> = {
   
   'class:add': {
     action: 'Add Classes',
-    allowedRoles: ['owner', 'manager'],
+    allowedRoles: ['owner', 'manager', 'head-coach'],
     description: 'Add new classes to schedule',
   },
   'class:edit': {
     action: 'Edit Classes',
-    allowedRoles: ['owner', 'manager'],
+    allowedRoles: ['owner', 'manager', 'head-coach'],
     description: 'Edit class details',
   },
   'class:delete': {
     action: 'Delete Classes',
-    allowedRoles: ['owner', 'manager'],
+    allowedRoles: ['owner', 'manager', 'head-coach'],
     description: 'Delete classes from schedule',
+  },
+  'approvals:substitution': {
+    action: 'Approve Substitution Requests',
+    allowedRoles: ['owner', 'manager', 'head-coach'],
+    description: 'Approve or deny class substitution requests',
+  },
+  'approvals:timeoff': {
+    action: 'Approve Time Off Requests',
+    allowedRoles: ['owner', 'manager'],
+    description: 'Approve or deny time off requests',
   },
   
   'reports:financial': {
@@ -133,6 +143,7 @@ export function getPermissionError(permissionKey: string): string {
     switch(role) {
       case 'owner': return 'Owner/Admin';
       case 'manager': return 'Manager';
+      case 'head-coach': return 'Head Coach/Trainer';
       case 'coach': return 'Coach/Trainer';
       case 'front-desk': return 'Front Desk';
       default: return role;

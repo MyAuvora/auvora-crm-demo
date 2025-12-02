@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { 
   getPendingSubstitutionRequests,
@@ -13,8 +12,7 @@ import { CheckCircle, XCircle, Clock, Calendar, UserX } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function ManagerApprovals() {
-  const { location, userRole } = useApp();
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { location } = useApp();
   
   const staff = getAllStaff();
   const currentManager = staff.find(s => s.location === location);
