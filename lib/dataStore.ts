@@ -41,6 +41,8 @@ export interface Transaction {
   promoCode?: string;
   timestamp: string;
   location: string;
+  sellerId?: string;
+  sellerName?: string;
 }
 
 export interface AuditLogEntry {

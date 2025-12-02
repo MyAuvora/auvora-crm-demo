@@ -6,6 +6,7 @@ import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X,
 import Dashboard from '@/components/Dashboard';
 import CoachDashboard from '@/components/CoachDashboard';
 import HeadCoachDashboard from '@/components/HeadCoachDashboard';
+import FrontDeskDashboard from '@/components/FrontDeskDashboard';
 import LeadsMembers from '@/components/LeadsMembers';
 import LeadPipeline from '@/components/LeadPipeline';
 import Schedule from '@/components/Schedule';
@@ -169,7 +170,8 @@ export default function CRMApp() {
         <main className="flex-1 p-4 lg:p-8">
           {activeSection === 'dashboard' && (
             userRole === 'head-coach' ? <HeadCoachDashboard /> :
-            userRole === 'coach' ? <CoachDashboard /> : 
+            userRole === 'coach' ? <CoachDashboard /> :
+            userRole === 'front-desk' ? <FrontDeskDashboard /> :
             <Dashboard />
           )}
           {activeSection === 'leads-members' && <LeadsMembers />}

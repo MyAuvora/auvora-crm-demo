@@ -20,6 +20,7 @@ export default function POS() {
   const [activeTab, setActiveTab] = useState<'pos' | 'inventory' | 'transactions' | 'invoices'>('pos');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
+  const [selectedSeller, setSelectedSeller] = useState<string>('');
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -35,6 +36,10 @@ export default function POS() {
   const currentStaff = staff.find(s => s.role === userRole && s.location === location);
   const staffSettings = currentStaff ? getStaffSettings(currentStaff.id) : null;
   const hasPOSAccess = userRole === 'owner' || userRole === 'manager' || userRole === 'front-desk' || (userRole === 'coach' && staffSettings?.posAccess !== false);
+  
+  if (hasPOSAccess && !selectedSeller && currentStaff) {
+    setTimeout(() => setSelectedSeller(currentStaff.id), 0);
+  }
 
   const locationProducts = getAllProducts().filter(p => p.location === location);
   const allMembers = [...getAllMembers(), ...getAllClassPackClients()].filter(m => m.location === location);
@@ -151,6 +156,7 @@ export default function POS() {
     const total = getTotal();
 
     const member = allMembers.find(m => m.id === selectedMember);
+    const seller = staff.find(s => s.id === selectedSeller);
     
     const transaction = createTransaction({
       memberId: selectedMember || undefined,
@@ -167,6 +173,8 @@ export default function POS() {
       total,
       promoCode: promoCode || undefined,
       location,
+      sellerId: selectedSeller || undefined,
+      sellerName: seller?.name || undefined,
     });
 
     const invoice = createInvoice({
@@ -307,20 +315,37 @@ export default function POS() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Member (Optional)
-                  </label>
-                  <select
-                    value={selectedMember}
-                    onChange={(e) => setSelectedMember(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                  >
-                    <option value="">Guest / Walk-in</option>
-                    {allMembers.map(member => (
-                      <option key={member.id} value={member.id}>{member.name}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Member (Optional)
+                    </label>
+                    <select
+                      value={selectedMember}
+                      onChange={(e) => setSelectedMember(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    >
+                      <option value="">Guest / Walk-in</option>
+                      {allMembers.map(member => (
+                        <option key={member.id} value={member.id}>{member.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Seller
+                    </label>
+                    <select
+                      value={selectedSeller}
+                      onChange={(e) => setSelectedSeller(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    >
+                      <option value="">Select Seller</option>
+                      {staff.filter(s => s.location === location).map(s => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div>
