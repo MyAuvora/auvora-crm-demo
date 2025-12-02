@@ -1,4 +1,4 @@
-import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings } from '@/lib/types';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings, StaffShift } from '@/lib/types';
 
 const tampaZipCodes = ['33602', '33603', '33606', '33607', '33609', '33611', '33612', '33613', '33614', '33615'];
 
@@ -614,7 +614,171 @@ export function generateStaffSettings(): StaffSettings[] {
   }));
 }
 
+export function generateStaffShifts(): StaffShift[] {
+  const shifts: StaffShift[] = [];
+  
+  const tampaFrontDesk = staff.filter(s => s.location === 'athletic-club' && s.role === 'front-desk');
+  const stPeteFrontDesk = staff.filter(s => s.location === 'dance-studio' && s.role === 'front-desk');
+  
+  if (tampaFrontDesk.length > 0) {
+    shifts.push({
+      id: `shift-tampa-morning-${Date.now()}`,
+      location: 'athletic-club',
+      assignedStaffId: tampaFrontDesk[0].id,
+      assignedStaffName: tampaFrontDesk[0].name,
+      templateType: 'front-desk',
+      notes: 'Morning front desk coverage',
+      recurrence: {
+        type: 'weekly',
+        dayOfWeek: 1, // Monday
+        startTime: '6:00 AM',
+        endTime: '2:00 PM',
+      },
+      status: 'scheduled',
+      createdBy: 'system',
+      createdAt: new Date().toISOString(),
+    });
+    
+    shifts.push({
+      id: `shift-tampa-morning-tue-${Date.now()}`,
+      location: 'athletic-club',
+      assignedStaffId: tampaFrontDesk[0].id,
+      assignedStaffName: tampaFrontDesk[0].name,
+      templateType: 'front-desk',
+      notes: 'Morning front desk coverage',
+      recurrence: {
+        type: 'weekly',
+        dayOfWeek: 2, // Tuesday
+        startTime: '6:00 AM',
+        endTime: '2:00 PM',
+      },
+      status: 'scheduled',
+      createdBy: 'system',
+      createdAt: new Date().toISOString(),
+    });
+    
+    shifts.push({
+      id: `shift-tampa-morning-wed-${Date.now()}`,
+      location: 'athletic-club',
+      assignedStaffId: tampaFrontDesk[0].id,
+      assignedStaffName: tampaFrontDesk[0].name,
+      templateType: 'front-desk',
+      notes: 'Morning front desk coverage',
+      recurrence: {
+        type: 'weekly',
+        dayOfWeek: 3, // Wednesday
+        startTime: '6:00 AM',
+        endTime: '2:00 PM',
+      },
+      status: 'scheduled',
+      createdBy: 'system',
+      createdAt: new Date().toISOString(),
+    });
+    
+    if (tampaFrontDesk.length > 1) {
+      shifts.push({
+        id: `shift-tampa-afternoon-${Date.now()}`,
+        location: 'athletic-club',
+        assignedStaffId: tampaFrontDesk[1].id,
+        assignedStaffName: tampaFrontDesk[1].name,
+        templateType: 'front-desk',
+        notes: 'Afternoon front desk coverage',
+        recurrence: {
+          type: 'weekly',
+          dayOfWeek: 1, // Monday
+          startTime: '2:00 PM',
+          endTime: '9:00 PM',
+        },
+        status: 'scheduled',
+        createdBy: 'system',
+        createdAt: new Date().toISOString(),
+      });
+      
+      shifts.push({
+        id: `shift-tampa-afternoon-thu-${Date.now()}`,
+        location: 'athletic-club',
+        assignedStaffId: tampaFrontDesk[1].id,
+        assignedStaffName: tampaFrontDesk[1].name,
+        templateType: 'front-desk',
+        notes: 'Afternoon front desk coverage',
+        recurrence: {
+          type: 'weekly',
+          dayOfWeek: 4, // Thursday
+          startTime: '2:00 PM',
+          endTime: '9:00 PM',
+        },
+        status: 'scheduled',
+        createdBy: 'system',
+        createdAt: new Date().toISOString(),
+      });
+    }
+  }
+  
+  if (stPeteFrontDesk.length > 0) {
+    shifts.push({
+      id: `shift-stpete-morning-${Date.now()}`,
+      location: 'dance-studio',
+      assignedStaffId: stPeteFrontDesk[0].id,
+      assignedStaffName: stPeteFrontDesk[0].name,
+      templateType: 'front-desk',
+      notes: 'Morning front desk coverage',
+      recurrence: {
+        type: 'weekly',
+        dayOfWeek: 1, // Monday
+        startTime: '6:00 AM',
+        endTime: '2:00 PM',
+      },
+      status: 'scheduled',
+      createdBy: 'system',
+      createdAt: new Date().toISOString(),
+    });
+    
+    shifts.push({
+      id: `shift-stpete-morning-fri-${Date.now()}`,
+      location: 'dance-studio',
+      assignedStaffId: stPeteFrontDesk[0].id,
+      assignedStaffName: stPeteFrontDesk[0].name,
+      templateType: 'front-desk',
+      notes: 'Morning front desk coverage',
+      recurrence: {
+        type: 'weekly',
+        dayOfWeek: 5, // Friday
+        startTime: '6:00 AM',
+        endTime: '2:00 PM',
+      },
+      status: 'scheduled',
+      createdBy: 'system',
+      createdAt: new Date().toISOString(),
+    });
+  }
+  
+  const today = new Date();
+  const nextSaturday = new Date(today);
+  nextSaturday.setDate(today.getDate() + (6 - today.getDay()));
+  
+  shifts.push({
+    id: `shift-event-${Date.now()}`,
+    location: 'athletic-club',
+    assignedStaffId: undefined,
+    assignedStaffName: undefined,
+    templateType: 'event',
+    notes: 'Open House Event - need staff coverage',
+    recurrence: {
+      type: 'none',
+    },
+    date: nextSaturday.toISOString().split('T')[0],
+    startTime: '10:00 AM',
+    endTime: '2:00 PM',
+    status: 'open',
+    createdBy: 'system',
+    createdAt: new Date().toISOString(),
+  });
+  
+  return shifts;
+}
+
 export const coachLeadInteractions = generateCoachLeadInteractions();
 export const substitutionRequests = generateSubstitutionRequests();
 export const timeOffRequests = generateTimeOffRequests();
 export const staffSettings = generateStaffSettings();
+export const staffShifts = generateStaffShifts();

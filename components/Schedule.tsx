@@ -6,6 +6,7 @@ import { getAllClasses, getAllStaff, getAllBookings, getAllWaitlist, addClass, u
 import { X, UserPlus, ClipboardList, Plus, Edit2 } from 'lucide-react';
 import BookingModal from './BookingModal';
 import CheckInModal from './CheckInModal';
+import StaffScheduleCalendar from './StaffScheduleCalendar';
 import { Class } from '@/lib/types';
 import { hasPermission } from '@/lib/permissions';
 import PersonStatusBadge from './PersonStatusBadge';
@@ -207,9 +208,7 @@ export default function Schedule() {
       </div>
 
       {scheduleType === 'staff' ? (
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-          <p className="text-gray-600">Staff scheduling coming soon...</p>
-        </div>
+        <StaffScheduleCalendar />
       ) : !selectedClass ? (
         <>
           {viewMode === 'calendar' ? (

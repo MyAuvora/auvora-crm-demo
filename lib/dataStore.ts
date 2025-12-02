@@ -1,7 +1,7 @@
 'use client';
 
 import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, Measurement, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings, StaffShift, ShiftTemplate, ShiftSwapRequest, StaffTimeOffRequest } from './types';
-import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes, coachLeadInteractions as seedCoachLeadInteractions, substitutionRequests as seedSubstitutionRequests, timeOffRequests as seedTimeOffRequests, staffSettings as seedStaffSettings } from '@/data/seedData';
+import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes, coachLeadInteractions as seedCoachLeadInteractions, substitutionRequests as seedSubstitutionRequests, timeOffRequests as seedTimeOffRequests, staffSettings as seedStaffSettings, staffShifts as seedStaffShifts } from '@/data/seedData';
 
 const STORAGE_VERSION = 4;
 const STORAGE_KEY = 'auvora-crm-data';
@@ -584,7 +584,7 @@ function initializeStore(): DataStore {
     timeOffRequests: seedTimeOffRequests,
     coachLeadInteractions: seedCoachLeadInteractions,
     staffSettings: seedStaffSettings,
-    staffShifts: [],
+    staffShifts: seedStaffShifts,
     shiftTemplates: [],
     shiftSwapRequests: [],
     staffTimeOffRequests: [],
