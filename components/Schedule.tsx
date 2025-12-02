@@ -7,6 +7,7 @@ import { X, UserPlus, ClipboardList, Plus, Edit2 } from 'lucide-react';
 import BookingModal from './BookingModal';
 import CheckInModal from './CheckInModal';
 import StaffScheduleCalendar from './StaffScheduleCalendar';
+import StaffScheduleView from './StaffScheduleView';
 import { Class } from '@/lib/types';
 import { hasPermission } from '@/lib/permissions';
 import PersonStatusBadge from './PersonStatusBadge';
@@ -208,7 +209,16 @@ export default function Schedule() {
       </div>
 
       {scheduleType === 'staff' ? (
-        <StaffScheduleCalendar />
+        <>
+          {(userRole === 'owner' || userRole === 'manager') ? (
+            <StaffScheduleCalendar />
+          ) : (
+            <StaffScheduleView 
+              staffId={`staff-${userRole}-demo`}
+              staffName={userRole === 'coach' ? 'Alex Rivera' : userRole === 'head-coach' ? 'Sarah Martinez' : 'Jessica Chen'}
+            />
+          )}
+        </>
       ) : !selectedClass ? (
         <>
           {viewMode === 'calendar' ? (

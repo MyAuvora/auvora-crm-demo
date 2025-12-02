@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Building, Palette, DollarSign, Users, MessageSquare, Bell, Shield } from 'lucide-react';
+import { Building, Palette, DollarSign, Users, MessageSquare, Bell, Shield, ClipboardCheck } from 'lucide-react';
 import { getAllStaff, getStaffSettings, updateStaffSettings } from '@/lib/dataStore';
 import { useApp } from '@/lib/context';
+import StaffScheduleApprovals from './StaffScheduleApprovals';
 
 export default function Settings() {
   const { location } = useApp();
-  const [activeSection, setActiveSection] = useState<'business' | 'branding' | 'billing' | 'staff' | 'messaging' | 'notifications' | 'security'>('business');
+  const [activeSection, setActiveSection] = useState<'business' | 'branding' | 'billing' | 'staff' | 'staff-requests' | 'messaging' | 'notifications' | 'security'>('business');
   const [, setRefreshTrigger] = useState(0);
   
   const [businessInfo, setBusinessInfo] = useState({
@@ -297,7 +298,13 @@ export default function Settings() {
               </div>
             )}
 
-            {activeSection === 'staff' && (
+            {activeSection === 'staff-requests' && (
+          <div className="space-y-6">
+            <StaffScheduleApprovals />
+          </div>
+        )}
+
+        {activeSection === 'staff' && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 mb-4">Staff Settings</h2>
