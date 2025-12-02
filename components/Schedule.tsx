@@ -6,7 +6,7 @@ import { getAllClasses, getAllStaff, getAllBookings, getAllWaitlist, addClass, u
 import { X, UserPlus, ClipboardList, Plus, Edit2 } from 'lucide-react';
 import BookingModal from './BookingModal';
 import CheckInModal from './CheckInModal';
-import StaffScheduleCalendar from './StaffScheduleCalendar';
+import StaffScheduleTimeline from './StaffScheduleTimeline';
 import StaffScheduleView from './StaffScheduleView';
 import { Class } from '@/lib/types';
 import { hasPermission } from '@/lib/permissions';
@@ -211,7 +211,7 @@ export default function Schedule() {
       {scheduleType === 'staff' ? (
         <>
           {(userRole === 'owner' || userRole === 'manager') ? (
-            <StaffScheduleCalendar />
+            <StaffScheduleTimeline />
           ) : (() => {
             const allStaff = getAllStaff();
             const staffList = allStaff.filter(s => 
