@@ -23,9 +23,14 @@ export default function CoachDashboard() {
   const [selectedClassForSub, setSelectedClassForSub] = useState<{ id: string; name: string; time: string; dayOfWeek: string } | null>(null);
   
   const staff = getAllStaff();
-  const currentCoach = staff.find(s => s.role === 'coach' && s.location === location);
+  const locationCoaches = staff.filter(s => s.role === 'coach' && s.location === location);
   
-  if (!currentCoach) {
+  const defaultCoachId = locationCoaches.find(c => c.id === 'coach-1')?.id || locationCoaches[0]?.id || '';
+  const [selectedCoachId, setSelectedCoachId] = useState(defaultCoachId);
+  
+  const currentCoach = staff.find(s => s.id === selectedCoachId);
+  
+  if (!currentCoach || locationCoaches.length === 0) {
     return (
       <div className="p-8">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -135,7 +140,23 @@ export default function CoachDashboard() {
           <h1 className="text-3xl font-bold text-gray-900">Welcome, {currentCoach.name}!</h1>
           <p className="text-gray-600 mt-1">Your personalized coach dashboard</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
+          {locationCoaches.length > 1 && (
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Viewing as:</label>
+              <select
+                value={selectedCoachId}
+                onChange={(e) => setSelectedCoachId(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm"
+              >
+                {locationCoaches.map(coach => (
+                  <option key={coach.id} value={coach.id}>
+                    {coach.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <button
             onClick={() => setShowTimeOffModal(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
