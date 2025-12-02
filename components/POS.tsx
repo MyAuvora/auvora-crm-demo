@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllProducts, getAllMembers, getAllClassPackClients, createTransaction, getAllTransactions, Transaction, createInvoice, getAllInvoices, Invoice, refundInvoice, getRefundsByInvoice, Refund } from '@/lib/dataStore';
+import { getAllProducts, getAllMembers, getAllClassPackClients, createTransaction, getAllTransactions, Transaction, createInvoice, getAllInvoices, Invoice, refundInvoice, getRefundsByInvoice, Refund, getStaffSettings, getAllStaff } from '@/lib/dataStore';
 import { ShoppingCart, AlertTriangle, Receipt, Tag, FileText, DollarSign, X } from 'lucide-react';
 import { Product } from '@/lib/types';
 import { hasPermission, getPermissionError } from '@/lib/permissions';
@@ -31,10 +31,29 @@ export default function POS() {
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
 
+  const staff = getAllStaff();
+  const currentStaff = staff.find(s => s.role === userRole && s.location === location);
+  const staffSettings = currentStaff ? getStaffSettings(currentStaff.id) : null;
+  const hasPOSAccess = userRole === 'owner' || userRole === 'manager' || userRole === 'front-desk' || (userRole === 'coach' && staffSettings?.posAccess !== false);
+
   const locationProducts = getAllProducts().filter(p => p.location === location);
   const allMembers = [...getAllMembers(), ...getAllClassPackClients()].filter(m => m.location === location);
   const transactions = getAllTransactions().filter(t => t.location === location);
   const invoices = getAllInvoices().filter(inv => inv.location === location);
+
+  if (!hasPOSAccess) {
+    return (
+      <div className="p-8">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+          <AlertTriangle size={48} className="mx-auto mb-3 text-yellow-600" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">POS Access Restricted</h2>
+          <p className="text-gray-700">
+            You do not have permission to access the Point of Sale system. Please contact your manager or owner for access.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const addToCart = (product: Product) => {
     const existing = cart.find(item => item.product.id === product.id);

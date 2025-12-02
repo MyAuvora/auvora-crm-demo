@@ -2,19 +2,21 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllMembers, getAllLeads, getAllClasses, getAllBookings, getAllTransactions, getAllStaff, getAllWaitlist, getAllProducts, getAllClassPackClients, getAllRefunds } from '@/lib/dataStore';
-import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X, AlertCircle, CreditCard, Zap, Target, MessageSquare, Package } from 'lucide-react';
+import { getAllMembers, getAllLeads, getAllClasses, getAllBookings, getAllTransactions, getAllStaff, getAllWaitlist, getAllProducts, getAllClassPackClients, getAllRefunds, getPendingSubstitutionRequests, getPendingTimeOffRequests } from '@/lib/dataStore';
+import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X, AlertCircle, CreditCard, Zap, Target, MessageSquare, Package, CheckCircle } from 'lucide-react';
 import { Class } from '@/lib/types';
 import { Transaction } from '@/lib/dataStore';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import DashboardOpsFeed from './DashboardOpsFeed';
+import ManagerApprovals from './ManagerApprovals';
 
 export default function Dashboard() {
-  const { location, navigateToMember, navigateToLead } = useApp();
+  const { location, navigateToMember, navigateToLead, userRole } = useApp();
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [paymentProcessing, setPaymentProcessing] = useState<Record<string, 'processing' | 'complete' | 'incomplete'>>({});
+  const [showApprovals, setShowApprovals] = useState(false);
   
   const locationMembers = getAllMembers().filter(m => m.location === location);
   const locationLeads = getAllLeads().filter(l => l.location === location);
@@ -44,6 +46,10 @@ export default function Dashboard() {
   const totalActiveMembers = locationMembers.length;
   
   const missedPayments = locationMembers.filter(m => m.paymentStatus === 'overdue');
+  
+  const pendingSubRequests = getPendingSubstitutionRequests(location);
+  const pendingTimeOffRequests = getPendingTimeOffRequests(location);
+  const totalPendingApprovals = pendingSubRequests.length + pendingTimeOffRequests.length;
   
   const allTransactions = getAllTransactions().filter(t => t.location === location);
   const now = new Date();
@@ -250,6 +256,28 @@ export default function Dashboard() {
       </div>
 
       <DashboardOpsFeed />
+
+      {(userRole === 'owner' || userRole === 'manager') && totalPendingApprovals > 0 && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CheckCircle size={24} className="text-orange-600" />
+              <div>
+                <h3 className="font-semibold text-gray-900">Pending Approvals</h3>
+                <p className="text-sm text-gray-600">
+                  {totalPendingApprovals} request{totalPendingApprovals !== 1 ? 's' : ''} need{totalPendingApprovals === 1 ? 's' : ''} your review
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowApprovals(true)}
+              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+            >
+              Review Now
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <button 
@@ -854,6 +882,25 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {showApprovals && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Pending Approvals</h2>
+              <button
+                onClick={() => setShowApprovals(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
+              <ManagerApprovals />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

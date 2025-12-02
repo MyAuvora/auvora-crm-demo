@@ -2,9 +2,13 @@
 
 import { useState } from 'react';
 import { Building, Palette, DollarSign, Users, MessageSquare, Bell, Shield } from 'lucide-react';
+import { getAllStaff, getStaffSettings, updateStaffSettings } from '@/lib/dataStore';
+import { useApp } from '@/lib/context';
 
 export default function Settings() {
+  const { location } = useApp();
   const [activeSection, setActiveSection] = useState<'business' | 'branding' | 'billing' | 'staff' | 'messaging' | 'notifications' | 'security'>('business');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   const [businessInfo, setBusinessInfo] = useState({
     businessName: 'The Lab Tampa',
@@ -342,6 +346,44 @@ export default function Settings() {
                       />
                     </div>
                   )}
+                </div>
+
+                {/* POS Access Management */}
+                <div className="border-t border-gray-200 pt-6 mt-6">
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">POS Access Control</h3>
+                    <p className="text-sm text-gray-600 mt-1">Manage which staff members can access the Point of Sale system</p>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="space-y-3">
+                      {getAllStaff().filter(s => s.location === location).map(staff => {
+                        const settings = getStaffSettings(staff.id);
+                        const hasPOSAccess = settings?.posAccess !== false;
+                        
+                        return (
+                          <div key={staff.id} className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200">
+                            <div>
+                              <p className="font-medium text-gray-900">{staff.name}</p>
+                              <p className="text-sm text-gray-600">{staff.role.charAt(0).toUpperCase() + staff.role.slice(1)} • {staff.email}</p>
+                            </div>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <span className="text-sm text-gray-700">POS Access</span>
+                              <input
+                                type="checkbox"
+                                checked={hasPOSAccess}
+                                onChange={(e) => {
+                                  updateStaffSettings(staff.id, { posAccess: e.target.checked });
+                                  setRefreshTrigger(prev => prev + 1);
+                                }}
+                                className="rounded border-gray-300 text-red-600 focus:ring-red-600"
+                              />
+                            </label>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

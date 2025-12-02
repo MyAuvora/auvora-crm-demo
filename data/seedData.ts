@@ -1,4 +1,4 @@
-import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note } from '@/lib/types';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings } from '@/lib/types';
 
 const tampaZipCodes = ['33602', '33603', '33606', '33607', '33609', '33611', '33612', '33613', '33614', '33615'];
 
@@ -495,3 +495,115 @@ export const promotions = generatePromotions();
 export const products = generateProducts();
 export const goals = generateGoals();
 export const notes = generateNotes();
+
+export function generateCoachLeadInteractions(): CoachLeadInteraction[] {
+  const interactions: CoachLeadInteraction[] = [];
+  const coaches = staff.filter(s => s.role === 'coach');
+  const allLeads = leads;
+  const allClasses = classes;
+  
+  for (let i = 0; i < 60; i++) {
+    const lead = randomItem(allLeads);
+    const coach = randomItem(coaches);
+    const classItem = allClasses.find(c => c.coachId === coach.id);
+    
+    if (classItem) {
+      const interactionDate = randomDate(90);
+      const converted = Math.random() < 0.25;
+      
+      interactions.push({
+        id: `coach-lead-${i + 1}`,
+        leadId: lead.id,
+        coachId: coach.id,
+        classId: classItem.id,
+        interactionDate,
+        interactionType: 'trial-class',
+        converted,
+        conversionDate: converted ? new Date(new Date(interactionDate).getTime() + Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : undefined,
+        location: lead.location,
+      });
+    }
+  }
+  
+  return interactions;
+}
+
+export function generateSubstitutionRequests(): SubstitutionRequest[] {
+  const requests: SubstitutionRequest[] = [];
+  const coaches = staff.filter(s => s.role === 'coach');
+  const allClasses = classes;
+  
+  for (let i = 0; i < 3; i++) {
+    const requestingCoach = randomItem(coaches);
+    const classItem = allClasses.find(c => c.coachId === requestingCoach.id);
+    
+    if (classItem) {
+      const type: 'switch' | 'available' = i % 2 === 0 ? 'switch' : 'available';
+      const targetCoach = type === 'switch' ? coaches.find(c => c.id !== requestingCoach.id) : undefined;
+      
+      requests.push({
+        id: `sub-req-${i + 1}`,
+        classId: classItem.id,
+        className: classItem.name,
+        classDate: new Date(Date.now() + (i + 1) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        classTime: classItem.time,
+        requestingCoachId: requestingCoach.id,
+        requestingCoachName: requestingCoach.name,
+        type,
+        targetCoachId: targetCoach?.id,
+        targetCoachName: targetCoach?.name,
+        status: 'pending',
+        reason: type === 'switch' ? 'Personal appointment' : 'Available for coverage',
+        createdDate: new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString(),
+        location: classItem.location,
+      });
+    }
+  }
+  
+  return requests;
+}
+
+export function generateTimeOffRequests(): TimeOffRequest[] {
+  const requests: TimeOffRequest[] = [];
+  const coaches = staff.filter(s => s.role === 'coach');
+  const allClasses = classes;
+  
+  for (let i = 0; i < 2; i++) {
+    const coach = randomItem(coaches);
+    const startDate = new Date(Date.now() + (i + 2) * 14 * 24 * 60 * 60 * 1000);
+    const endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    const affectedClasses = allClasses
+      .filter(c => c.coachId === coach.id)
+      .slice(0, 3)
+      .map(c => c.id);
+    
+    requests.push({
+      id: `time-off-${i + 1}`,
+      coachId: coach.id,
+      coachName: coach.name,
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      reason: i === 0 ? 'Family vacation' : 'Medical appointment',
+      status: 'pending',
+      affectedClassIds: affectedClasses,
+      createdDate: new Date(Date.now() - Math.random() * 2 * 24 * 60 * 60 * 1000).toISOString(),
+      location: coach.location,
+    });
+  }
+  
+  return requests;
+}
+
+export function generateStaffSettings(): StaffSettings[] {
+  return staff.map(s => ({
+    staffId: s.id,
+    posAccess: true, // Default to true for all staff
+    location: s.location,
+  }));
+}
+
+export const coachLeadInteractions = generateCoachLeadInteractions();
+export const substitutionRequests = generateSubstitutionRequests();
+export const timeOffRequests = generateTimeOffRequests();
+export const staffSettings = generateStaffSettings();

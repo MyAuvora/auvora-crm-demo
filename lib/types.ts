@@ -160,3 +160,62 @@ export interface Measurement {
   recordedBy: string; // staff id
   notes?: string;
 }
+
+export type SubstitutionRequestType = 'switch' | 'available';
+export type SubstitutionRequestStatus = 'pending' | 'approved' | 'denied' | 'completed';
+
+export interface SubstitutionRequest {
+  id: string;
+  classId: string;
+  className: string;
+  classDate: string;
+  classTime: string;
+  requestingCoachId: string;
+  requestingCoachName: string;
+  type: SubstitutionRequestType; // 'switch' = swap with specific coach, 'available' = anyone can take
+  targetCoachId?: string; // only for 'switch' type
+  targetCoachName?: string;
+  substituteCoachId?: string; // who actually took the class
+  substituteCoachName?: string;
+  status: SubstitutionRequestStatus;
+  reason?: string;
+  createdDate: string;
+  reviewedDate?: string;
+  reviewedBy?: string; // manager id
+  location: Location;
+}
+
+export type TimeOffRequestStatus = 'pending' | 'approved' | 'denied';
+
+export interface TimeOffRequest {
+  id: string;
+  coachId: string;
+  coachName: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  status: TimeOffRequestStatus;
+  affectedClassIds: string[]; // classes that need substitutes during this period
+  createdDate: string;
+  reviewedDate?: string;
+  reviewedBy?: string; // manager id
+  location: Location;
+}
+
+export interface CoachLeadInteraction {
+  id: string;
+  leadId: string;
+  coachId: string;
+  classId: string;
+  interactionDate: string;
+  interactionType: 'trial-class' | 'class-attendance';
+  converted: boolean; // did the lead join as a member?
+  conversionDate?: string;
+  location: Location;
+}
+
+export interface StaffSettings {
+  staffId: string;
+  posAccess: boolean; // can this staff member access POS?
+  location: Location;
+}

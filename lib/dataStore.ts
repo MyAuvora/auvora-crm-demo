@@ -1,9 +1,9 @@
 'use client';
 
-import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, Measurement } from './types';
-import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes } from '@/data/seedData';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, Measurement, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings } from './types';
+import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes, coachLeadInteractions as seedCoachLeadInteractions, substitutionRequests as seedSubstitutionRequests, timeOffRequests as seedTimeOffRequests, staffSettings as seedStaffSettings } from '@/data/seedData';
 
-const STORAGE_VERSION = 3;
+const STORAGE_VERSION = 4;
 const STORAGE_KEY = 'auvora-crm-data';
 
 export interface Booking {
@@ -187,6 +187,10 @@ interface DataStore {
   goals: Goal[];
   notes: Note[];
   measurements: Measurement[];
+  substitutionRequests: SubstitutionRequest[];
+  timeOffRequests: TimeOffRequest[];
+  coachLeadInteractions: CoachLeadInteraction[];
+  staffSettings: StaffSettings[];
 }
 
 let store: DataStore | null = null;
@@ -361,6 +365,10 @@ function initializeStore(): DataStore {
       goals: [],
       notes: [],
       measurements: [],
+      substitutionRequests: [],
+      timeOffRequests: [],
+      coachLeadInteractions: [],
+      staffSettings: [],
     };
   }
 
@@ -376,6 +384,10 @@ function initializeStore(): DataStore {
       if (!parsed.goals) parsed.goals = [];
       if (!parsed.notes) parsed.notes = [];
       if (!parsed.measurements) parsed.measurements = [];
+      if (!parsed.substitutionRequests) parsed.substitutionRequests = [];
+      if (!parsed.timeOffRequests) parsed.timeOffRequests = [];
+      if (!parsed.coachLeadInteractions) parsed.coachLeadInteractions = [];
+      if (!parsed.staffSettings) parsed.staffSettings = [];
       
       if (parsed.version === STORAGE_VERSION) {
         let needsSave = false;
@@ -449,6 +461,10 @@ function initializeStore(): DataStore {
     goals: seedGoals,
     notes: seedNotes,
     measurements: [],
+    substitutionRequests: seedSubstitutionRequests,
+    timeOffRequests: seedTimeOffRequests,
+    coachLeadInteractions: seedCoachLeadInteractions,
+    staffSettings: seedStaffSettings,
   };
 
   saveStore(initialStore);
@@ -1526,4 +1542,219 @@ export function deleteMeasurement(measurementId: string) {
   
   saveStore(store);
   return { success: true };
+}
+
+export function getAllSubstitutionRequests() {
+  return getStore().substitutionRequests;
+}
+
+export function getSubstitutionRequestsByCoach(coachId: string) {
+  return getStore().substitutionRequests.filter(r => r.requestingCoachId === coachId || r.targetCoachId === coachId);
+}
+
+export function getPendingSubstitutionRequests(location?: string) {
+  const requests = getStore().substitutionRequests.filter(r => r.status === 'pending');
+  return location ? requests.filter(r => r.location === location) : requests;
+}
+
+export function createSubstitutionRequest(data: Omit<SubstitutionRequest, 'id' | 'createdDate' | 'status'>) {
+  const store = getStore();
+  const newRequest: SubstitutionRequest = {
+    ...data,
+    id: `sub-req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    status: 'pending',
+    createdDate: new Date().toISOString(),
+  };
+  
+  store.substitutionRequests.push(newRequest);
+  addAuditLog('create_substitution_request', 'substitution_request', newRequest.id, 
+    `${data.requestingCoachName} requested ${data.type === 'switch' ? 'switch' : 'substitute'} for ${data.className}`, data.location);
+  saveStore(store);
+  return { success: true, request: newRequest };
+}
+
+export function updateSubstitutionRequest(requestId: string, updates: Partial<SubstitutionRequest>) {
+  const store = getStore();
+  const request = store.substitutionRequests.find(r => r.id === requestId);
+  
+  if (!request) {
+    return { success: false, message: 'Request not found' };
+  }
+  
+  Object.assign(request, updates);
+  
+  if (updates.status) {
+    request.reviewedDate = new Date().toISOString();
+  }
+  
+  addAuditLog('update_substitution_request', 'substitution_request', requestId, 
+    `Substitution request ${updates.status || 'updated'}`, request.location);
+  saveStore(store);
+  return { success: true, request };
+}
+
+export function deleteSubstitutionRequest(requestId: string) {
+  const store = getStore();
+  const index = store.substitutionRequests.findIndex(r => r.id === requestId);
+  
+  if (index === -1) {
+    return { success: false, message: 'Request not found' };
+  }
+  
+  const request = store.substitutionRequests[index];
+  store.substitutionRequests.splice(index, 1);
+  addAuditLog('delete_substitution_request', 'substitution_request', requestId, 
+    `Substitution request deleted`, request.location);
+  saveStore(store);
+  return { success: true };
+}
+
+export function getAllTimeOffRequests() {
+  return getStore().timeOffRequests;
+}
+
+export function getTimeOffRequestsByCoach(coachId: string) {
+  return getStore().timeOffRequests.filter(r => r.coachId === coachId);
+}
+
+export function getPendingTimeOffRequests(location?: string) {
+  const requests = getStore().timeOffRequests.filter(r => r.status === 'pending');
+  return location ? requests.filter(r => r.location === location) : requests;
+}
+
+export function createTimeOffRequest(data: Omit<TimeOffRequest, 'id' | 'createdDate' | 'status'>) {
+  const store = getStore();
+  const newRequest: TimeOffRequest = {
+    ...data,
+    id: `time-off-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    status: 'pending',
+    createdDate: new Date().toISOString(),
+  };
+  
+  store.timeOffRequests.push(newRequest);
+  addAuditLog('create_time_off_request', 'time_off_request', newRequest.id, 
+    `${data.coachName} requested time off from ${data.startDate} to ${data.endDate}`, data.location);
+  saveStore(store);
+  return { success: true, request: newRequest };
+}
+
+export function updateTimeOffRequest(requestId: string, updates: Partial<TimeOffRequest>) {
+  const store = getStore();
+  const request = store.timeOffRequests.find(r => r.id === requestId);
+  
+  if (!request) {
+    return { success: false, message: 'Request not found' };
+  }
+  
+  Object.assign(request, updates);
+  
+  if (updates.status) {
+    request.reviewedDate = new Date().toISOString();
+  }
+  
+  addAuditLog('update_time_off_request', 'time_off_request', requestId, 
+    `Time off request ${updates.status || 'updated'}`, request.location);
+  saveStore(store);
+  return { success: true, request };
+}
+
+export function deleteTimeOffRequest(requestId: string) {
+  const store = getStore();
+  const index = store.timeOffRequests.findIndex(r => r.id === requestId);
+  
+  if (index === -1) {
+    return { success: false, message: 'Request not found' };
+  }
+  
+  const request = store.timeOffRequests[index];
+  store.timeOffRequests.splice(index, 1);
+  addAuditLog('delete_time_off_request', 'time_off_request', requestId, 
+    `Time off request deleted`, request.location);
+  saveStore(store);
+  return { success: true };
+}
+
+export function getAllCoachLeadInteractions() {
+  return getStore().coachLeadInteractions;
+}
+
+export function getCoachLeadInteractionsByCoach(coachId: string) {
+  return getStore().coachLeadInteractions.filter(i => i.coachId === coachId);
+}
+
+export function getCoachLeadInteractionsByLead(leadId: string) {
+  return getStore().coachLeadInteractions.filter(i => i.leadId === leadId);
+}
+
+export function createCoachLeadInteraction(data: Omit<CoachLeadInteraction, 'id'>) {
+  const store = getStore();
+  const newInteraction: CoachLeadInteraction = {
+    ...data,
+    id: `coach-lead-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  };
+  
+  store.coachLeadInteractions.push(newInteraction);
+  saveStore(store);
+  return { success: true, interaction: newInteraction };
+}
+
+export function updateCoachLeadInteraction(interactionId: string, updates: Partial<CoachLeadInteraction>) {
+  const store = getStore();
+  const interaction = store.coachLeadInteractions.find(i => i.id === interactionId);
+  
+  if (!interaction) {
+    return { success: false, message: 'Interaction not found' };
+  }
+  
+  Object.assign(interaction, updates);
+  saveStore(store);
+  return { success: true, interaction };
+}
+
+export function getCoachConversionStats(coachId: string, startDate: string, endDate: string) {
+  const interactions = getStore().coachLeadInteractions.filter(i => 
+    i.coachId === coachId && 
+    i.interactionDate >= startDate && 
+    i.interactionDate <= endDate
+  );
+  
+  const uniqueLeads = new Set(interactions.map(i => i.leadId));
+  const convertedLeads = new Set(interactions.filter(i => i.converted).map(i => i.leadId));
+  
+  return {
+    totalLeads: uniqueLeads.size,
+    convertedLeads: convertedLeads.size,
+    conversionRate: uniqueLeads.size > 0 ? (convertedLeads.size / uniqueLeads.size) * 100 : 0,
+  };
+}
+
+export function getAllStaffSettings() {
+  return getStore().staffSettings;
+}
+
+export function getStaffSettings(staffId: string) {
+  return getStore().staffSettings.find(s => s.staffId === staffId);
+}
+
+export function updateStaffSettings(staffId: string, settings: Partial<Omit<StaffSettings, 'staffId'>>) {
+  const store = getStore();
+  let staffSettings = store.staffSettings.find(s => s.staffId === staffId);
+  
+  if (!staffSettings) {
+    const staff = store.staff.find(s => s.id === staffId);
+    if (!staff) {
+      return { success: false, message: 'Staff not found' };
+    }
+    
+    staffSettings = {
+      staffId,
+      posAccess: true, // default to true
+      location: staff.location,
+    };
+    store.staffSettings.push(staffSettings);
+  }
+  
+  Object.assign(staffSettings, settings);
+  saveStore(store);
+  return { success: true, settings: staffSettings };
 }

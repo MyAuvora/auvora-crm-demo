@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useApp, Section } from '@/lib/context';
 import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor, MessageSquare, Share2, DollarSign, Search, Settings as SettingsIcon } from 'lucide-react';
 import Dashboard from '@/components/Dashboard';
+import CoachDashboard from '@/components/CoachDashboard';
 import LeadsMembers from '@/components/LeadsMembers';
 import LeadPipeline from '@/components/LeadPipeline';
 import Schedule from '@/components/Schedule';
@@ -60,7 +61,7 @@ export default function CRMApp() {
     { id: 'pipeline' as Section, label: 'Lead Pipeline', icon: GitBranch, roles: ['owner', 'manager'] },
     { id: 'schedule' as Section, label: 'Schedule', icon: Calendar, roles: ['owner', 'manager', 'coach', 'front-desk'] },
     { id: 'staff' as Section, label: 'Staff', icon: UserCog, roles: ['owner', 'manager'] },
-    { id: 'pos' as Section, label: 'POS', icon: ShoppingCart, roles: ['owner', 'manager', 'front-desk'] },
+    { id: 'pos' as Section, label: 'POS', icon: ShoppingCart, roles: ['owner', 'manager', 'coach', 'front-desk'] },
     { id: 'reports' as Section, label: 'Reports', icon: TrendingUp, roles: ['owner', 'manager'] },
     { id: 'promotions' as Section, label: 'Promotions', icon: Tag, roles: ['owner', 'manager'] },
     { id: 'messaging' as Section, label: 'Messaging', icon: MessageSquare, roles: ['owner', 'manager', 'front-desk'] },
@@ -163,7 +164,7 @@ export default function CRMApp() {
         </nav>
 
         <main className="flex-1 p-4 lg:p-8">
-          {activeSection === 'dashboard' && <Dashboard />}
+          {activeSection === 'dashboard' && (userRole === 'coach' ? <CoachDashboard /> : <Dashboard />)}
           {activeSection === 'leads-members' && <LeadsMembers />}
           {activeSection === 'pipeline' && <LeadPipeline />}
           {activeSection === 'schedule' && <Schedule />}
