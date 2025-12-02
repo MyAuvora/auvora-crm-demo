@@ -12,7 +12,7 @@ interface StaffScheduleCalendarProps {
 }
 
 export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCalendarProps) {
-  const { location, userRole, selectedStaffId } = useApp();
+  const { location, userRole, selectedStaffId, setSelectedStaffId } = useApp();
   const [showShiftModal, setShowShiftModal] = useState(false);
   const [editingShift, setEditingShift] = useState<StaffShift | null>(null);
   const [, setRefreshTrigger] = useState(0);
@@ -23,6 +23,12 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
   const allShifts = getAllStaffShifts();
   const locationShifts = allShifts.filter(s => s.location === location);
   const locationStaff = getAllStaff().filter(s => s.location === location);
+  
+  const filteredShifts = selectedStaffId 
+    ? locationShifts.filter(s => s.assignedStaffId === selectedStaffId)
+    : locationShifts;
+  
+  const frontDeskStaff = locationStaff.filter(s => s.role === 'front-desk');
 
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const timeSlots = [
@@ -151,7 +157,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - today.getDay() + 1);
 
-    locationShifts.forEach(shift => {
+    filteredShifts.forEach(shift => {
       if (shift.recurrence.type === 'weekly' && shift.recurrence.dayOfWeek !== undefined) {
         const dayIndex = shift.recurrence.dayOfWeek;
         const shiftDate = new Date(startOfWeek);
@@ -244,9 +250,26 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
   return (
     <div className="space-y-4" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">Staff Schedule</h2>
-          <p className="text-sm text-gray-600 mt-1">Weekly staff shift schedule</p>
+        <div className="flex items-center gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Staff Schedule</h2>
+            <p className="text-sm text-gray-600 mt-1">Weekly staff shift schedule</p>
+          </div>
+          {frontDeskStaff.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Viewing:</label>
+              <select
+                value={selectedStaffId || 'all'}
+                onChange={(e) => setSelectedStaffId(e.target.value === 'all' ? null : e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              >
+                <option value="all">All Staff</option>
+                {frontDeskStaff.map(staff => (
+                  <option key={staff.id} value={staff.id}>{staff.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
         {canManageSchedule && (
           <button

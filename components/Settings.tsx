@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Building, Palette, DollarSign, Users, MessageSquare, Bell, Shield, ClipboardCheck } from 'lucide-react';
-import { getAllStaff, getStaffSettings, updateStaffSettings } from '@/lib/dataStore';
+import { Building, Palette, DollarSign, Users, MessageSquare, Bell, Shield, ClipboardCheck, RefreshCw } from 'lucide-react';
+import { getAllStaff, getStaffSettings, updateStaffSettings, resetData } from '@/lib/dataStore';
 import { useApp } from '@/lib/context';
 import StaffScheduleApprovals from './StaffScheduleApprovals';
 
@@ -545,6 +545,23 @@ export default function Settings() {
                       className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
                     />
                   </div>
+                </div>
+
+                <div className="pt-6 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Demo Data Management</h3>
+                  <p className="text-sm text-gray-600 mb-4">Reset all demo data to see the latest seed data including new staff members</p>
+                  <button
+                    onClick={() => {
+                      if (confirm('Are you sure you want to reset all demo data? This will clear all changes and reload fresh seed data.')) {
+                        resetData();
+                        window.location.reload();
+                      }
+                    }}
+                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2"
+                  >
+                    <RefreshCw size={16} />
+                    Reset Demo Data
+                  </button>
                 </div>
               </div>
             )}

@@ -542,6 +542,18 @@ function initializeStore(): DataStore {
           needsSave = true;
         }
         
+        if (!parsed.staff.some((s: Staff) => s.id === 'desk-4')) {
+          const jessicaChen: Staff = {
+            id: 'desk-4',
+            name: 'Jessica Chen',
+            role: 'front-desk',
+            email: 'jessica.chen@thelabfitness.com',
+            location: 'athletic-club'
+          };
+          parsed.staff.push(jessicaChen);
+          needsSave = true;
+        }
+        
         if (needsSave) {
           saveStore(parsed);
         }
