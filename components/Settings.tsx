@@ -71,6 +71,7 @@ export default function Settings() {
     { id: 'branding' as const, label: 'Branding', icon: Palette },
     { id: 'billing' as const, label: 'Billing & Payments', icon: DollarSign },
     { id: 'staff' as const, label: 'Staff Settings', icon: Users },
+    { id: 'staff-requests' as const, label: 'Staff Requests', icon: ClipboardCheck },
     { id: 'messaging' as const, label: 'Messaging', icon: MessageSquare },
     { id: 'notifications' as const, label: 'Notifications', icon: Bell },
     { id: 'security' as const, label: 'Security', icon: Shield },

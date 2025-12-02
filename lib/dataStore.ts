@@ -2101,8 +2101,55 @@ export function getAllStaffShifts() {
 }
 
 export function getAllShiftTemplates() {
-  return getStore().shiftTemplates;
+  return getStore().shiftTemplates || [];
 }
+
+export function createShiftTemplate(data: { name: string; type: 'front-desk' | 'event' | 'meeting' | 'other'; defaultDuration: number; color: string }) {
+  const store = getStore();
+  const newTemplate: ShiftTemplate = {
+    id: `template-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    name: data.name,
+    type: data.type,
+    defaultDuration: data.defaultDuration,
+    color: data.color,
+  };
+  if (!store.shiftTemplates) {
+    store.shiftTemplates = [];
+  }
+  store.shiftTemplates.push(newTemplate);
+  saveStore(store);
+  addAuditLog('create', 'shift-template', newTemplate.id, `Created shift template: ${newTemplate.name}`, 'athletic-club');
+  return { success: true, template: newTemplate };
+}
+
+export function updateShiftTemplate(templateId: string, data: { name?: string; type?: 'front-desk' | 'event' | 'meeting' | 'other'; defaultDuration?: number; color?: string }) {
+  const store = getStore();
+  const template = store.shiftTemplates?.find(t => t.id === templateId);
+  if (!template) {
+    return { success: false, message: 'Template not found' };
+  }
+  if (data.name !== undefined) template.name = data.name;
+  if (data.type !== undefined) template.type = data.type;
+  if (data.defaultDuration !== undefined) template.defaultDuration = data.defaultDuration;
+  if (data.color !== undefined) template.color = data.color;
+  saveStore(store);
+  addAuditLog('update', 'shift-template', templateId, `Updated shift template: ${template.name}`, 'athletic-club');
+  return { success: true, template };
+}
+
+export function deleteShiftTemplate(templateId: string) {
+  const store = getStore();
+  const index = store.shiftTemplates?.findIndex(t => t.id === templateId);
+  if (index === undefined || index === -1) {
+    return { success: false, message: 'Template not found' };
+  }
+  const template = store.shiftTemplates![index];
+  store.shiftTemplates!.splice(index, 1);
+  saveStore(store);
+  addAuditLog('delete', 'shift-template', templateId, `Deleted shift template: ${template.name}`, 'athletic-club');
+  return { success: true };
+}
+
 
 export function getAllShiftSwapRequests() {
   return getStore().shiftSwapRequests;
@@ -2173,6 +2220,46 @@ export function approveShiftSwapRequest(requestId: string, reviewerId: string) {
   request.status = 'approved';
   request.reviewedBy = reviewerId;
   request.reviewedAt = new Date().toISOString();
+  
+  const shift = store.staffShifts.find(s => s.id === request.shiftId);
+  if (shift) {
+    if (request.kind === 'open') {
+      shift.status = 'open';
+      shift.assignedStaffId = undefined;
+      shift.assignedStaffName = undefined;
+    } else if (request.kind === 'direct' && request.targetStaffId && request.targetStaffName) {
+      if (shift.recurrence.type === 'weekly') {
+        if (!shift.recurrence.exDates) {
+          shift.recurrence.exDates = [];
+        }
+        if (!shift.recurrence.exDates.includes(request.shiftDate)) {
+          shift.recurrence.exDates.push(request.shiftDate);
+        }
+        
+        const newShift: StaffShift = {
+          id: `shift-swap-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          location: shift.location,
+          assignedStaffId: request.targetStaffId,
+          assignedStaffName: request.targetStaffName,
+          templateType: shift.templateType,
+          notes: `Swapped from ${request.requesterName}`,
+          recurrence: { type: 'none' },
+          date: request.shiftDate,
+          startTime: shift.recurrence.startTime,
+          endTime: shift.recurrence.endTime,
+          status: 'scheduled',
+          createdBy: reviewerId,
+          createdAt: new Date().toISOString(),
+        };
+        store.staffShifts.push(newShift);
+      } else {
+        shift.assignedStaffId = request.targetStaffId;
+        shift.assignedStaffName = request.targetStaffName;
+        shift.notes = `Swapped from ${request.requesterName}`;
+      }
+    }
+  }
+  
   saveStore(store);
   addAuditLog('update', 'shift-swap-request', requestId, `Approved shift swap request from ${request.requesterName}`, request.location);
   return { success: true, request };
@@ -2215,6 +2302,39 @@ export function approveStaffTimeOffRequest(requestId: string, reviewerId: string
   request.status = 'approved';
   request.reviewedBy = reviewerId;
   request.reviewedAt = new Date().toISOString();
+  
+  const startDate = new Date(request.startDate);
+  const endDate = new Date(request.endDate);
+  
+  request.affectedShiftIds.forEach(shiftId => {
+    const shift = store.staffShifts.find(s => s.id === shiftId);
+    if (shift && shift.assignedStaffId === request.staffId) {
+      if (shift.recurrence.type === 'weekly') {
+        if (!shift.recurrence.exDates) {
+          shift.recurrence.exDates = [];
+        }
+        const currentDate = new Date(startDate);
+        while (currentDate <= endDate) {
+          const dayOfWeek = currentDate.getDay();
+          if (shift.recurrence.dayOfWeek === dayOfWeek) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            if (!shift.recurrence.exDates.includes(dateStr)) {
+              shift.recurrence.exDates.push(dateStr);
+            }
+          }
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      } else if (shift.date) {
+        const shiftDate = new Date(shift.date);
+        if (shiftDate >= startDate && shiftDate <= endDate) {
+          shift.status = 'open';
+          shift.assignedStaffId = undefined;
+          shift.assignedStaffName = undefined;
+        }
+      }
+    }
+  });
+  
   saveStore(store);
   addAuditLog('update', 'staff-timeoff-request', requestId, `Approved time off request from ${request.staffName}`, request.location);
   return { success: true, request };

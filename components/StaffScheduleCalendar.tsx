@@ -101,7 +101,49 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
     return expanded;
   };
 
+  const detectConflicts = (shifts: Array<StaffShift & { displayDate?: string }>) => {
+    const conflicts: string[] = [];
+    const shiftsByStaff: { [staffId: string]: Array<StaffShift & { displayDate?: string }> } = {};
+
+    shifts.forEach(shift => {
+      if (shift.assignedStaffId) {
+        if (!shiftsByStaff[shift.assignedStaffId]) {
+          shiftsByStaff[shift.assignedStaffId] = [];
+        }
+        shiftsByStaff[shift.assignedStaffId].push(shift);
+      }
+    });
+
+    Object.entries(shiftsByStaff).forEach(([staffId, staffShifts]) => {
+      for (let i = 0; i < staffShifts.length; i++) {
+        for (let j = i + 1; j < staffShifts.length; j++) {
+          const shift1 = staffShifts[i];
+          const shift2 = staffShifts[j];
+          
+          const date1 = shift1.displayDate || shift1.date;
+          const date2 = shift2.displayDate || shift2.date;
+          
+          if (date1 === date2) {
+            const start1 = shift1.startTime || shift1.recurrence.startTime;
+            const end1 = shift1.endTime || shift1.recurrence.endTime;
+            const start2 = shift2.startTime || shift2.recurrence.startTime;
+            const end2 = shift2.endTime || shift2.recurrence.endTime;
+            
+            if (start1 && end1 && start2 && end2) {
+              if ((start1 < end2 && end1 > start2)) {
+                conflicts.push(`${shift1.assignedStaffName} has overlapping shifts on ${date1}`);
+              }
+            }
+          }
+        }
+      }
+    });
+
+    return conflicts;
+  };
+
   const expandedShifts = expandShiftsForWeek();
+  const conflicts = detectConflicts(expandedShifts);
 
   const getShiftsForDayAndTime = (day: string, time: string) => {
     const dayIndex = daysOfWeek.indexOf(day);
@@ -139,6 +181,26 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
           </button>
         )}
       </div>
+
+      {conflicts.length > 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-yellow-800">Scheduling Conflicts Detected</h3>
+              <ul className="mt-2 text-sm text-yellow-700 list-disc list-inside">
+                {conflicts.map((conflict, idx) => (
+                  <li key={idx}>{conflict}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">

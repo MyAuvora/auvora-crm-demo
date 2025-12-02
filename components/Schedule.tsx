@@ -212,12 +212,24 @@ export default function Schedule() {
         <>
           {(userRole === 'owner' || userRole === 'manager') ? (
             <StaffScheduleCalendar />
-          ) : (
-            <StaffScheduleView 
-              staffId={`staff-${userRole}-demo`}
-              staffName={userRole === 'coach' ? 'Alex Rivera' : userRole === 'head-coach' ? 'Sarah Martinez' : 'Jessica Chen'}
-            />
-          )}
+          ) : (() => {
+            const staff = getAllStaff().find(s => 
+              s.location === location && 
+              (userRole === 'coach' ? s.role === 'coach' : 
+               userRole === 'head-coach' ? s.role === 'head-coach' : 
+               s.role === 'front-desk')
+            );
+            return staff ? (
+              <StaffScheduleView 
+                staffId={staff.id}
+                staffName={staff.name}
+              />
+            ) : (
+              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 text-center">
+                <p className="text-gray-600">No staff member found for this role at this location.</p>
+              </div>
+            );
+          })()}
         </>
       ) : !selectedClass ? (
         <>
