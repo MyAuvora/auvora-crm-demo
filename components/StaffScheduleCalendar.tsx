@@ -176,7 +176,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
           });
         }
       } else if (shift.recurrence.type === 'none' && shift.date) {
-        const shiftDate = new Date(shift.date);
+        const shiftDate = parseLocalDate(shift.date);
         const weekStart = new Date(startOfWeek);
         const weekEnd = new Date(startOfWeek);
         weekEnd.setDate(weekStart.getDate() + 6);
@@ -234,6 +234,10 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
   const expandedShifts = expandShiftsForWeek();
   const conflicts = detectConflicts(expandedShifts);
 
+  const parseLocalDate = (dateStr: string) => {
+    return new Date(dateStr + 'T12:00:00');
+  };
+
   const timeToMinutes = (time: string) => {
     const [timePart, period] = time.split(' ');
     let [hours, minutes] = timePart.split(':').map(Number);
@@ -257,7 +261,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
         const endMinutes = timeToMinutes(shift.recurrence.endTime);
         return currentTimeMinutes >= startMinutes && currentTimeMinutes < endMinutes;
       } else if (shift.date) {
-        const shiftDate = new Date(shift.date);
+        const shiftDate = parseLocalDate(shift.date);
         const shiftDay = daysOfWeek[shiftDate.getDay() === 0 ? 6 : shiftDate.getDay() - 1];
         if (shiftDay !== day) return false;
         
