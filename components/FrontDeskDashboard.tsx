@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllTransactions, getAllMembers, getAllLeads, getAllBookings, getAllClasses, getAllStaff, getCommissionReport } from '@/lib/dataStore';
+import { getAllTransactions, getAllMembers, getAllLeads, getAllBookings, getAllClasses, getAllStaff, getCommissionReport, getPersonById } from '@/lib/dataStore';
 import { DollarSign, Users, UserPlus, Calendar, AlertCircle, TrendingUp, CreditCard } from 'lucide-react';
 import { format, startOfDay, endOfDay, startOfMonth, endOfMonth } from 'date-fns';
 import BookingModal from './BookingModal';
@@ -188,24 +188,34 @@ export default function FrontDeskDashboard() {
         return {
           title: "Today's Revenue - All Sales",
           breakdown: revenueByCategory,
-          items: todayTransactions.map(t => ({
-            id: t.id,
-            name: t.memberName || 'Guest',
-            detail: `${format(new Date(t.timestamp), 'h:mm a')} • ${t.items.map(i => `${i.productName} ($${i.price})`).join(', ')} • Total: $${t.total.toFixed(2)}`,
-            onClick: () => {}
-          }))
+          items: todayTransactions.map(t => {
+            const displayName = t.memberId 
+              ? (getPersonById(t.memberId)?.person.name || t.memberName || 'Guest')
+              : (t.memberName || 'Guest');
+            return {
+              id: t.id,
+              name: displayName,
+              detail: `${format(new Date(t.timestamp), 'h:mm a')} • ${t.items.map(i => `${i.productName} ($${i.price})`).join(', ')} • Total: $${t.total.toFixed(2)}`,
+              onClick: () => {}
+            };
+          })
         };
       case 'my-sales':
         return {
           title: "My Sales Today",
           items: todayTransactions
             .filter(t => t.sellerId === currentStaff?.id)
-            .map(t => ({
-              id: t.id,
-              name: t.memberName || 'Guest',
-              detail: `${format(new Date(t.timestamp), 'h:mm a')} • ${t.items.map(i => `${i.productName} ($${i.price})`).join(', ')} • Total: $${t.total.toFixed(2)}`,
-              onClick: () => {}
-            }))
+            .map(t => {
+              const displayName = t.memberId 
+                ? (getPersonById(t.memberId)?.person.name || t.memberName || 'Guest')
+                : (t.memberName || 'Guest');
+              return {
+                id: t.id,
+                name: displayName,
+                detail: `${format(new Date(t.timestamp), 'h:mm a')} • ${t.items.map(i => `${i.productName} ($${i.price})`).join(', ')} • Total: $${t.total.toFixed(2)}`,
+                onClick: () => {}
+              };
+            })
         };
       default:
         return null;

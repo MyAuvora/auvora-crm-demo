@@ -212,6 +212,12 @@ function generateSampleRevenue(): Transaction[] {
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
   
+  const allMembers = seedMembers;
+  const allPackClients = seedClassPackClients;
+  const allDropInClients = seedDropInClients;
+  const allLeads = seedLeads;
+  const allStaff = seedStaff;
+  
   const productTypes = [
     { id: 'membership-1x', name: '1x/Week Membership', price: 99, category: 'membership' },
     { id: 'membership-2x', name: '2x/Week Membership', price: 149, category: 'membership' },
@@ -246,9 +252,24 @@ function generateSampleRevenue(): Transaction[] {
         
         const timestamp = new Date(currentYear, month, day, Math.floor(Math.random() * 12) + 8, Math.floor(Math.random() * 60)).toISOString();
         
+        const locationPeople = [
+          ...allMembers.filter(m => m.location === location),
+          ...allPackClients.filter(c => c.location === location),
+          ...allDropInClients.filter(d => d.location === location),
+          ...allLeads.filter(l => l.location === location)
+        ];
+        
+        const hasPerson = Math.random() > 0.2 && locationPeople.length > 0;
+        const person = hasPerson ? locationPeople[Math.floor(Math.random() * locationPeople.length)] : null;
+        
+        const locationStaff = allStaff.filter(s => s.location === location && s.role === 'front-desk');
+        const seller = locationStaff.length > 0 ? locationStaff[Math.floor(Math.random() * locationStaff.length)] : null;
+        
         transactions.push({
           id: `txn-sample-${transactionId++}`,
-          memberName: `Member ${transactionId}`,
+          memberId: person?.id,
+          memberName: person?.name || 'Guest',
+          sellerId: seller?.id,
           items: [{
             productId: product.id,
             productName: product.name,
@@ -365,6 +386,24 @@ function migratePaymentFields(members: Member[]): Member[] {
   });
 }
 
+function migrateTransactionNames(transactions: Transaction[]): Transaction[] {
+  return transactions.map(t => {
+    const hasPlaceholderName = t.memberName && /^Member\s+\d+$/.test(t.memberName);
+    
+    if ((hasPlaceholderName || !t.memberName) && t.memberId) {
+      const personData = getPersonById(t.memberId);
+      if (personData) {
+        return {
+          ...t,
+          memberName: personData.person.name
+        };
+      }
+    }
+    
+    return t;
+  });
+}
+
 function initializeStore(): DataStore {
   if (typeof window === 'undefined') {
     return {
@@ -444,6 +483,12 @@ function initializeStore(): DataStore {
         const migratedMembers = migratePaymentFields(parsed.members);
         if (migratedMembers.some((m, i) => m !== parsed.members[i])) {
           parsed.members = migratedMembers;
+          needsSave = true;
+        }
+        
+        const migratedTransactions = migrateTransactionNames(parsed.transactions);
+        if (migratedTransactions.some((t, i) => t.memberName !== parsed.transactions[i].memberName)) {
+          parsed.transactions = migratedTransactions;
           needsSave = true;
         }
         
