@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllStaff, getAllStaffShifts, createStaffShift, updateStaffShift, deleteStaffShift } from '@/lib/dataStore';
 import { StaffShift, Location } from '@/lib/types';
@@ -38,6 +38,14 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
   const [dragStart, setDragStart] = useState<{ day: string; time: string } | null>(null);
   const [dragEnd, setDragEnd] = useState<{ day: string; time: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    if (isDragging) {
+      const onUp = () => handleMouseUp();
+      window.addEventListener('mouseup', onUp);
+      return () => window.removeEventListener('mouseup', onUp);
+    }
+  }, [isDragging]);
 
   const allShifts = getAllStaffShifts();
   const locationShifts = allShifts.filter(s => s.location === location);
@@ -83,6 +91,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
       return;
     }
 
+    setIsDragging(false);
     const startTimeIndex = timeSlots.indexOf(dragStart.time);
     const endTimeIndex = timeSlots.indexOf(dragEnd.time);
     
@@ -342,7 +351,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
 
       <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className={`w-full border-collapse ${isDragging ? 'select-none' : ''}`}>
             <thead>
               <tr className="bg-gray-50">
                 <th className="px-2 py-3 text-left text-xs font-medium text-gray-700 border-r border-gray-200 w-24">Time</th>
@@ -372,12 +381,13 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
                         onMouseEnter={() => handleMouseEnter(day, time)}
                         onMouseUp={handleMouseUp}
                       >
-                        {dayShifts.map(shift => (
-                          <div
-                            key={shift.id}
-                            onClick={() => onShiftClick?.(shift)}
-                            className={`mb-1 p-2 border rounded cursor-pointer transition-colors ${getShiftColor(shift.templateType)}`}
-                          >
+                        <div className={isDragging ? 'pointer-events-none' : ''}>
+                          {dayShifts.map(shift => (
+                            <div
+                              key={shift.id}
+                              onClick={() => onShiftClick?.(shift)}
+                              className={`mb-1 p-2 border rounded cursor-pointer transition-colors ${getShiftColor(shift.templateType)}`}
+                            >
                             <div className="flex items-start justify-between gap-1">
                               <div className="flex-1 min-w-0">
                                 <div className="text-xs font-semibold text-gray-900 truncate capitalize">
@@ -411,6 +421,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
                             </div>
                           </div>
                         ))}
+                        </div>
                       </td>
                     );
                   })}
