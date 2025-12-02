@@ -7,9 +7,10 @@ import { X, UserPlus, ClipboardList, Plus, Edit2 } from 'lucide-react';
 import BookingModal from './BookingModal';
 import CheckInModal from './CheckInModal';
 import { Class } from '@/lib/types';
+import { hasPermission } from '@/lib/permissions';
 
 export default function Schedule() {
-  const { location } = useApp();
+  const { location, userRole } = useApp();
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showCheckInModal, setShowCheckInModal] = useState(false);
@@ -169,13 +170,15 @@ export default function Schedule() {
               List
             </button>
           </div>
-          <button
-            onClick={() => setShowAddClassModal(true)}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
-          >
-            <Plus size={20} />
-            Add Class
-          </button>
+          {hasPermission(userRole, 'class:add') && (
+            <button
+              onClick={() => setShowAddClassModal(true)}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+            >
+              <Plus size={20} />
+              Add Class
+            </button>
+          )}
         </div>
       </div>
 
@@ -217,15 +220,17 @@ export default function Schedule() {
                                       <div className="text-xs text-gray-600">{getStaffName(cls.coachId)}</div>
                                       <div className="text-xs text-gray-500">{cls.duration}min</div>
                                     </div>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleEditClass(cls);
-                                      }}
-                                      className="p-1 hover:bg-red-200 rounded"
-                                    >
-                                      <Edit2 size={12} className="text-gray-600" />
-                                    </button>
+                                    {hasPermission(userRole, 'class:edit') && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditClass(cls);
+                                        }}
+                                        className="p-1 hover:bg-red-200 rounded"
+                                      >
+                                        <Edit2 size={12} className="text-gray-600" />
+                                      </button>
+                                    )}
                                   </div>
                                   <div className={`text-xs font-medium mt-1 ${
                                     getClassBookingCount(cls.id) >= cls.capacity * 0.9 ? 'text-red-600' :
@@ -300,12 +305,14 @@ export default function Schedule() {
                               >
                                 View
                               </button>
-                              <button
-                                onClick={() => handleEditClass(cls)}
-                                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-xs"
-                              >
-                                Edit
-                              </button>
+                              {hasPermission(userRole, 'class:edit') && (
+                                <button
+                                  onClick={() => handleEditClass(cls)}
+                                  className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-xs"
+                                >
+                                  Edit
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>

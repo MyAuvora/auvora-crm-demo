@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { 
   getPendingSubstitutionRequests,
@@ -13,6 +14,7 @@ import { format } from 'date-fns';
 
 export default function ManagerApprovals() {
   const { location } = useApp();
+  const [, setRefreshTrigger] = useState(0);
   
   const staff = getAllStaff();
   const currentManager = staff.find(s => s.location === location);
