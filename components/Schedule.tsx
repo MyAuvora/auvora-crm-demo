@@ -12,6 +12,7 @@ import PersonStatusBadge from './PersonStatusBadge';
 
 export default function Schedule() {
   const { location, userRole } = useApp();
+  const [scheduleType, setScheduleType] = useState<'classes' | 'staff'>('classes');
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showCheckInModal, setShowCheckInModal] = useState(false);
@@ -149,36 +150,58 @@ export default function Schedule() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Schedule & Classes</h1>
-          <p className="text-gray-600 mt-1">View and manage class schedules</p>
+          <h1 className="text-3xl font-bold text-gray-900">Schedule</h1>
+          <p className="text-gray-600 mt-1">View and manage class and staff schedules</p>
         </div>
         <div className="flex gap-3">
           <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
             <button
-              onClick={() => setViewMode('calendar')}
+              onClick={() => setScheduleType('classes')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                viewMode === 'calendar' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                scheduleType === 'classes' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Calendar
+              Classes
             </button>
             <button
-              onClick={() => setViewMode('list')}
+              onClick={() => setScheduleType('staff')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                viewMode === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                scheduleType === 'staff' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              List
+              Staff
             </button>
           </div>
-          {hasPermission(userRole, 'class:add') && (
-            <button
-              onClick={() => setShowAddClassModal(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
-            >
-              <Plus size={20} />
-              Add Class
-            </button>
+          {scheduleType === 'classes' && (
+            <>
+              <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    viewMode === 'calendar' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Calendar
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    viewMode === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  List
+                </button>
+              </div>
+              {hasPermission(userRole, 'class:add') && (
+                <button
+                  onClick={() => setShowAddClassModal(true)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                >
+                  <Plus size={20} />
+                  Add Class
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>

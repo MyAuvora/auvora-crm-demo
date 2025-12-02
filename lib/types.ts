@@ -219,3 +219,79 @@ export interface StaffSettings {
   posAccess: boolean; // can this staff member access POS?
   location: Location;
 }
+
+export type ShiftTemplateType = 'front-desk' | 'event' | 'meeting' | 'other';
+
+export interface ShiftTemplate {
+  id: string;
+  name: string;
+  type: ShiftTemplateType;
+  defaultDuration: number; // minutes
+  color: string;
+}
+
+export type ShiftRecurrenceType = 'none' | 'weekly';
+
+export interface ShiftRecurrence {
+  type: ShiftRecurrenceType;
+  dayOfWeek?: number; // 0-6 (Sunday-Saturday) for weekly
+  startTime?: string; // HH:MM
+  endTime?: string; // HH:MM
+  effectiveFrom?: string; // YYYY-MM-DD
+  effectiveTo?: string; // YYYY-MM-DD
+  exDates?: string[]; // YYYY-MM-DD dates to exclude
+}
+
+export type ShiftStatus = 'scheduled' | 'open' | 'canceled';
+
+export interface StaffShift {
+  id: string;
+  location: Location;
+  assignedStaffId?: string;
+  assignedStaffName?: string;
+  templateType: ShiftTemplateType;
+  notes?: string;
+  recurrence: ShiftRecurrence;
+  date?: string; // YYYY-MM-DD for one-time shifts (when recurrence.type === 'none')
+  startTime?: string; // HH:MM for one-time shifts
+  endTime?: string; // HH:MM for one-time shifts
+  status: ShiftStatus;
+  createdBy: string;
+  createdAt: string;
+}
+
+export type ShiftSwapRequestKind = 'open' | 'direct';
+export type ShiftSwapRequestStatus = 'pending' | 'approved' | 'rejected';
+
+export interface ShiftSwapRequest {
+  id: string;
+  shiftId: string;
+  shiftDate: string; // YYYY-MM-DD - specific date for the swap
+  shiftTime: string; // Display time for UI
+  requesterId: string;
+  requesterName: string;
+  kind: ShiftSwapRequestKind;
+  targetStaffId?: string; // for 'direct' swaps
+  targetStaffName?: string;
+  reason: string;
+  status: ShiftSwapRequestStatus;
+  createdAt: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  location: Location;
+}
+
+export interface StaffTimeOffRequest {
+  id: string;
+  staffId: string;
+  staffName: string;
+  startDate: string; // YYYY-MM-DD
+  endDate: string; // YYYY-MM-DD
+  reason: string;
+  status: TimeOffRequestStatus;
+  affectedShiftIds: string[]; // shifts that are affected during this period
+  createdAt: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  location: Location;
+}

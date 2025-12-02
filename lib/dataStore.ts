@@ -1,6 +1,6 @@
 'use client';
 
-import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, Measurement, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings } from './types';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, Measurement, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings, StaffShift, ShiftTemplate, ShiftSwapRequest, StaffTimeOffRequest } from './types';
 import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes, coachLeadInteractions as seedCoachLeadInteractions, substitutionRequests as seedSubstitutionRequests, timeOffRequests as seedTimeOffRequests, staffSettings as seedStaffSettings } from '@/data/seedData';
 
 const STORAGE_VERSION = 4;
@@ -193,6 +193,10 @@ interface DataStore {
   timeOffRequests: TimeOffRequest[];
   coachLeadInteractions: CoachLeadInteraction[];
   staffSettings: StaffSettings[];
+  staffShifts: StaffShift[];
+  shiftTemplates: ShiftTemplate[];
+  shiftSwapRequests: ShiftSwapRequest[];
+  staffTimeOffRequests: StaffTimeOffRequest[];
 }
 
 let store: DataStore | null = null;
@@ -470,6 +474,10 @@ function initializeStore(): DataStore {
       timeOffRequests: [],
       coachLeadInteractions: [],
       staffSettings: [],
+      staffShifts: [],
+      shiftTemplates: [],
+      shiftSwapRequests: [],
+      staffTimeOffRequests: [],
     };
   }
 
@@ -489,6 +497,10 @@ function initializeStore(): DataStore {
       if (!parsed.timeOffRequests) parsed.timeOffRequests = [];
       if (!parsed.coachLeadInteractions) parsed.coachLeadInteractions = [];
       if (!parsed.staffSettings) parsed.staffSettings = [];
+      if (!parsed.staffShifts) parsed.staffShifts = [];
+      if (!parsed.shiftTemplates) parsed.shiftTemplates = [];
+      if (!parsed.shiftSwapRequests) parsed.shiftSwapRequests = [];
+      if (!parsed.staffTimeOffRequests) parsed.staffTimeOffRequests = [];
       
       if (parsed.version === STORAGE_VERSION) {
         let needsSave = false;
@@ -572,6 +584,10 @@ function initializeStore(): DataStore {
     timeOffRequests: seedTimeOffRequests,
     coachLeadInteractions: seedCoachLeadInteractions,
     staffSettings: seedStaffSettings,
+    staffShifts: [],
+    shiftTemplates: [],
+    shiftSwapRequests: [],
+    staffTimeOffRequests: [],
   };
 
   saveStore(initialStore);
@@ -2078,4 +2094,142 @@ export function getAllCoachStats(location: Location, startDate: string, endDate:
       totalBookings: classSizeStats.totalBookings,
     };
   });
+}
+
+export function getAllStaffShifts() {
+  return getStore().staffShifts;
+}
+
+export function getAllShiftTemplates() {
+  return getStore().shiftTemplates;
+}
+
+export function getAllShiftSwapRequests() {
+  return getStore().shiftSwapRequests;
+}
+
+export function getAllStaffTimeOffRequests() {
+  return getStore().staffTimeOffRequests;
+}
+
+export function createStaffShift(shift: Omit<StaffShift, 'id' | 'createdAt'>) {
+  const store = getStore();
+  const newShift: StaffShift = {
+    ...shift,
+    id: `shift-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    createdAt: new Date().toISOString(),
+  };
+  store.staffShifts.push(newShift);
+  saveStore(store);
+  addAuditLog('create', 'staff-shift', newShift.id, `Created shift for ${newShift.assignedStaffName || 'unassigned'}`, newShift.location);
+  return { success: true, shift: newShift };
+}
+
+export function updateStaffShift(shiftId: string, updates: Partial<Omit<StaffShift, 'id' | 'createdAt' | 'createdBy'>>) {
+  const store = getStore();
+  const shift = store.staffShifts.find(s => s.id === shiftId);
+  if (!shift) {
+    return { success: false, message: 'Shift not found' };
+  }
+  Object.assign(shift, updates);
+  saveStore(store);
+  addAuditLog('update', 'staff-shift', shiftId, `Updated shift for ${shift.assignedStaffName || 'unassigned'}`, shift.location);
+  return { success: true, shift };
+}
+
+export function deleteStaffShift(shiftId: string) {
+  const store = getStore();
+  const index = store.staffShifts.findIndex(s => s.id === shiftId);
+  if (index === -1) {
+    return { success: false, message: 'Shift not found' };
+  }
+  const shift = store.staffShifts[index];
+  store.staffShifts.splice(index, 1);
+  saveStore(store);
+  addAuditLog('delete', 'staff-shift', shiftId, `Deleted shift for ${shift.assignedStaffName || 'unassigned'}`, shift.location);
+  return { success: true };
+}
+
+export function createShiftSwapRequest(request: Omit<ShiftSwapRequest, 'id' | 'createdAt' | 'status'>) {
+  const store = getStore();
+  const newRequest: ShiftSwapRequest = {
+    ...request,
+    id: `swap-req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  };
+  store.shiftSwapRequests.push(newRequest);
+  saveStore(store);
+  addAuditLog('create', 'shift-swap-request', newRequest.id, `${newRequest.requesterName} requested shift swap`, newRequest.location);
+  return { success: true, request: newRequest };
+}
+
+export function approveShiftSwapRequest(requestId: string, reviewerId: string) {
+  const store = getStore();
+  const request = store.shiftSwapRequests.find(r => r.id === requestId);
+  if (!request) {
+    return { success: false, message: 'Request not found' };
+  }
+  request.status = 'approved';
+  request.reviewedBy = reviewerId;
+  request.reviewedAt = new Date().toISOString();
+  saveStore(store);
+  addAuditLog('update', 'shift-swap-request', requestId, `Approved shift swap request from ${request.requesterName}`, request.location);
+  return { success: true, request };
+}
+
+export function rejectShiftSwapRequest(requestId: string, reviewerId: string) {
+  const store = getStore();
+  const request = store.shiftSwapRequests.find(r => r.id === requestId);
+  if (!request) {
+    return { success: false, message: 'Request not found' };
+  }
+  request.status = 'rejected';
+  request.reviewedBy = reviewerId;
+  request.reviewedAt = new Date().toISOString();
+  saveStore(store);
+  addAuditLog('update', 'shift-swap-request', requestId, `Rejected shift swap request from ${request.requesterName}`, request.location);
+  return { success: true, request };
+}
+
+export function createStaffTimeOffRequest(request: Omit<StaffTimeOffRequest, 'id' | 'createdAt' | 'status'>) {
+  const store = getStore();
+  const newRequest: StaffTimeOffRequest = {
+    ...request,
+    id: `timeoff-req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  };
+  store.staffTimeOffRequests.push(newRequest);
+  saveStore(store);
+  addAuditLog('create', 'staff-timeoff-request', newRequest.id, `${newRequest.staffName} requested time off`, newRequest.location);
+  return { success: true, request: newRequest };
+}
+
+export function approveStaffTimeOffRequest(requestId: string, reviewerId: string) {
+  const store = getStore();
+  const request = store.staffTimeOffRequests.find(r => r.id === requestId);
+  if (!request) {
+    return { success: false, message: 'Request not found' };
+  }
+  request.status = 'approved';
+  request.reviewedBy = reviewerId;
+  request.reviewedAt = new Date().toISOString();
+  saveStore(store);
+  addAuditLog('update', 'staff-timeoff-request', requestId, `Approved time off request from ${request.staffName}`, request.location);
+  return { success: true, request };
+}
+
+export function rejectStaffTimeOffRequest(requestId: string, reviewerId: string) {
+  const store = getStore();
+  const request = store.staffTimeOffRequests.find(r => r.id === requestId);
+  if (!request) {
+    return { success: false, message: 'Request not found' };
+  }
+  request.status = 'denied';
+  request.reviewedBy = reviewerId;
+  request.reviewedAt = new Date().toISOString();
+  saveStore(store);
+  addAuditLog('update', 'staff-timeoff-request', requestId, `Denied time off request from ${request.staffName}`, request.location);
+  return { success: true, request };
 }
