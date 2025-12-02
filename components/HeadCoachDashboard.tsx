@@ -377,49 +377,94 @@ export default function HeadCoachDashboard() {
         </div>
         {showScheduleManager && (
           <div className="p-6">
-            <div className="mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-gray-600">Total Classes: {classes.length}</p>
             </div>
+            
+            {/* Weekly Calendar View */}
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Day</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Time</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Class</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Coach</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Capacity</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {classes.slice(0, 20).map((cls) => {
-                    const coach = staff.find(s => s.id === cls.coachId);
-                    return (
-                      <tr key={cls.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-gray-900">{cls.dayOfWeek}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{cls.time}</td>
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{cls.name}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{coach?.name || 'Unassigned'}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{cls.bookedCount}/{cls.capacity}</td>
-                        <td className="px-4 py-3">
-                          <button
-                            onClick={() => handleDeleteClass(cls.id)}
-                            className="text-red-600 hover:text-red-700"
-                            title="Delete class"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div className="min-w-[900px]">
+                {/* Calendar Header - Days of Week */}
+                <div className="grid grid-cols-8 gap-px bg-gray-200 border border-gray-200 rounded-t-lg overflow-hidden">
+                  <div className="bg-gray-50 p-3 font-semibold text-sm text-gray-600">Time</div>
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
+                    <div key={day} className="bg-gray-50 p-3 text-center font-semibold text-sm text-gray-900">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar Body - Time Slots */}
+                <div className="border-l border-r border-b border-gray-200 rounded-b-lg overflow-hidden">
+                  {['5:00 AM', '6:00 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', 
+                    '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM'].map((timeSlot) => (
+                    <div key={timeSlot} className="grid grid-cols-8 gap-px bg-gray-200 min-h-[80px]">
+                      {/* Time Column */}
+                      <div className="bg-white p-2 flex items-start justify-end">
+                        <span className="text-xs font-medium text-gray-500">{timeSlot}</span>
+                      </div>
+                      
+                      {/* Day Columns */}
+                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => {
+                        const dayClasses = classes.filter(cls => 
+                          cls.dayOfWeek === day && cls.time === timeSlot
+                        );
+                        
+                        return (
+                          <div key={`${day}-${timeSlot}`} className="bg-white p-1 relative">
+                            {dayClasses.map((cls) => {
+                              const coach = staff.find(s => s.id === cls.coachId);
+                              const fillPercentage = (cls.bookedCount / cls.capacity) * 100;
+                              const fillColor = fillPercentage >= 90 ? 'bg-red-100 border-red-300' : 
+                                               fillPercentage >= 70 ? 'bg-yellow-100 border-yellow-300' : 
+                                               'bg-green-100 border-green-300';
+                              
+                              return (
+                                <div
+                                  key={cls.id}
+                                  className={`${fillColor} border rounded p-2 mb-1 text-xs group hover:shadow-md transition-shadow cursor-pointer relative`}
+                                >
+                                  <div className="font-semibold text-gray-900 truncate">{cls.name}</div>
+                                  <div className="text-gray-600 truncate text-[10px]">{coach?.name || 'Unassigned'}</div>
+                                  <div className="text-gray-500 text-[10px]">{cls.bookedCount}/{cls.capacity}</div>
+                                  
+                                  {/* Delete button - shows on hover */}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteClass(cls.id);
+                                    }}
+                                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded p-0.5 hover:bg-red-50"
+                                    title="Delete class"
+                                  >
+                                    <Trash2 size={12} className="text-red-600" />
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-            {classes.length > 20 && (
-              <p className="text-sm text-gray-500 mt-4 text-center">Showing first 20 of {classes.length} classes</p>
-            )}
+
+            <div className="mt-4 flex items-center gap-4 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
+                <span className="text-gray-600">&lt;70% Full</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div>
+                <span className="text-gray-600">70-89% Full</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
+                <span className="text-gray-600">90%+ Full</span>
+              </div>
+            </div>
           </div>
         )}
       </div>
