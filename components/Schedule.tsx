@@ -222,7 +222,7 @@ export default function Schedule() {
             );
             
             const staff = selectedStaffId 
-              ? allStaff.find(s => s.id === selectedStaffId)
+              ? staffList.find(s => s.id === selectedStaffId) || staffList[0]
               : staffList[0];
             
             return staff ? (

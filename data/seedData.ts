@@ -201,7 +201,7 @@ export function generateStaff(): Staff[] {
   
   const headCoachNames = ['Chris Johnson', 'Pat Williams'];
   const coachNames = ['Alex Rivera', 'Jordan Martinez', 'Casey Thompson', 'Morgan Lee', 'Taylor Anderson', 'Jamie Wilson'];
-  const frontDeskNames = ['Sam Brown', 'Riley Davis', 'Avery Garcia'];
+  const frontDeskNames = ['Sam Brown', 'Riley Davis', 'Avery Garcia', 'Jessica Chen'];
   const instructorNames = ['Quinn Rodriguez', 'Skylar Hernandez', 'Dakota Lopez', 'Cameron Gonzalez', 'Parker Torres'];
   
   const specialties = ['strength', 'conditioning', 'beginners', 'advanced', 'HIIT', 'endurance'];

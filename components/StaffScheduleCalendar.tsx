@@ -12,7 +12,7 @@ interface StaffScheduleCalendarProps {
 }
 
 export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCalendarProps) {
-  const { location, userRole } = useApp();
+  const { location, userRole, selectedStaffId } = useApp();
   const [showShiftModal, setShowShiftModal] = useState(false);
   const [editingShift, setEditingShift] = useState<StaffShift | null>(null);
   const [, setRefreshTrigger] = useState(0);
@@ -366,6 +366,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
       {showShiftModal && (
         <ShiftModal
           shift={editingShift}
+          defaultStaffId={selectedStaffId || undefined}
           onClose={() => {
             setShowShiftModal(false);
             setEditingShift(null);
@@ -381,13 +382,13 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
   );
 }
 
-function ShiftModal({ shift, onClose, onSave }: { shift: StaffShift | null; onClose: () => void; onSave: () => void }) {
+function ShiftModal({ shift, defaultStaffId, onClose, onSave }: { shift: StaffShift | null; defaultStaffId?: string; onClose: () => void; onSave: () => void }) {
   const { location } = useApp();
   const locationStaff = getAllStaff().filter(s => s.location === location);
   
   const [formData, setFormData] = useState({
     templateType: shift?.templateType || 'front-desk',
-    assignedStaffId: shift?.assignedStaffId || '',
+    assignedStaffId: shift?.assignedStaffId || defaultStaffId || '',
     isRecurring: shift?.recurrence.type === 'weekly',
     dayOfWeek: shift?.recurrence.type === 'weekly' ? shift.recurrence.dayOfWeek?.toString() || '1' : '1',
     date: shift?.date || new Date().toISOString().split('T')[0],

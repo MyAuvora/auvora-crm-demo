@@ -12,7 +12,7 @@ interface StaffScheduleViewProps {
 }
 
 export default function StaffScheduleView({ staffId, staffName }: StaffScheduleViewProps) {
-  const { location } = useApp();
+  const { location, userRole, selectedStaffId, setSelectedStaffId } = useApp();
   const [viewMode, setViewMode] = useState<'my-schedule' | 'team-schedule'>('my-schedule');
   const [showTimeOffModal, setShowTimeOffModal] = useState(false);
   const [showSwapModal, setShowSwapModal] = useState(false);
@@ -20,7 +20,18 @@ export default function StaffScheduleView({ staffId, staffName }: StaffScheduleV
 
   const allShifts = getAllStaffShifts();
   const locationShifts = allShifts.filter(s => s.location === location);
-  const locationStaff = getAllStaff().filter(s => s.location === location);
+  const allStaff = getAllStaff();
+  const locationStaff = allStaff.filter(s => s.location === location);
+  
+  const roleStaff = locationStaff.filter(s => 
+    userRole === 'coach' ? s.role === 'coach' : 
+    userRole === 'head-coach' ? s.role === 'head-coach' : 
+    s.role === 'front-desk'
+  );
+  
+  const effectiveStaffId = selectedStaffId || staffId;
+  const currentStaff = allStaff.find(s => s.id === effectiveStaffId);
+  const showStaffSelector = roleStaff.length > 1;
 
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const timeSlots = [
@@ -36,7 +47,7 @@ export default function StaffScheduleView({ staffId, staffName }: StaffScheduleV
     startOfWeek.setDate(today.getDate() - today.getDay() + 1);
 
     const shiftsToShow = viewMode === 'my-schedule' 
-      ? locationShifts.filter(s => s.assignedStaffId === staffId)
+      ? locationShifts.filter(s => s.assignedStaffId === effectiveStaffId)
       : locationShifts;
 
     shiftsToShow.forEach(shift => {
@@ -115,10 +126,26 @@ export default function StaffScheduleView({ staffId, staffName }: StaffScheduleV
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">My Schedule</h2>
-          <p className="text-sm text-gray-600 mt-1">View your shifts and request changes</p>
+          <h2 className="text-xl font-bold text-gray-900">
+            {currentStaff ? `${currentStaff.name}'s Schedule` : 'My Schedule'}
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">View shifts and request changes</p>
         </div>
         <div className="flex gap-3">
+          {showStaffSelector && (
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Viewing:</label>
+              <select
+                value={effectiveStaffId}
+                onChange={(e) => setSelectedStaffId(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              >
+                {roleStaff.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
             <button
               onClick={() => setViewMode('my-schedule')}

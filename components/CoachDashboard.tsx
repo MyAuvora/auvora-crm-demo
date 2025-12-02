@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { 
   getAllClasses, 
@@ -33,9 +33,11 @@ export default function CoachDashboard() {
   const defaultCoachId = locationCoaches.find(c => c.id === 'coach-1')?.id || locationCoaches[0]?.id || '';
   const selectedCoachId = selectedStaffId || defaultCoachId;
   
-  if (selectedStaffId !== selectedCoachId) {
-    setSelectedStaffId(selectedCoachId);
-  }
+  React.useEffect(() => {
+    if (selectedStaffId !== selectedCoachId) {
+      setSelectedStaffId(selectedCoachId);
+    }
+  }, [selectedStaffId, selectedCoachId, setSelectedStaffId]);
   
   const currentCoach = staff.find(s => s.id === selectedCoachId);
   

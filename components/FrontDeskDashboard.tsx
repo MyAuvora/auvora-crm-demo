@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllTransactions, getAllMembers, getAllLeads, getAllBookings, getAllClasses, getAllStaff, getCommissionReport, getPersonById } from '@/lib/dataStore';
 import { DollarSign, Users, UserPlus, Calendar, AlertCircle, TrendingUp, CreditCard } from 'lucide-react';
@@ -30,12 +30,14 @@ export default function FrontDeskDashboard() {
   
   const locationFrontDesk = staff.filter(s => s.role === 'front-desk' && s.location === location);
   
-  const defaultFrontDeskId = locationFrontDesk.find(fd => fd.id === 'staff-3')?.id || locationFrontDesk[0]?.id || '';
+  const defaultFrontDeskId = locationFrontDesk[0]?.id || '';
   const selectedFrontDeskId = selectedStaffId || defaultFrontDeskId;
   
-  if (selectedStaffId !== selectedFrontDeskId) {
-    setSelectedStaffId(selectedFrontDeskId);
-  }
+  React.useEffect(() => {
+    if (selectedStaffId !== selectedFrontDeskId) {
+      setSelectedStaffId(selectedFrontDeskId);
+    }
+  }, [selectedStaffId, selectedFrontDeskId, setSelectedStaffId]);
   
   const currentStaff = staff.find(s => s.id === selectedFrontDeskId);
   
