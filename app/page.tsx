@@ -70,7 +70,7 @@ export default function CRMApp() {
     { id: 'promotions' as Section, label: 'Promotions', icon: Tag, roles: ['owner', 'manager'] },
     { id: 'messaging' as Section, label: 'Messaging', icon: MessageSquare, roles: ['owner', 'manager', 'front-desk'], badge: 3 },
     { id: 'social-media' as Section, label: 'Social Media', icon: Share2, roles: ['owner', 'manager'] },
-    { id: 'quickbooks' as Section, label: 'QuickBooks', icon: DollarSign, roles: ['owner', 'manager'] },
+    { id: 'quickbooks' as Section, label: 'Accounting', icon: DollarSign, roles: ['owner', 'manager'] },
     { id: 'settings' as Section, label: 'Settings', icon: SettingsIcon, roles: ['owner'] },
     { id: 'kiosk' as Section, label: 'Kiosk Mode', icon: Monitor, roles: ['front-desk'] },
   ];

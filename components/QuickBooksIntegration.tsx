@@ -55,7 +55,7 @@ export default function QuickBooksIntegration() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">QuickBooks Integration</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Accounting</h1>
           <p className="text-gray-600 mt-1">Sync your financial data with QuickBooks Online</p>
         </div>
         {isConnected ? (
