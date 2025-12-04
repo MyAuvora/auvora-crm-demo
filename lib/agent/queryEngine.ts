@@ -13,6 +13,7 @@ export type QueryIntent =
   | 'compare_periods'
   | 'recommend_promo'
   | 'show_metrics'
+  | 'strategic_plan'
   | 'unknown';
 
 export interface QueryParams {
@@ -110,6 +111,26 @@ function parseTimeRange(query: string): { start: Date; end: Date; description: s
 function detectIntent(query: string): QueryIntent {
   const lowerQuery = query.toLowerCase();
 
+  const strategicKeywords = [
+    'prepare', 'plan', 'planning', 'strategy', 'strategic',
+    'next month', 'coming month', 'forecast', 'predict',
+    'should we do', 'what to do', 'how to', 'recommend',
+    'goal', 'target', 'hit', 'reach', 'achieve',
+    'based on', 'last 12 months', 'past year'
+  ];
+  
+  let strategicScore = 0;
+  strategicKeywords.forEach(keyword => {
+    if (lowerQuery.includes(keyword)) strategicScore++;
+  });
+  
+  if (strategicScore >= 2 || 
+      lowerQuery.includes('what should') || 
+      lowerQuery.includes('what to do') ||
+      lowerQuery.includes('how should we')) {
+    return 'strategic_plan';
+  }
+
   if ((lowerQuery.includes('promo') || lowerQuery.includes('promotion')) && 
       (lowerQuery.includes('work') || lowerQuery.includes('best') || lowerQuery.includes('perform'))) {
     return 'list_promotions';
@@ -140,6 +161,12 @@ function detectIntent(query: string): QueryIntent {
 
   if (lowerQuery.includes('metric') || lowerQuery.includes('kpi') || lowerQuery.includes('performance')) {
     return 'show_metrics';
+  }
+
+  if (lowerQuery.includes('next month') || 
+      lowerQuery.includes('this month') || 
+      lowerQuery.includes('prepare')) {
+    return 'strategic_plan';
   }
 
   return 'unknown';
@@ -175,8 +202,5 @@ export const EXAMPLE_QUERIES = [
   'Which promos worked best in the past 12 months?',
   'Show me all cancellations from the past 3 months',
   'What is our revenue this month?',
-  'Which promo should we run in July?',
-  'Why are cancellations up this month?',
-  'Show me our best performing coaches',
-  'What changed this week vs last week?',
+  'Based on the last 12 months, what should we do to prepare for next month?',
 ];

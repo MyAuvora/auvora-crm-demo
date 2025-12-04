@@ -5,6 +5,8 @@ import { X, Send, Sparkles, TrendingUp, Users, DollarSign, AlertCircle } from 'l
 import { parseQuery, EXAMPLE_QUERIES } from '@/lib/agent/queryEngine';
 import { analyzePromoPerformance, analyzeRevenue, analyzeCancellations, generateInsights } from '@/lib/agent/analytics';
 import { getAllTransactions, getAllPromotions, getMembershipCancellations, getAllMembers } from '@/lib/dataStore';
+import { generateStrategicPlan, parseTimeframe } from '@/lib/agent/strategicPlanner';
+import { useApp } from '@/lib/context';
 
 interface Message {
   id: string;
@@ -20,11 +22,12 @@ interface AskAuvoraProps {
 }
 
 export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
+  const { location } = useApp();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
-      content: "Hi! I'm Auvora, your AI business assistant. I can help you analyze your business data, answer questions about performance, and provide recommendations. Try asking me:\n\n• Which promos worked best in the past 12 months?\n• Show me all cancellations from the past 3 months\n• What is our revenue this month?\n• Why are cancellations up?",
+      content: "Hi! I'm Auvora, your AI business assistant. I can help you analyze your business data, answer questions about performance, and provide recommendations. Try asking me:\n\n• Which promos worked best in the past 12 months?\n• Show me all cancellations from the past 3 months\n• What is our revenue this month?\n• Based on the last 12 months, what should we do to prepare for next month?",
     },
   ]);
   const [input, setInput] = useState('');
@@ -198,11 +201,63 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
             content,
             citations: ['Historical promo performance', 'Seasonal trends'],
           };
+        } else if (parsed.intent === 'strategic_plan') {
+          const timeframe = parseTimeframe(input);
+          const plan = generateStrategicPlan(location, timeframe);
+          
+          let content = `**📊 Strategic Plan**\n\n`;
+          content += `${plan.summary}\n\n`;
+          
+          content += `**📈 Forecast for ${plan.forecast.month}**\n`;
+          content += `• Revenue: $${plan.forecast.revenue.toFixed(0)}\n`;
+          content += `• Confidence: ${(plan.forecast.confidence * 100).toFixed(0)}%\n`;
+          content += `• Seasonality Factor: ${plan.forecast.seasonalityFactor}x\n`;
+          content += `• Trend: ${plan.forecast.trend === 'up' ? '📈 Growing' : plan.forecast.trend === 'down' ? '📉 Declining' : '➡️ Stable'}\n\n`;
+          
+          if (plan.risks.length > 0) {
+            content += `**⚠️ Key Risks**\n`;
+            plan.risks.slice(0, 3).forEach((risk, idx) => {
+              const icon = risk.type === 'high' ? '🔴' : risk.type === 'medium' ? '🟡' : '🟢';
+              content += `${icon} **${risk.title}**\n`;
+              content += `   ${risk.description}\n`;
+              content += `   *Mitigation:* ${risk.mitigation}\n\n`;
+            });
+          }
+          
+          content += `**🎯 Top Recommendations**\n`;
+          plan.recommendations.slice(0, 3).forEach((rec, idx) => {
+            content += `**${idx + 1}. ${rec.title}** (${rec.priority} priority)\n`;
+            content += `   ${rec.description}\n`;
+            content += `   *Why:* ${rec.reasoning}\n`;
+            content += `   *Impact:* ${rec.projectedImpact}\n`;
+            content += `   *Confidence:* ${(rec.confidence * 100).toFixed(0)}%\n\n`;
+          });
+          
+          content += `**📌 Key Metrics**\n`;
+          content += `• Current Revenue: $${plan.keyMetrics.currentRevenue.toFixed(0)}\n`;
+          content += `• Forecast Revenue: $${plan.keyMetrics.forecastRevenue.toFixed(0)}\n`;
+          content += `• Revenue Gap: $${plan.keyMetrics.revenueGap.toFixed(0)}\n`;
+          content += `• At-Risk Members: ${plan.keyMetrics.atRiskMembers}\n`;
+          content += `• Churn Rate: ${plan.keyMetrics.churnRate.toFixed(1)}%\n`;
+          content += `• Top Promo: ${plan.keyMetrics.topPromo}\n\n`;
+          
+          content += `**📋 Assumptions**\n`;
+          plan.forecast.assumptions.forEach(assumption => {
+            content += `• ${assumption}\n`;
+          });
+
+          response = {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content,
+            data: plan,
+            citations: plan.citations,
+          };
         } else {
           response = {
             id: Date.now().toString(),
             role: 'assistant',
-            content: "I'm not sure how to answer that. Try asking me about:\n• Promotion performance\n• Cancellations and churn\n• Revenue analysis\n• Promo recommendations",
+            content: "I'm not sure how to answer that. Try asking me about:\n• Promotion performance\n• Cancellations and churn\n• Revenue analysis\n• Strategic planning and forecasts",
           };
         }
       } catch (error) {
