@@ -19,15 +19,17 @@ import SocialMedia from '@/components/SocialMedia';
 import QuickBooksIntegration from '@/components/QuickBooksIntegration';
 import Settings from '@/components/Settings';
 import KioskMode from '@/components/KioskMode';
-import AuvoraChat from '@/components/AuvoraChat';
+import AskAuvora from '@/components/AskAuvora';
 import CommandPalette from '@/components/CommandPalette';
 import { ToastContainer } from '@/components/Toast';
 import { useToast } from '@/lib/useToast';
+import { Sparkles } from 'lucide-react';
 
 export default function CRMApp() {
   const { location, setLocation, userRole, setUserRole, activeSection, setActiveSection } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [showAskAuvora, setShowAskAuvora] = useState(false);
   const { toasts, closeToast } = useToast();
 
   useEffect(() => {
@@ -195,7 +197,17 @@ export default function CRMApp() {
         </main>
       </div>
 
-      <AuvoraChat />
+      {(userRole === 'owner' || userRole === 'manager') && (
+        <button
+          onClick={() => setShowAskAuvora(true)}
+          className="fixed bottom-6 right-6 bg-gradient-to-r from-[#AC1305] to-[#8B0F04] text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow z-50"
+          title="Ask Auvora"
+        >
+          <Sparkles size={24} />
+        </button>
+      )}
+      
+      <AskAuvora isOpen={showAskAuvora} onClose={() => setShowAskAuvora(false)} />
       <CommandPalette 
         isOpen={showCommandPalette} 
         onClose={() => setShowCommandPalette(false)}

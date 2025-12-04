@@ -254,20 +254,9 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back! Here&apos;s what&apos;s happening today.</p>
-        </div>
-        {(userRole === 'owner' || userRole === 'manager') && (
-          <button
-            onClick={() => setShowAskAuvora(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#AC1305] to-[#8B0F04] text-white rounded-lg hover:shadow-lg transition-shadow"
-          >
-            <Sparkles size={20} />
-            Ask Auvora
-          </button>
-        )}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600 mt-1">Welcome back! Here&apos;s what&apos;s happening today.</p>
       </div>
 
       {(userRole === 'owner' || userRole === 'manager') && <AgentDailyBrief />}
