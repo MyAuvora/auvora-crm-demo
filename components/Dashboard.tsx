@@ -3,13 +3,15 @@
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllMembers, getAllLeads, getAllClasses, getAllBookings, getAllTransactions, getAllStaff, getAllWaitlist, getAllProducts, getAllClassPackClients, getAllRefunds, getPendingSubstitutionRequests, getPendingTimeOffRequests } from '@/lib/dataStore';
-import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X, AlertCircle, CreditCard, Zap, Target, MessageSquare, Package, CheckCircle } from 'lucide-react';
+import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X, AlertCircle, CreditCard, Zap, Target, MessageSquare, Package, CheckCircle, Sparkles } from 'lucide-react';
 import { Class } from '@/lib/types';
 import { Transaction } from '@/lib/dataStore';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import DashboardOpsFeed from './DashboardOpsFeed';
 import ManagerApprovals from './ManagerApprovals';
 import PersonStatusBadge from './PersonStatusBadge';
+import AgentDailyBrief from './AgentDailyBrief';
+import AskAuvora from './AskAuvora';
 
 export default function Dashboard() {
   const { location, navigateToMember, navigateToLead, userRole } = useApp();
@@ -18,6 +20,7 @@ export default function Dashboard() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [paymentProcessing, setPaymentProcessing] = useState<Record<string, 'processing' | 'complete' | 'incomplete'>>({});
   const [showApprovals, setShowApprovals] = useState(false);
+  const [showAskAuvora, setShowAskAuvora] = useState(false);
   
   const locationMembers = getAllMembers().filter(m => m.location === location);
   const locationLeads = getAllLeads().filter(l => l.location === location);
@@ -251,10 +254,23 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Welcome back! Here&apos;s what&apos;s happening today.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-1">Welcome back! Here&apos;s what&apos;s happening today.</p>
+        </div>
+        {(userRole === 'owner' || userRole === 'manager') && (
+          <button
+            onClick={() => setShowAskAuvora(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#AC1305] to-[#8B0F04] text-white rounded-lg hover:shadow-lg transition-shadow"
+          >
+            <Sparkles size={20} />
+            Ask Auvora
+          </button>
+        )}
       </div>
+
+      {(userRole === 'owner' || userRole === 'manager') && <AgentDailyBrief />}
 
       <DashboardOpsFeed />
 
@@ -905,6 +921,8 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      <AskAuvora isOpen={showAskAuvora} onClose={() => setShowAskAuvora(false)} />
     </div>
   );
 }

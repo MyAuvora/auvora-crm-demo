@@ -2,8 +2,9 @@
 
 import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, Measurement, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings, StaffShift, ShiftTemplate, ShiftSwapRequest, StaffTimeOffRequest } from './types';
 import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes, coachLeadInteractions as seedCoachLeadInteractions, substitutionRequests as seedSubstitutionRequests, timeOffRequests as seedTimeOffRequests, staffSettings as seedStaffSettings, staffShifts as seedStaffShifts } from '@/data/seedData';
+import { generateHistoricalData } from './historyGenerator';
 
-const STORAGE_VERSION = 4;
+const STORAGE_VERSION = 5;
 const STORAGE_KEY = 'auvora-crm-data';
 
 export interface Booking {
@@ -485,6 +486,39 @@ function initializeStore(): DataStore {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored) as DataStore;
+      
+      if (parsed.version < STORAGE_VERSION) {
+        console.log('Upgrading to version', STORAGE_VERSION, '- generating historical data...');
+        
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setFullYear(startDate.getFullYear() - 1);
+        startDate.setMonth(startDate.getMonth() - 1); // 13 months total
+        
+        const historicalData = generateHistoricalData({
+          startDate,
+          endDate,
+          initialRevenue: 40000,
+          revenueGrowthRate: 0.03,
+          location: 'athletic-club',
+        });
+        
+        parsed.transactions = [...historicalData.transactions, ...parsed.transactions.filter(t => !t.id.startsWith('txn-'))];
+        parsed.promotions = [...historicalData.promotions, ...parsed.promotions];
+        parsed.membershipCancellations = [
+          ...parsed.membershipCancellations,
+          ...historicalData.cancellations.map(c => ({
+            memberId: c.memberId,
+            cancellationDate: c.cancellationDate,
+            effectiveDate: c.cancellationDate,
+            reason: c.reason,
+          }))
+        ];
+        
+        parsed.version = STORAGE_VERSION;
+        saveStore(parsed);
+        return parsed;
+      }
       
       if (!parsed.invoices) parsed.invoices = [];
       if (!parsed.refunds) parsed.refunds = [];
