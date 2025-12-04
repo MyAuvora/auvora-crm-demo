@@ -181,18 +181,28 @@ function identifyRisks(
  * Generate comprehensive strategic plan
  */
 export function generateStrategicPlan(
-  location: 'athletic-club' | 'dance-studio',
+  location: 'athletic-club' | 'dance-studio' | 'all',
   timeframe: 'next-month' | 'this-month' | 'custom' = 'next-month'
 ): StrategicPlan {
   const now = new Date();
   const nextMonth = (now.getMonth() + 1) % 12;
   const targetMonth = timeframe === 'next-month' ? nextMonth : now.getMonth();
   
-  const allTransactions = getAllTransactions().filter(t => t.location === location);
-  const allMembers = getAllMembers().filter(m => m.location === location);
-  const allPackClients = getAllClassPackClients().filter(c => c.location === location);
-  const allLeads = getAllLeads().filter(l => l.location === location);
-  const allClasses = getAllClasses().filter(c => c.location === location);
+  const allTransactions = location === 'all' 
+    ? getAllTransactions() 
+    : getAllTransactions().filter(t => t.location === location);
+  const allMembers = location === 'all'
+    ? getAllMembers()
+    : getAllMembers().filter(m => m.location === location);
+  const allPackClients = location === 'all'
+    ? getAllClassPackClients()
+    : getAllClassPackClients().filter(c => c.location === location);
+  const allLeads = location === 'all'
+    ? getAllLeads()
+    : getAllLeads().filter(l => l.location === location);
+  const allClasses = location === 'all'
+    ? getAllClasses()
+    : getAllClasses().filter(c => c.location === location);
   
   const twelveMonthsAgo = new Date(now);
   twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);

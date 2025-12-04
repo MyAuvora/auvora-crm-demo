@@ -4,7 +4,7 @@ import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, P
 import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes, coachLeadInteractions as seedCoachLeadInteractions, substitutionRequests as seedSubstitutionRequests, timeOffRequests as seedTimeOffRequests, staffSettings as seedStaffSettings, staffShifts as seedStaffShifts } from '@/data/seedData';
 import { generateHistoricalData } from './historyGenerator';
 
-const STORAGE_VERSION = 5;
+const STORAGE_VERSION = 6;
 const STORAGE_KEY = 'auvora-crm-data';
 
 export interface Booking {

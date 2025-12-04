@@ -1,4 +1,4 @@
-export type Location = 'athletic-club' | 'dance-studio';
+export type Location = 'athletic-club' | 'dance-studio' | 'all';
 
 export type MembershipType = '1x-week' | '2x-week' | 'unlimited';
 export type ClassPackType = '5-pack' | '10-pack' | '20-pack';

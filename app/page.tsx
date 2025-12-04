@@ -7,6 +7,7 @@ import Dashboard from '@/components/Dashboard';
 import CoachDashboard from '@/components/CoachDashboard';
 import HeadCoachDashboard from '@/components/HeadCoachDashboard';
 import FrontDeskDashboard from '@/components/FrontDeskDashboard';
+import FranchisorDashboard from '@/components/FranchisorDashboard';
 import LeadsMembers from '@/components/LeadsMembers';
 import LeadPipeline from '@/components/LeadPipeline';
 import Schedule from '@/components/Schedule';
@@ -48,7 +49,7 @@ export default function CRMApp() {
     setActiveSection(section as Section);
   };
 
-  const locationName = location === 'athletic-club' ? 'Athletic Club' : 'Dance Studio';
+  const locationName = location === 'all' ? 'All Locations' : location === 'athletic-club' ? 'Athletic Club' : 'Dance Studio';
   
   const getRoleName = (role: string) => {
     switch(role) {
@@ -57,12 +58,13 @@ export default function CRMApp() {
       case 'head-coach': return 'Head Coach/Trainer';
       case 'coach': return 'Coach/Trainer';
       case 'front-desk': return 'Front Desk';
+      case 'franchisor': return 'Franchisor';
       default: return 'Owner/Admin';
     }
   };
 
   const allNavItems = [
-    { id: 'dashboard' as Section, label: 'Dashboard', icon: Home, roles: ['owner', 'manager', 'head-coach', 'coach', 'front-desk'] },
+    { id: 'dashboard' as Section, label: 'Dashboard', icon: Home, roles: ['owner', 'manager', 'head-coach', 'coach', 'front-desk', 'franchisor'] },
     { id: 'leads-members' as Section, label: 'Leads & Members', icon: Users, roles: ['owner', 'manager', 'front-desk'] },
     { id: 'pipeline' as Section, label: 'Lead Pipeline', icon: GitBranch, roles: ['owner', 'manager'] },
     { id: 'schedule' as Section, label: 'Schedule', icon: Calendar, roles: ['owner', 'manager', 'head-coach', 'coach', 'front-desk'] },
@@ -109,16 +111,23 @@ export default function CRMApp() {
             
             <select
               value={location}
-              onChange={(e) => setLocation(e.target.value as 'athletic-club' | 'dance-studio')}
+              onChange={(e) => setLocation(e.target.value as 'athletic-club' | 'dance-studio' | 'all')}
               className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600"
             >
+              {userRole === 'franchisor' && <option value="all">All Locations</option>}
               <option value="athletic-club">Athletic Club</option>
               <option value="dance-studio">Dance Studio</option>
             </select>
             
             <select
               value={userRole}
-              onChange={(e) => setUserRole(e.target.value as 'owner' | 'manager' | 'head-coach' | 'coach' | 'front-desk')}
+              onChange={(e) => {
+                const newRole = e.target.value as 'owner' | 'manager' | 'head-coach' | 'coach' | 'front-desk' | 'franchisor';
+                setUserRole(newRole);
+                if (newRole === 'franchisor') {
+                  setLocation('all');
+                }
+              }}
               className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600"
             >
               <option value="owner">Owner/Admin</option>
@@ -126,6 +135,7 @@ export default function CRMApp() {
               <option value="head-coach">Head Coach/Trainer</option>
               <option value="coach">Coach/Trainer</option>
               <option value="front-desk">Front Desk</option>
+              <option value="franchisor">Franchisor</option>
             </select>
             
             <div className="hidden lg:block text-sm text-gray-400">
@@ -177,6 +187,7 @@ export default function CRMApp() {
 
         <main className="flex-1 p-4 lg:p-8">
           {activeSection === 'dashboard' && (
+            userRole === 'franchisor' ? <FranchisorDashboard /> :
             userRole === 'head-coach' ? <HeadCoachDashboard /> :
             userRole === 'coach' ? <CoachDashboard /> :
             userRole === 'front-desk' ? <FrontDeskDashboard /> :
