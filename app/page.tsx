@@ -49,6 +49,20 @@ export default function CRMApp() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  useEffect(() => {
+    const allowedSections = allNavItems
+      .filter(item => item.roles.includes(userRole))
+      .map(item => item.id);
+    
+    if (!allowedSections.includes(activeSection)) {
+      setActiveSection('dashboard');
+    }
+    
+    if (userRole !== 'franchisor' && location === 'all') {
+      setLocation('athletic-club');
+    }
+  }, [userRole, activeSection, location, setActiveSection, setLocation]);
+
   const handleNavigate = (section: string) => {
     setActiveSection(section as Section);
   };
@@ -220,10 +234,10 @@ export default function CRMApp() {
           {activeSection === 'quickbooks' && <QuickBooksIntegration />}
           {activeSection === 'settings' && <Settings />}
           {activeSection === 'kiosk' && <KioskMode />}
-          {activeSection === 'franchisor-promos' && <FranchisorPromos />}
-          {activeSection === 'franchisor-messaging' && <FranchisorMessaging />}
-          {activeSection === 'franchisor-fees' && <FranchiseFees />}
-          {activeSection === 'franchisor-revenue' && <FranchisorRevenue />}
+          {activeSection === 'franchisor-promos' && userRole === 'franchisor' && <FranchisorPromos />}
+          {activeSection === 'franchisor-messaging' && userRole === 'franchisor' && <FranchisorMessaging />}
+          {activeSection === 'franchisor-fees' && userRole === 'franchisor' && <FranchiseFees />}
+          {activeSection === 'franchisor-revenue' && userRole === 'franchisor' && <FranchisorRevenue />}
         </main>
       </div>
 
