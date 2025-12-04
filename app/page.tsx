@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useApp, Section } from '@/lib/context';
-import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor, MessageSquare, Share2, DollarSign, Search, Settings as SettingsIcon } from 'lucide-react';
+import { Home, Users, Calendar, UserCog, ShoppingCart, TrendingUp, Tag, Menu, X, GitBranch, Monitor, MessageSquare, Share2, DollarSign, Search, Settings as SettingsIcon, Megaphone, Mail, Receipt, PiggyBank } from 'lucide-react';
 import Dashboard from '@/components/Dashboard';
 import CoachDashboard from '@/components/CoachDashboard';
 import HeadCoachDashboard from '@/components/HeadCoachDashboard';
@@ -20,6 +20,10 @@ import SocialMedia from '@/components/SocialMedia';
 import QuickBooksIntegration from '@/components/QuickBooksIntegration';
 import Settings from '@/components/Settings';
 import KioskMode from '@/components/KioskMode';
+import FranchisorPromos from '@/components/FranchisorPromos';
+import FranchisorMessaging from '@/components/FranchisorMessaging';
+import FranchiseFees from '@/components/FranchiseFees';
+import FranchisorRevenue from '@/components/FranchisorRevenue';
 import AskAuvora from '@/components/AskAuvora';
 import CommandPalette from '@/components/CommandPalette';
 import { ToastContainer } from '@/components/Toast';
@@ -77,6 +81,10 @@ export default function CRMApp() {
     { id: 'quickbooks' as Section, label: 'Accounting', icon: DollarSign, roles: ['owner', 'manager'] },
     { id: 'settings' as Section, label: 'Settings', icon: SettingsIcon, roles: ['owner'] },
     { id: 'kiosk' as Section, label: 'Kiosk Mode', icon: Monitor, roles: ['front-desk'] },
+    { id: 'franchisor-promos' as Section, label: 'Brand Promotions', icon: Megaphone, roles: ['franchisor'] },
+    { id: 'franchisor-messaging' as Section, label: 'Location Messaging', icon: Mail, roles: ['franchisor'] },
+    { id: 'franchisor-fees' as Section, label: 'Franchise Fees', icon: Receipt, roles: ['franchisor'] },
+    { id: 'franchisor-revenue' as Section, label: 'Franchisor Revenue', icon: PiggyBank, roles: ['franchisor'] },
   ];
   
   const navItems = allNavItems.filter(item => item.roles.includes(userRole));
@@ -212,6 +220,10 @@ export default function CRMApp() {
           {activeSection === 'quickbooks' && <QuickBooksIntegration />}
           {activeSection === 'settings' && <Settings />}
           {activeSection === 'kiosk' && <KioskMode />}
+          {activeSection === 'franchisor-promos' && <FranchisorPromos />}
+          {activeSection === 'franchisor-messaging' && <FranchisorMessaging />}
+          {activeSection === 'franchisor-fees' && <FranchiseFees />}
+          {activeSection === 'franchisor-revenue' && <FranchisorRevenue />}
         </main>
       </div>
 

@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Location } from './types';
 
 export type UserRole = 'owner' | 'manager' | 'head-coach' | 'coach' | 'front-desk' | 'franchisor';
-export type Section = 'dashboard' | 'leads-members' | 'pipeline' | 'schedule' | 'staff' | 'pos' | 'reports' | 'promotions' | 'messaging' | 'social-media' | 'quickbooks' | 'settings' | 'kiosk';
+export type Section = 'dashboard' | 'leads-members' | 'pipeline' | 'schedule' | 'staff' | 'pos' | 'reports' | 'promotions' | 'messaging' | 'social-media' | 'quickbooks' | 'settings' | 'kiosk' | 'franchisor-promos' | 'franchisor-messaging' | 'franchisor-fees' | 'franchisor-revenue';
 
 export interface DeepLink {
   type: 'member' | 'lead' | 'class';
