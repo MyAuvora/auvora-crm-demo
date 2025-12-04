@@ -1,4 +1,30 @@
-export type Location = 'athletic-club' | 'dance-studio' | 'all';
+export type Location = 'all' | string;
+
+export interface FranchiseLocation {
+  id: string;
+  name: string;
+  city: string;
+  state: string;
+  type: 'athletic-club' | 'dance-studio';
+  clickable: boolean;
+}
+
+export interface FranchiseSummary {
+  locationId: string;
+  mtdRevenue: number;
+  lastMonthRevenue: number;
+  ytdRevenue: number;
+  yoyGrowth: number;
+  activeMembers: number;
+  newMembers: number;
+  cancelled: number;
+  leads: number;
+  conversion: number;
+  avgFillRate: number;
+  churnRate: number;
+  totalStaff: number;
+  totalClasses: number;
+}
 
 export type MembershipType = '1x-week' | '2x-week' | 'unlimited';
 export type ClassPackType = '5-pack' | '10-pack' | '20-pack';

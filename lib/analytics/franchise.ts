@@ -1,5 +1,6 @@
-import { Member, Lead, Class, Location, ClassPackClient, DropInClient, Promotion } from '../types';
+import { Member, Lead, Class, Location, ClassPackClient, DropInClient, Promotion, FranchiseLocation, FranchiseSummary } from '../types';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval, parseISO, subYears } from 'date-fns';
+import { getFranchiseLocations, getFranchiseSummaries } from '../dataStore';
 
 export interface LocationMetrics {
   location: Location;
@@ -58,14 +59,12 @@ export interface FranchiseOverview {
   locationMetrics: LocationMetrics[];
 }
 
-const LOCATION_NAMES: Record<Location, string> = {
-  'athletic-club': 'Athletic Club',
-  'dance-studio': 'Dance Studio',
-  'all': 'All Locations'
-};
-
 export function getLocationName(location: Location): string {
-  return LOCATION_NAMES[location] || location;
+  if (location === 'all') return 'All Locations';
+  
+  const franchiseLocations = getFranchiseLocations();
+  const loc = franchiseLocations.find(l => l.id === location);
+  return loc ? loc.name : location;
 }
 
 export function getRevenueByLocation(
@@ -202,67 +201,124 @@ export function getLocationMetrics(
   staff: any[],
   location: Location
 ): LocationMetrics {
-  const now = new Date();
-  const mtdRange = { start: startOfMonth(now), end: now };
-  const ytdRange = { start: new Date(now.getFullYear(), 0, 1), end: now };
-  const lastMonthRange = { start: startOfMonth(subMonths(now, 1)), end: endOfMonth(subMonths(now, 1)) };
-  const lastYearRange = { start: new Date(now.getFullYear() - 1, 0, 1), end: new Date(now.getFullYear() - 1, 11, 31) };
+  if (location === 'athletic-club') {
+    const now = new Date();
+    const mtdRange = { start: startOfMonth(now), end: now };
+    const ytdRange = { start: new Date(now.getFullYear(), 0, 1), end: now };
+    const lastMonthRange = { start: startOfMonth(subMonths(now, 1)), end: endOfMonth(subMonths(now, 1)) };
+    const lastYearRange = { start: new Date(now.getFullYear() - 1, 0, 1), end: new Date(now.getFullYear() - 1, 11, 31) };
 
-  const revenueMTD = getRevenueByLocation(members, classPacks, dropIns, location, mtdRange);
-  const revenueYTD = getRevenueByLocation(members, classPacks, dropIns, location, ytdRange);
-  const revenueLastMonth = getRevenueByLocation(members, classPacks, dropIns, location, lastMonthRange);
-  const revenueLastYear = getRevenueByLocation(members, classPacks, dropIns, location, lastYearRange);
-  const momGrowth = revenueLastMonth > 0 ? ((revenueMTD - revenueLastMonth) / revenueLastMonth) * 100 : 0;
-  const yoyGrowth = revenueLastYear > 0 ? ((revenueYTD - revenueLastYear) / revenueLastYear) * 100 : 0;
+    const revenueMTD = getRevenueByLocation(members, classPacks, dropIns, location, mtdRange);
+    const revenueYTD = getRevenueByLocation(members, classPacks, dropIns, location, ytdRange);
+    const revenueLastMonth = getRevenueByLocation(members, classPacks, dropIns, location, lastMonthRange);
+    const revenueLastYear = getRevenueByLocation(members, classPacks, dropIns, location, lastYearRange);
+    const momGrowth = revenueLastMonth > 0 ? ((revenueMTD - revenueLastMonth) / revenueLastMonth) * 100 : 0;
+    const yoyGrowth = revenueLastYear > 0 ? ((revenueYTD - revenueLastYear) / revenueLastYear) * 100 : 0;
 
-  const activeMembers = getActiveMembersByLocation(members, location);
-  const newMembers = getNewMembersByLocation(members, location, mtdRange);
-  const { cancelled, churnRate } = getMemberChurnByLocation(members, location, mtdRange);
-  const netGrowth = newMembers - cancelled;
-  const retention = 100 - churnRate;
+    const activeMembers = getActiveMembersByLocation(members, location);
+    const newMembers = getNewMembersByLocation(members, location, mtdRange);
+    const { cancelled, churnRate } = getMemberChurnByLocation(members, location, mtdRange);
+    const netGrowth = newMembers - cancelled;
+    const retention = 100 - churnRate;
 
-  const leadStats = getLeadConversionByLocation(leads, location);
+    const leadStats = getLeadConversionByLocation(leads, location);
+    const classStats = getClassFillRateByLocation(classes, location);
 
-  const classStats = getClassFillRateByLocation(classes, location);
+    const locationStaff = staff.filter(s => s.location === location);
+    const coaches = locationStaff.filter(s => s.role === 'coach' || s.role === 'head-coach').length;
+    const frontDesk = locationStaff.filter(s => s.role === 'front-desk').length;
 
-  const locationStaff = location === 'all' ? staff : staff.filter(s => s.location === location);
-  const coaches = locationStaff.filter(s => s.role === 'coach' || s.role === 'head-coach').length;
-  const frontDesk = locationStaff.filter(s => s.role === 'front-desk').length;
+    return {
+      location,
+      locationName: getLocationName(location),
+      revenue: {
+        mtd: revenueMTD,
+        ytd: revenueYTD,
+        lastMonth: revenueLastMonth,
+        lastYear: revenueLastYear,
+        momGrowth,
+        yoyGrowth
+      },
+      members: {
+        active: activeMembers,
+        new: newMembers,
+        cancelled,
+        netGrowth,
+        retention,
+        churn: churnRate
+      },
+      leads: {
+        total: leadStats.total,
+        converted: leadStats.converted,
+        conversionRate: leadStats.conversionRate
+      },
+      classes: {
+        total: classes.filter(c => c.location === location).length,
+        averageFillRate: classStats.averageFillRate,
+        totalCapacity: classStats.totalCapacity,
+        totalBooked: classStats.totalBooked
+      },
+      staff: {
+        total: locationStaff.length,
+        coaches,
+        frontDesk
+      }
+    };
+  }
+  
+  const summaries = getFranchiseSummaries();
+  const summary = summaries[location];
+  
+  if (!summary) {
+    return {
+      location,
+      locationName: getLocationName(location),
+      revenue: { mtd: 0, ytd: 0, lastMonth: 0, lastYear: 0, momGrowth: 0, yoyGrowth: 0 },
+      members: { active: 0, new: 0, cancelled: 0, netGrowth: 0, retention: 100, churn: 0 },
+      leads: { total: 0, converted: 0, conversionRate: 0 },
+      classes: { total: 0, averageFillRate: 0, totalCapacity: 0, totalBooked: 0 },
+      staff: { total: 0, coaches: 0, frontDesk: 0 }
+    };
+  }
+
+  const momGrowth = summary.lastMonthRevenue > 0 
+    ? ((summary.mtdRevenue - summary.lastMonthRevenue) / summary.lastMonthRevenue) * 100 
+    : 0;
 
   return {
     location,
     locationName: getLocationName(location),
     revenue: {
-      mtd: revenueMTD,
-      ytd: revenueYTD,
-      lastMonth: revenueLastMonth,
-      lastYear: revenueLastYear,
+      mtd: summary.mtdRevenue,
+      ytd: summary.ytdRevenue,
+      lastMonth: summary.lastMonthRevenue,
+      lastYear: summary.ytdRevenue / 1.1,
       momGrowth,
-      yoyGrowth
+      yoyGrowth: summary.yoyGrowth
     },
     members: {
-      active: activeMembers,
-      new: newMembers,
-      cancelled,
-      netGrowth,
-      retention,
-      churn: churnRate
+      active: summary.activeMembers,
+      new: summary.newMembers,
+      cancelled: summary.cancelled,
+      netGrowth: summary.newMembers - summary.cancelled,
+      retention: 100 - (summary.churnRate * 100),
+      churn: summary.churnRate * 100
     },
     leads: {
-      total: leadStats.total,
-      converted: leadStats.converted,
-      conversionRate: leadStats.conversionRate
+      total: summary.leads,
+      converted: Math.floor(summary.leads * summary.conversion),
+      conversionRate: summary.conversion * 100
     },
     classes: {
-      total: classStats.totalCapacity > 0 ? (location === 'all' ? classes.length : classes.filter(c => c.location === location).length) : 0,
-      averageFillRate: classStats.averageFillRate,
-      totalCapacity: classStats.totalCapacity,
-      totalBooked: classStats.totalBooked
+      total: summary.totalClasses,
+      averageFillRate: summary.avgFillRate * 100,
+      totalCapacity: summary.totalClasses * 20,
+      totalBooked: Math.floor(summary.totalClasses * 20 * summary.avgFillRate)
     },
     staff: {
-      total: locationStaff.length,
-      coaches,
-      frontDesk
+      total: summary.totalStaff,
+      coaches: Math.floor(summary.totalStaff * 0.6),
+      frontDesk: Math.floor(summary.totalStaff * 0.3)
     }
   };
 }
@@ -275,31 +331,48 @@ export function getFranchiseOverview(
   dropIns: DropInClient[],
   staff: any[]
 ): FranchiseOverview {
-  const locations: Location[] = ['athletic-club', 'dance-studio'];
+  const franchiseLocations = getFranchiseLocations();
+  const locationIds = franchiseLocations.map(loc => loc.id);
   
-  const allMetrics = getLocationMetrics(members, leads, classes, classPacks, dropIns, staff, 'all');
-  
-  const locationMetrics = locations.map(loc => 
+  const locationMetrics = locationIds.map(loc => 
     getLocationMetrics(members, leads, classes, classPacks, dropIns, staff, loc)
   );
 
+  const totalRevenueMTD = locationMetrics.reduce((sum, m) => sum + m.revenue.mtd, 0);
+  const totalRevenueYTD = locationMetrics.reduce((sum, m) => sum + m.revenue.ytd, 0);
+  const totalRevenueLastMonth = locationMetrics.reduce((sum, m) => sum + m.revenue.lastMonth, 0);
+  const totalRevenueLastYear = locationMetrics.reduce((sum, m) => sum + m.revenue.lastYear, 0);
+  
+  const momGrowth = totalRevenueLastMonth > 0 ? ((totalRevenueMTD - totalRevenueLastMonth) / totalRevenueLastMonth) * 100 : 0;
+  const yoyGrowth = totalRevenueLastYear > 0 ? ((totalRevenueYTD - totalRevenueLastYear) / totalRevenueLastYear) * 100 : 0;
+
+  const totalActiveMembers = locationMetrics.reduce((sum, m) => sum + m.members.active, 0);
+  const totalNetGrowth = locationMetrics.reduce((sum, m) => sum + m.members.netGrowth, 0);
+  const avgChurn = locationMetrics.reduce((sum, m) => sum + m.members.churn, 0) / locationMetrics.length;
+
+  const totalLeads = locationMetrics.reduce((sum, m) => sum + m.leads.total, 0);
+  const totalConverted = locationMetrics.reduce((sum, m) => sum + m.leads.converted, 0);
+  const avgConversionRate = totalLeads > 0 ? (totalConverted / totalLeads) * 100 : 0;
+
+  const avgFillRate = locationMetrics.reduce((sum, m) => sum + m.classes.averageFillRate, 0) / locationMetrics.length;
+
   return {
     totalRevenue: {
-      mtd: allMetrics.revenue.mtd,
-      ytd: allMetrics.revenue.ytd,
-      momGrowth: allMetrics.revenue.momGrowth,
-      yoyGrowth: allMetrics.revenue.yoyGrowth
+      mtd: totalRevenueMTD,
+      ytd: totalRevenueYTD,
+      momGrowth,
+      yoyGrowth
     },
     totalMembers: {
-      active: allMetrics.members.active,
-      netGrowth: allMetrics.members.netGrowth,
-      churn: allMetrics.members.churn
+      active: totalActiveMembers,
+      netGrowth: totalNetGrowth,
+      churn: avgChurn
     },
     totalLeads: {
-      count: allMetrics.leads.total,
-      conversionRate: allMetrics.leads.conversionRate
+      count: totalLeads,
+      conversionRate: avgConversionRate
     },
-    averageFillRate: allMetrics.classes.averageFillRate,
+    averageFillRate: avgFillRate,
     locationMetrics
   };
 }

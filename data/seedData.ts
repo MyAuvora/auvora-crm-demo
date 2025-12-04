@@ -1,4 +1,4 @@
-import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings, StaffShift } from '@/lib/types';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings, StaffShift, FranchiseLocation, FranchiseSummary } from '@/lib/types';
 
 const tampaZipCodes = ['33602', '33603', '33606', '33607', '33609', '33611', '33612', '33613', '33614', '33615'];
 
@@ -793,3 +793,114 @@ export const substitutionRequests = generateSubstitutionRequests();
 export const timeOffRequests = generateTimeOffRequests();
 export const staffSettings = generateStaffSettings();
 export const staffShifts = generateStaffShifts();
+
+// Franchise Locations - 26 total (Tampa + 25 other cities)
+export function generateFranchiseLocations(): FranchiseLocation[] {
+  const cities = [
+    { city: 'Tampa', state: 'FL', id: 'athletic-club' }, // The original Tampa location (clickable)
+    { city: 'Austin', state: 'TX', id: 'lab-austin' },
+    { city: 'Miami', state: 'FL', id: 'lab-miami' },
+    { city: 'Denver', state: 'CO', id: 'lab-denver' },
+    { city: 'Seattle', state: 'WA', id: 'lab-seattle' },
+    { city: 'Portland', state: 'OR', id: 'lab-portland' },
+    { city: 'Phoenix', state: 'AZ', id: 'lab-phoenix' },
+    { city: 'San Diego', state: 'CA', id: 'lab-san-diego' },
+    { city: 'Dallas', state: 'TX', id: 'lab-dallas' },
+    { city: 'Houston', state: 'TX', id: 'lab-houston' },
+    { city: 'Atlanta', state: 'GA', id: 'lab-atlanta' },
+    { city: 'Charlotte', state: 'NC', id: 'lab-charlotte' },
+    { city: 'Nashville', state: 'TN', id: 'lab-nashville' },
+    { city: 'Orlando', state: 'FL', id: 'lab-orlando' },
+    { city: 'Las Vegas', state: 'NV', id: 'lab-las-vegas' },
+    { city: 'San Antonio', state: 'TX', id: 'lab-san-antonio' },
+    { city: 'Jacksonville', state: 'FL', id: 'lab-jacksonville' },
+    { city: 'Fort Worth', state: 'TX', id: 'lab-fort-worth' },
+    { city: 'Columbus', state: 'OH', id: 'lab-columbus' },
+    { city: 'Indianapolis', state: 'IN', id: 'lab-indianapolis' },
+    { city: 'Raleigh', state: 'NC', id: 'lab-raleigh' },
+    { city: 'Memphis', state: 'TN', id: 'lab-memphis' },
+    { city: 'Louisville', state: 'KY', id: 'lab-louisville' },
+    { city: 'Richmond', state: 'VA', id: 'lab-richmond' },
+    { city: 'Oklahoma City', state: 'OK', id: 'lab-oklahoma-city' },
+    { city: 'Tucson', state: 'AZ', id: 'lab-tucson' },
+  ];
+
+  return cities.map(({ city, state, id }) => ({
+    id,
+    name: `The Lab ${city}`,
+    city,
+    state,
+    type: 'athletic-club' as const,
+    clickable: id === 'athletic-club', // Only Tampa is clickable
+  }));
+}
+
+// Generate realistic franchise summaries for non-Tampa locations
+export function generateFranchiseSummaries(): Record<string, FranchiseSummary> {
+  const locations = generateFranchiseLocations();
+  const summaries: Record<string, FranchiseSummary> = {};
+
+  // Seeded random number generator for consistent results
+  function seededRandom(seed: string): number {
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+      hash = hash & hash;
+    }
+    return Math.abs(Math.sin(hash) * 10000) % 1;
+  }
+
+  locations.forEach((location, index) => {
+    // Skip Tampa - it has real data
+    if (location.id === 'athletic-club') return;
+
+    const seed = location.id;
+    const rand1 = seededRandom(seed + '1');
+    const rand2 = seededRandom(seed + '2');
+    const rand3 = seededRandom(seed + '3');
+    const rand4 = seededRandom(seed + '4');
+    const rand5 = seededRandom(seed + '5');
+    const rand6 = seededRandom(seed + '6');
+
+    // Generate realistic metrics with variation
+    const mtdRevenue = Math.floor(12000 + rand1 * 33000); // 12k-45k
+    const lastMonthRevenue = Math.floor(mtdRevenue * (0.85 + rand2 * 0.30)); // ±15%
+    const ytdRevenue = Math.floor(mtdRevenue * (10 + rand3 * 2)); // ~10-12 months
+    const yoyGrowth = -5 + rand4 * 30; // -5% to 25%
+    
+    const activeMembers = Math.floor(100 + (mtdRevenue / 150)); // Correlated with revenue
+    const newMembers = Math.floor(5 + rand5 * 35); // 5-40
+    const cancelled = Math.floor(rand6 * 20); // 0-20
+    
+    const leads = Math.floor(100 + rand1 * 300); // 100-400
+    const conversion = Math.min(0.45, Math.max(0.15, newMembers / leads)); // 15%-45%
+    
+    const avgFillRate = 0.45 + rand2 * 0.40; // 45%-85%
+    const churnRate = 0.01 + rand3 * 0.05; // 1%-6%
+    
+    const totalStaff = Math.floor(8 + rand4 * 8); // 8-16
+    const totalClasses = Math.floor(60 + rand5 * 80); // 60-140
+
+    summaries[location.id] = {
+      locationId: location.id,
+      mtdRevenue,
+      lastMonthRevenue,
+      ytdRevenue,
+      yoyGrowth,
+      activeMembers,
+      newMembers,
+      cancelled,
+      leads,
+      conversion,
+      avgFillRate,
+      churnRate,
+      totalStaff,
+      totalClasses,
+    };
+  });
+
+  return summaries;
+}
+
+export const franchiseLocations = generateFranchiseLocations();
+export const franchiseSummaries = generateFranchiseSummaries();

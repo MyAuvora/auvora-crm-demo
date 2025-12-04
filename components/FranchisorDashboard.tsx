@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/lib/context';
-import { getAllMembers, getAllLeads, getAllClasses, getAllClassPackClients, getAllDropInClients, getAllStaff } from '@/lib/dataStore';
+import { getAllMembers, getAllLeads, getAllClasses, getAllClassPackClients, getAllDropInClients, getAllStaff, getFranchiseLocations } from '@/lib/dataStore';
 import { getFranchiseOverview, rankLocationsByMetric, computeRoyalty, LocationMetrics } from '@/lib/analytics/franchise';
 import { TrendingUp, TrendingDown, Users, DollarSign, Target, Calendar, BarChart3, Building2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
@@ -15,6 +15,7 @@ export default function FranchisorDashboard() {
   const classPacks = getAllClassPackClients();
   const dropIns = getAllDropInClients();
   const staff = getAllStaff();
+  const franchiseLocations = getFranchiseLocations();
   const [selectedMetric, setSelectedMetric] = useState<'revenue' | 'members' | 'conversion' | 'fillRate'>('revenue');
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
@@ -57,14 +58,11 @@ export default function FranchisorDashboard() {
     'Total Booked': loc.classes.totalBooked
   }));
 
-  const handleLocationClick = (locationName: string) => {
-    const locationMap: Record<string, 'athletic-club' | 'dance-studio'> = {
-      'Athletic Club': 'athletic-club',
-      'Dance Studio': 'dance-studio'
-    };
-    const location = locationMap[locationName];
-    if (location) {
-      setLocation(location);
+  const handleLocationClick = (locationId: string) => {
+    const franchiseLocations = getFranchiseLocations();
+    const location = franchiseLocations.find(l => l.id === locationId);
+    if (location && location.clickable) {
+      setLocation(locationId);
       setSelectedLocation(null);
     }
   };
@@ -373,12 +371,16 @@ export default function FranchisorDashboard() {
                     {loc.classes.averageFillRate.toFixed(1)}%
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-right text-sm">
-                    <button
-                      onClick={() => setSelectedLocation(loc.locationName)}
-                      className="text-[#AC1305] hover:underline"
-                    >
-                      View Details
-                    </button>
+                    {franchiseLocations.find(fl => fl.id === loc.location)?.clickable ? (
+                      <button
+                        onClick={() => handleLocationClick(loc.location)}
+                        className="text-[#AC1305] hover:underline"
+                      >
+                        View Details
+                      </button>
+                    ) : (
+                      <span className="text-gray-400 text-xs">View Only</span>
+                    )}
                   </td>
                 </tr>
               ))}

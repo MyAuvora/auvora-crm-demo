@@ -181,7 +181,7 @@ function identifyRisks(
  * Generate comprehensive strategic plan
  */
 export function generateStrategicPlan(
-  location: 'athletic-club' | 'dance-studio' | 'all',
+  location: string,
   timeframe: 'next-month' | 'this-month' | 'custom' = 'next-month'
 ): StrategicPlan {
   const now = new Date();

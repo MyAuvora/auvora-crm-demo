@@ -1,7 +1,7 @@
 'use client';
 
-import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, Measurement, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings, StaffShift, ShiftTemplate, ShiftSwapRequest, StaffTimeOffRequest } from './types';
-import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes, coachLeadInteractions as seedCoachLeadInteractions, substitutionRequests as seedSubstitutionRequests, timeOffRequests as seedTimeOffRequests, staffSettings as seedStaffSettings, staffShifts as seedStaffShifts } from '@/data/seedData';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, Measurement, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings, StaffShift, ShiftTemplate, ShiftSwapRequest, StaffTimeOffRequest, FranchiseLocation, FranchiseSummary } from './types';
+import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes, coachLeadInteractions as seedCoachLeadInteractions, substitutionRequests as seedSubstitutionRequests, timeOffRequests as seedTimeOffRequests, staffSettings as seedStaffSettings, staffShifts as seedStaffShifts, franchiseLocations as seedFranchiseLocations, franchiseSummaries as seedFranchiseSummaries } from '@/data/seedData';
 import { generateHistoricalData } from './historyGenerator';
 
 const STORAGE_VERSION = 6;
@@ -2398,4 +2398,13 @@ export function rejectStaffTimeOffRequest(requestId: string, reviewerId: string)
   saveStore(store);
   addAuditLog('update', 'staff-timeoff-request', requestId, `Denied time off request from ${request.staffName}`, request.location);
   return { success: true, request };
+}
+
+// Franchise Location Getters
+export function getFranchiseLocations(): FranchiseLocation[] {
+  return seedFranchiseLocations;
+}
+
+export function getFranchiseSummaries(): Record<string, FranchiseSummary> {
+  return seedFranchiseSummaries;
 }

@@ -49,7 +49,7 @@ export default function CRMApp() {
     setActiveSection(section as Section);
   };
 
-  const locationName = location === 'all' ? 'All Locations' : location === 'athletic-club' ? 'Athletic Club' : 'Dance Studio';
+  const locationName = location === 'all' ? 'All Locations' : location === 'athletic-club' ? 'The Lab Tampa' : 'Dance Studio';
   
   const getRoleName = (role: string) => {
     switch(role) {
@@ -93,8 +93,7 @@ export default function CRMApp() {
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             <div className="flex flex-col leading-tight">
-              <span className="text-2xl font-bold text-white">The LAB</span>
-              <span className="text-lg font-semibold text-white">Tampa</span>
+              <span className="text-2xl font-bold text-white">The Lab</span>
             </div>
           </div>
           
@@ -114,9 +113,17 @@ export default function CRMApp() {
               onChange={(e) => setLocation(e.target.value as 'athletic-club' | 'dance-studio' | 'all')}
               className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600"
             >
-              {userRole === 'franchisor' && <option value="all">All Locations</option>}
-              <option value="athletic-club">Athletic Club</option>
-              <option value="dance-studio">Dance Studio</option>
+              {userRole === 'franchisor' ? (
+                <>
+                  <option value="all">All Locations</option>
+                  <option value="athletic-club">The Lab Tampa</option>
+                </>
+              ) : (
+                <>
+                  <option value="athletic-club">Athletic Club</option>
+                  <option value="dance-studio">Dance Studio</option>
+                </>
+              )}
             </select>
             
             <select
