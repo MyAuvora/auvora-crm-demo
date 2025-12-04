@@ -246,6 +246,17 @@ export function generateStaff(): Staff[] {
     });
   });
   
+  const dsFrontDeskNames = ['Taylor Kim', 'Jordan Lee', 'Alex Martinez'];
+  dsFrontDeskNames.forEach((name, i) => {
+    staff.push({
+      id: `desk-ds-${i + 1}`,
+      name,
+      email: generateEmail(name),
+      role: 'front-desk',
+      location: 'dance-studio'
+    });
+  });
+  
   instructorNames.forEach((name, i) => {
     staff.push({
       id: `instructor-${i + 1}`,

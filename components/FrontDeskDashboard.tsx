@@ -34,22 +34,12 @@ export default function FrontDeskDashboard() {
   const selectedFrontDeskId = selectedStaffId || defaultFrontDeskId;
   
   React.useEffect(() => {
-    if (selectedStaffId !== selectedFrontDeskId) {
-      setSelectedStaffId(selectedFrontDeskId);
+    if (!locationFrontDesk.some(s => s.id === selectedStaffId)) {
+      setSelectedStaffId(defaultFrontDeskId);
     }
-  }, [selectedStaffId, selectedFrontDeskId, setSelectedStaffId]);
+  }, [location, locationFrontDesk, selectedStaffId, defaultFrontDeskId, setSelectedStaffId]);
   
   const currentStaff = staff.find(s => s.id === selectedFrontDeskId);
-  
-  if (!currentStaff || locationFrontDesk.length === 0) {
-    return (
-      <div className="p-8">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-yellow-800">Front desk staff profile not found. Please contact an administrator.</p>
-        </div>
-      </div>
-    );
-  }
 
   const todayTransactions = transactions.filter(t => {
     const txDate = new Date(t.timestamp);
@@ -244,6 +234,16 @@ export default function FrontDeskDashboard() {
   };
 
   const details = selectedMetric ? getMetricDetails(selectedMetric) : null;
+
+  if (!currentStaff || locationFrontDesk.length === 0) {
+    return (
+      <div className="p-8">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-yellow-800">Front desk staff profile not found for this location. Please contact an administrator.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

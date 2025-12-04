@@ -197,7 +197,7 @@ export default function CRMApp() {
         </main>
       </div>
 
-      {(userRole === 'owner' || userRole === 'manager') && (
+      {activeSection !== 'kiosk' && (
         <button
           onClick={() => setShowAskAuvora(true)}
           className="fixed bottom-6 right-6 bg-gradient-to-r from-[#AC1305] to-[#8B0F04] text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow z-50"
