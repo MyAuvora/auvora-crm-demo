@@ -17,7 +17,17 @@ export type QueryIntent =
   | 'rank_coaches_cancellations'
   | 'rank_members_activity'
   | 'revenue_recommendations'
+  | 'member_frequency_analysis'
   | 'unknown';
+
+export interface FrequencyParams {
+  operator: 'at_least' | 'at_most' | 'equal' | 'gt' | 'lt';
+  value: number;
+  period: 'week' | 'month';
+  metric: 'checkins' | 'bookings';
+  average: boolean;
+  returnList?: boolean;
+}
 
 export interface QueryParams {
   intent: QueryIntent;
@@ -34,6 +44,7 @@ export interface QueryParams {
   };
   sortBy?: string;
   limit?: number;
+  frequency?: FrequencyParams;
 }
 
 export interface ParsedQuery {
@@ -111,8 +122,65 @@ function parseTimeRange(query: string): { start: Date; end: Date; description: s
   return undefined;
 }
 
+function parseFrequency(query: string): FrequencyParams | undefined {
+  const lowerQuery = query.toLowerCase();
+  
+  const isMemberFrequencyQuery = 
+    /(how many|which|who).*(members|people|clients)/i.test(query) &&
+    /(attend|go to|check[- ]?in|visit|classes?|times?|sessions?)/i.test(query) &&
+    /(per|\/|each|every).*(week|wk|month|mo)/i.test(query);
+  
+  if (!isMemberFrequencyQuery) return undefined;
+  
+  let operator: FrequencyParams['operator'] = 'at_least';
+  let value = 3; // default
+  
+  const atLeastMatch = lowerQuery.match(/(at least|minimum|min|>=|≥|(\d+)\+)\s*(\d+)?/i);
+  const atMostMatch = lowerQuery.match(/(at most|maximum|max|<=|≤|under|below)\s*(\d+)/i);
+  const exactMatch = lowerQuery.match(/(exactly|equal to|=)\s*(\d+)/i);
+  const numberMatch = lowerQuery.match(/(\d+)\s*(classes?|times?|sessions?)/i);
+  
+  if (atLeastMatch) {
+    operator = 'at_least';
+    value = parseInt(atLeastMatch[3] || atLeastMatch[1].replace(/\D/g, '') || '3');
+  } else if (atMostMatch) {
+    operator = 'at_most';
+    value = parseInt(atMostMatch[2]);
+  } else if (exactMatch) {
+    operator = 'equal';
+    value = parseInt(exactMatch[2]);
+  } else if (numberMatch) {
+    value = parseInt(numberMatch[1]);
+    operator = 'at_least';
+  }
+  
+  const period: FrequencyParams['period'] = 
+    /(per|\/|each|every).*(week|wk|weekly)/i.test(query) ? 'week' : 'month';
+  
+  const metric: FrequencyParams['metric'] = 
+    /book/i.test(query) ? 'bookings' : 'checkins';
+  
+  const average = /(on average|avg|average|typically|usually)/i.test(query);
+  
+  const returnList = /(show|list|who|which members|give me|see)/i.test(query);
+  
+  return {
+    operator,
+    value,
+    period,
+    metric,
+    average: average || period === 'week', // Default to average for weekly queries
+    returnList
+  };
+}
+
 function detectIntent(query: string): QueryIntent {
   const lowerQuery = query.toLowerCase();
+
+  const frequencyParams = parseFrequency(query);
+  if (frequencyParams) {
+    return 'member_frequency_analysis';
+  }
 
   if (/(give|show|provide|need).* recommendations?/i.test(query) ||
       /(grow|increase|boost|improve).* (revenue|sales)/i.test(query) ||
@@ -197,10 +265,12 @@ function detectIntent(query: string): QueryIntent {
 export function parseQuery(query: string): ParsedQuery {
   const intent = detectIntent(query);
   const timeRange = parseTimeRange(query);
+  const frequency = parseFrequency(query);
 
   const params: QueryParams = {
     intent,
     timeRange,
+    frequency,
   };
 
   if (query.toLowerCase().includes('best') || query.toLowerCase().includes('top')) {
@@ -212,6 +282,7 @@ export function parseQuery(query: string): ParsedQuery {
   let confidence = 0.5;
   if (intent !== 'unknown') confidence += 0.3;
   if (timeRange) confidence += 0.2;
+  if (frequency) confidence += 0.2;
 
   return {
     intent,
@@ -225,6 +296,8 @@ export const EXAMPLE_QUERIES = [
   'We need +$7k this month—what should we do?',
   'Which coach has the most cancellations?',
   'Who is the most active member?',
+  'How many members attend at least 3 classes per week?',
+  'Show me members who check in 4+ times per week',
   'Show me three high-ROI actions for this week',
   'What\'s our revenue analysis for this month?',
 ];
