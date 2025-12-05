@@ -528,7 +528,7 @@ export default function HeadCoachDashboard() {
               </div>
             </div>
 
-            <div className="mt-4 flex items-center gap-4 text-xs">
+            <div className="mt-3 sm:mt-4 flex flex-wrap items-center gap-3 sm:gap-4 text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
                 <span className="text-gray-600">&lt;70% Full</span>
@@ -548,52 +548,52 @@ export default function HeadCoachDashboard() {
 
       {/* Drill-Down Modal */}
       {drillDownModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl h-[66vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[95vh] sm:h-[66vh] overflow-hidden flex flex-col">
+            <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base sm:text-xl font-bold text-gray-900 truncate">
                   {drillDownModal.coachName} - {
                     drillDownModal.type === 'leads' ? 'Leads Worked With' :
                     drillDownModal.type === 'bookings' ? 'Total Bookings' :
                     'Total Classes'
                   }
                 </h3>
-                <p className="text-sm text-gray-600 mt-1">{timeRange} Performance</p>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">{timeRange} Performance</p>
               </div>
               <button
                 onClick={() => setDrillDownModal(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 flex-shrink-0"
               >
-                <X size={24} />
+                <X size={20} className="sm:w-6 sm:h-6" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               {drillDownModal.type === 'leads' && (
                 <div className="space-y-3">
                   {getCoachLeadsDetails(drillDownModal.coachId).map(({ lead, converted, interactionDate }) => (
                     <div
                       key={lead.id}
-                      className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                      className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 cursor-pointer"
                       onClick={() => handlePersonClick(lead.id)}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                             <PersonStatusBadge personId={lead.id} />
-                            <p className="font-semibold text-gray-900">{lead.name}</p>
+                            <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">{lead.name}</p>
                             {converted ? (
-                              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded whitespace-nowrap">
                                 Converted
                               </span>
                             ) : (
-                              <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded">
+                              <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded whitespace-nowrap">
                                 Not Converted
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-600 mt-1">{lead.email}</p>
+                          <p className="text-xs sm:text-sm text-gray-600 mt-1 truncate">{lead.email}</p>
                           <p className="text-xs text-gray-500 mt-1">
                             Interaction: {format(new Date(interactionDate), 'MMM d, yyyy')}
                           </p>
@@ -602,7 +602,7 @@ export default function HeadCoachDashboard() {
                     </div>
                   ))}
                   {getCoachLeadsDetails(drillDownModal.coachId).length === 0 && (
-                    <p className="text-center text-gray-500 py-8">No leads found for this time period</p>
+                    <p className="text-center text-gray-500 py-8 text-sm">No leads found for this time period</p>
                   )}
                 </div>
               )}
@@ -612,20 +612,20 @@ export default function HeadCoachDashboard() {
                   {getCoachBookingsDetails(drillDownModal.coachId).map((booking) => (
                     <div
                       key={booking.id}
-                      className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                      className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 cursor-pointer"
                       onClick={() => handlePersonClick(booking.memberId)}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <PersonStatusBadge personId={booking.memberId} />
-                            <p className="font-semibold text-gray-900">{booking.memberName}</p>
+                            <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">{booking.memberName}</p>
                           </div>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-xs sm:text-sm text-gray-600 mt-1">
                             {booking.className} • {booking.classDayOfWeek} at {booking.classTime}
                           </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={`px-2 py-1 text-xs font-medium rounded ${
+                          <div className="flex flex-wrap items-center gap-2 mt-1">
+                            <span className={`px-2 py-1 text-xs font-medium rounded whitespace-nowrap ${
                               booking.status === 'checked-in' ? 'bg-green-100 text-green-800' :
                               booking.status === 'booked' ? 'bg-blue-100 text-blue-800' :
                               'bg-gray-100 text-gray-800'
@@ -642,7 +642,7 @@ export default function HeadCoachDashboard() {
                     </div>
                   ))}
                   {getCoachBookingsDetails(drillDownModal.coachId).length === 0 && (
-                    <p className="text-center text-gray-500 py-8">No bookings found for this time period</p>
+                    <p className="text-center text-gray-500 py-8 text-sm">No bookings found for this time period</p>
                   )}
                 </div>
               )}
@@ -652,19 +652,19 @@ export default function HeadCoachDashboard() {
                   {getCoachClassesDetails(drillDownModal.coachId).map((cls) => (
                     <div
                       key={cls.id}
-                      className="border border-gray-200 rounded-lg p-4"
+                      className="border border-gray-200 rounded-lg p-3 sm:p-4"
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-900">{cls.name}</p>
-                          <p className="text-sm text-gray-600 mt-1">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-gray-900 text-sm sm:text-base">{cls.name}</p>
+                          <p className="text-xs sm:text-sm text-gray-600 mt-1">
                             {cls.dayOfWeek} at {cls.time}
                           </p>
-                          <div className="flex items-center gap-2 mt-2">
+                          <div className="flex flex-wrap items-center gap-2 mt-2">
                             <span className="text-xs text-gray-500">
                               Capacity: {cls.bookedCount}/{cls.capacity}
                             </span>
-                            <span className={`px-2 py-1 text-xs font-medium rounded ${
+                            <span className={`px-2 py-1 text-xs font-medium rounded whitespace-nowrap ${
                               (cls.bookedCount / cls.capacity) * 100 >= 90 ? 'bg-red-100 text-red-800' :
                               (cls.bookedCount / cls.capacity) * 100 >= 70 ? 'bg-yellow-100 text-yellow-800' :
                               'bg-green-100 text-green-800'
@@ -677,7 +677,7 @@ export default function HeadCoachDashboard() {
                     </div>
                   ))}
                   {getCoachClassesDetails(drillDownModal.coachId).length === 0 && (
-                    <p className="text-center text-gray-500 py-8">No classes assigned to this coach</p>
+                    <p className="text-center text-gray-500 py-8 text-sm">No classes assigned to this coach</p>
                   )}
                 </div>
               )}
