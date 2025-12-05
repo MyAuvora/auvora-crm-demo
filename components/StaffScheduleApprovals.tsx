@@ -58,32 +58,32 @@ export default function StaffScheduleApprovals() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Staff Schedule Requests</h2>
-          <p className="text-sm text-gray-600 mt-1">Review and approve time-off and shift swap requests</p>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Staff Schedule Requests</h2>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Review and approve time-off and shift swap requests</p>
         </div>
-        <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+        <div className="flex gap-1 sm:gap-2 bg-gray-100 p-1 rounded-lg overflow-x-auto">
           <button
             onClick={() => setActiveTab('time-off')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'time-off' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            <div className="flex items-center gap-2">
-              <Clock size={16} />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Clock size={14} className="sm:w-4 sm:h-4" />
               Time Off ({pendingTimeOff.length})
             </div>
           </button>
           <button
             onClick={() => setActiveTab('swaps')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'swaps' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            <div className="flex items-center gap-2">
-              <Users size={16} />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Users size={14} className="sm:w-4 sm:h-4" />
               Shift Swaps ({pendingSwaps.length})
             </div>
           </button>
@@ -99,8 +99,8 @@ export default function StaffScheduleApprovals() {
             </div>
           ) : (
             pendingTimeOff.map(request => (
-              <div key={request.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-4">
-                <div className="flex items-start justify-between">
+              <div key={request.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-gray-900">{request.staffName}</h3>
@@ -124,17 +124,17 @@ export default function StaffScheduleApprovals() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2 ml-4">
+                  <div className="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-3 sm:mt-0">
                     <button
                       onClick={() => handleApproveTimeOff(request.id)}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                      className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
                     >
                       <CheckCircle size={16} />
                       Approve
                     </button>
                     <button
                       onClick={() => handleRejectTimeOff(request.id)}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                      className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
                     >
                       <XCircle size={16} />
                       Deny
