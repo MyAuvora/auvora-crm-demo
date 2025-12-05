@@ -55,18 +55,18 @@ export function ToastItem({ toast, onClose }: ToastProps) {
 
   return (
     <div
-      className={`flex items-center gap-3 p-4 rounded-lg border shadow-lg ${getStyles()} animate-slide-in`}
+      className={`flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg border shadow-lg ${getStyles()} animate-slide-in`}
       role="alert"
       aria-live="polite"
     >
       {getIcon()}
-      <p className="flex-1 text-sm font-medium">{toast.message}</p>
+      <p className="flex-1 text-xs sm:text-sm font-medium">{toast.message}</p>
       <button
         onClick={() => onClose(toast.id)}
-        className="p-1 hover:bg-black hover:bg-opacity-10 rounded"
+        className="p-1 hover:bg-black hover:bg-opacity-10 rounded flex-shrink-0"
         aria-label="Close notification"
       >
-        <X size={16} />
+        <X size={14} className="sm:w-4 sm:h-4" />
       </button>
     </div>
   );
@@ -79,7 +79,7 @@ interface ToastContainerProps {
 
 export function ToastContainer({ toasts, onClose }: ToastContainerProps) {
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-md">
+    <div className="fixed top-2 right-2 sm:top-4 sm:right-4 z-50 flex flex-col gap-2 max-w-[calc(100vw-1rem)] sm:max-w-md">
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onClose={onClose} />
       ))}
