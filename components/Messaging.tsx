@@ -168,91 +168,91 @@ export default function Messaging() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Messaging</h1>
-        <p className="text-gray-600 mt-1">Send text messages to members and leads</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Messaging</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Send text messages to members and leads</p>
       </div>
 
       <div className="bg-white rounded-lg shadow-md border border-gray-200">
         <div className="border-b border-gray-200">
-          <div className="flex">
+          <div className="flex overflow-x-auto">
             <button
               onClick={() => setActiveTab('inbox')}
-              className={`px-6 py-3 font-medium flex items-center gap-2 ${
+              className={`px-4 sm:px-6 py-2 sm:py-3 font-medium flex items-center gap-2 text-sm sm:text-base whitespace-nowrap ${
                 activeTab === 'inbox'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <Inbox size={20} />
+              <Inbox size={18} />
               Inbox
             </button>
             <button
               onClick={() => setActiveTab('compose')}
-              className={`px-6 py-3 font-medium flex items-center gap-2 ${
+              className={`px-4 sm:px-6 py-2 sm:py-3 font-medium flex items-center gap-2 text-sm sm:text-base whitespace-nowrap ${
                 activeTab === 'compose'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <Send size={20} />
+              <Send size={18} />
               Compose
             </button>
             <button
               onClick={() => setActiveTab('history')}
-              className={`px-6 py-3 font-medium flex items-center gap-2 ${
+              className={`px-4 sm:px-6 py-2 sm:py-3 font-medium flex items-center gap-2 text-sm sm:text-base whitespace-nowrap ${
                 activeTab === 'history'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <Clock size={20} />
+              <Clock size={18} />
               History
             </button>
             <button
               onClick={() => setActiveTab('templates')}
-              className={`px-6 py-3 font-medium flex items-center gap-2 ${
+              className={`px-4 sm:px-6 py-2 sm:py-3 font-medium flex items-center gap-2 text-sm sm:text-base whitespace-nowrap ${
                 activeTab === 'templates'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <MessageSquare size={20} />
+              <MessageSquare size={18} />
               Templates
             </button>
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {activeTab === 'inbox' && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">2-Way SMS Inbox</h3>
-              <div className="grid grid-cols-3 gap-4 h-[600px]">
+            <div className="space-y-3 sm:space-y-4">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">2-Way SMS Inbox</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 h-[500px] sm:h-[600px]">
                 {/* Contact List */}
                 <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  <div className="bg-gray-50 p-3 border-b border-gray-200">
+                  <div className="bg-gray-50 p-2 sm:p-3 border-b border-gray-200">
                     <input
                       type="text"
                       placeholder="Search contacts..."
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                     />
                   </div>
-                  <div className="overflow-y-auto h-[calc(100%-60px)]">
+                  <div className="overflow-y-auto h-[calc(100%-50px)] sm:h-[calc(100%-60px)]">
                     {allRecipients.slice(0, 20).map((contact) => (
                       <button
                         key={contact.id}
                         onClick={() => setSelectedContact(contact.id)}
-                        className={`w-full p-3 text-left border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                        className={`w-full p-2 sm:p-3 text-left border-b border-gray-100 hover:bg-gray-50 transition-colors ${
                           selectedContact === contact.id ? 'bg-red-50 border-l-4 border-l-red-600' : ''
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                            <User size={20} className="text-gray-600" />
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                            <User size={16} className="text-gray-600 sm:w-5 sm:h-5" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-900 truncate">{contact.name}</p>
+                            <p className="font-medium text-gray-900 truncate text-sm sm:text-base">{contact.name}</p>
                             <p className="text-xs text-gray-600 truncate">{contact.phone}</p>
                           </div>
                         </div>
@@ -262,69 +262,69 @@ export default function Messaging() {
                 </div>
 
                 {/* Message Thread */}
-                <div className="col-span-2 border border-gray-200 rounded-lg overflow-hidden flex flex-col">
+                <div className="md:col-span-2 border border-gray-200 rounded-lg overflow-hidden flex flex-col">
                   {selectedContact ? (
                     <>
-                      <div className="bg-gray-50 p-4 border-b border-gray-200">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                            <User size={20} className="text-gray-600" />
+                      <div className="bg-gray-50 p-3 sm:p-4 border-b border-gray-200">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                            <User size={16} className="text-gray-600 sm:w-5 sm:h-5" />
                           </div>
                           <div>
-                            <p className="font-bold text-gray-900">
+                            <p className="font-bold text-gray-900 text-sm sm:text-base">
                               {allRecipients.find(r => r.id === selectedContact)?.name}
                             </p>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-xs sm:text-sm text-gray-600">
                               {allRecipients.find(r => r.id === selectedContact)?.phone}
                             </p>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-3">
+                      <div className="flex-1 overflow-y-auto p-3 sm:p-4 bg-gray-50 space-y-2 sm:space-y-3">
                         {/* Sample messages */}
                         <div className="flex justify-start">
-                          <div className="bg-white p-3 rounded-lg shadow-sm max-w-[70%] border border-gray-200">
-                            <p className="text-sm text-gray-900">Hi! What are your hours today?</p>
-                            <p className="text-xs text-gray-500 mt-1">10:30 AM</p>
+                          <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm max-w-[80%] sm:max-w-[70%] border border-gray-200">
+                            <p className="text-xs sm:text-sm text-gray-900">Hi! What are your hours today?</p>
+                            <p className="text-[10px] sm:text-xs text-gray-500 mt-1">10:30 AM</p>
                           </div>
                         </div>
                         <div className="flex justify-end">
-                          <div className="bg-red-600 text-white p-3 rounded-lg shadow-sm max-w-[70%]">
-                            <p className="text-sm">We&apos;re open 6 AM - 9 PM today! See you soon!</p>
-                            <p className="text-xs text-red-100 mt-1">10:32 AM • Sent</p>
+                          <div className="bg-red-600 text-white p-2 sm:p-3 rounded-lg shadow-sm max-w-[80%] sm:max-w-[70%]">
+                            <p className="text-xs sm:text-sm">We&apos;re open 6 AM - 9 PM today! See you soon!</p>
+                            <p className="text-[10px] sm:text-xs text-red-100 mt-1">10:32 AM • Sent</p>
                           </div>
                         </div>
                         <div className="flex justify-start">
-                          <div className="bg-white p-3 rounded-lg shadow-sm max-w-[70%] border border-gray-200">
-                            <p className="text-sm text-gray-900">Perfect, thanks!</p>
-                            <p className="text-xs text-gray-500 mt-1">10:33 AM</p>
+                          <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm max-w-[80%] sm:max-w-[70%] border border-gray-200">
+                            <p className="text-xs sm:text-sm text-gray-900">Perfect, thanks!</p>
+                            <p className="text-[10px] sm:text-xs text-gray-500 mt-1">10:33 AM</p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="p-4 border-t border-gray-200 bg-white">
+                      <div className="p-3 sm:p-4 border-t border-gray-200 bg-white">
                         <div className="flex gap-2">
                           <input
                             type="text"
                             placeholder="Type a message..."
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                           />
-                          <button className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
-                            <Send size={18} />
-                            Send
+                          <button className="px-4 sm:px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm min-h-[44px]">
+                            <Send size={16} className="sm:w-[18px] sm:h-[18px]" />
+                            <span className="hidden sm:inline">Send</span>
                           </button>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">
+                        <p className="text-[10px] sm:text-xs text-gray-500 mt-2">
                           Note: This is a demo inbox. Real 2-way SMS requires Twilio/SMS gateway integration.
                         </p>
                       </div>
                     </>
                   ) : (
                     <div className="flex items-center justify-center h-full text-gray-500">
-                      <div className="text-center">
-                        <MessageSquare size={48} className="mx-auto mb-3 text-gray-400" />
-                        <p>Select a contact to view conversation</p>
+                      <div className="text-center p-4">
+                        <MessageSquare size={36} className="mx-auto mb-3 text-gray-400 sm:w-12 sm:h-12" />
+                        <p className="text-sm sm:text-base">Select a contact to view conversation</p>
                       </div>
                     </div>
                   )}
@@ -334,26 +334,26 @@ export default function Messaging() {
           )}
 
           {activeTab === 'compose' && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Select Recipients</h3>
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Select Recipients</h3>
                 
-                <div className="flex gap-4 mb-4">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-3 sm:mb-4">
                   <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                     <input
                       type="text"
                       placeholder="Search by name or phone..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                     />
                   </div>
                   
                   <select
                     value={recipientType}
                     onChange={(e) => setRecipientType(e.target.value as 'all' | 'members' | 'leads')}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   >
                     <option value="all">All</option>
                     <option value="members">Members Only</option>
@@ -361,21 +361,21 @@ export default function Messaging() {
                   </select>
                 </div>
 
-                <div className="flex gap-2 mb-4">
+                <div className="flex flex-wrap gap-2 mb-3 sm:mb-4">
                   <button
                     onClick={selectAll}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm min-h-[44px]"
                   >
                     Select All ({filteredRecipients.length})
                   </button>
                   <button
                     onClick={clearSelection}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm min-h-[44px]"
                   >
                     Clear Selection
                   </button>
                   {selectedRecipients.length > 0 && (
-                    <span className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium">
+                    <span className="px-3 sm:px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium text-sm">
                       {selectedRecipients.length} selected
                     </span>
                   )}
@@ -385,7 +385,7 @@ export default function Messaging() {
                   {filteredRecipients.map((recipient) => (
                     <label
                       key={recipient.id}
-                      className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                     >
                       <input
                         type="checkbox"
@@ -393,9 +393,9 @@ export default function Messaging() {
                         onChange={() => toggleRecipient(recipient.id)}
                         className="w-4 h-4 text-red-600 focus:ring-red-600"
                       />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{recipient.name}</p>
-                        <p className="text-sm text-gray-600">{recipient.phone} • {recipient.type === 'member' ? 'Member' : 'Lead'}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 text-sm sm:text-base">{recipient.name}</p>
+                        <p className="text-xs sm:text-sm text-gray-600">{recipient.phone} • {recipient.type === 'member' ? 'Member' : 'Lead'}</p>
                       </div>
                     </label>
                   ))}
@@ -403,15 +403,15 @@ export default function Messaging() {
               </div>
 
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Message</h3>
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Message</h3>
                 <textarea
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
                   placeholder="Type your message here..."
                   rows={6}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 resize-none"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600 resize-none"
                 />
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-xs sm:text-sm text-gray-600 mt-2">
                   {messageText.length} characters • Estimated {Math.ceil(messageText.length / 160)} SMS segment(s)
                 </p>
               </div>
@@ -419,25 +419,25 @@ export default function Messaging() {
               <button
                 onClick={handleSendMessage}
                 disabled={!messageText.trim() || selectedRecipients.length === 0}
-                className="w-full bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-red-600 text-white px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base min-h-[44px]"
               >
-                <Send size={20} />
+                <Send size={18} />
                 Send Message to {selectedRecipients.length} Recipient{selectedRecipients.length !== 1 ? 's' : ''}
               </button>
             </div>
           )}
 
           {activeTab === 'history' && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Message History</h3>
+            <div className="space-y-3 sm:space-y-4">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Message History</h3>
               {messageHistory.length > 0 ? (
                 <div className="space-y-3">
                   {messageHistory.map((msg) => (
-                    <div key={msg.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <p className="font-medium text-gray-900">{msg.recipientName}</p>
-                          <p className="text-sm text-gray-600">
+                    <div key={msg.id} className="p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900 text-sm sm:text-base">{msg.recipientName}</p>
+                          <p className="text-xs sm:text-sm text-gray-600">
                             {msg.recipientType === 'member' ? 'Member' : 'Lead'} • {new Date(msg.timestamp).toLocaleString()}
                           </p>
                         </div>
@@ -449,36 +449,36 @@ export default function Messaging() {
                           {msg.status}
                         </span>
                       </div>
-                      <p className="text-gray-700">{msg.message}</p>
+                      <p className="text-gray-700 text-sm sm:text-base">{msg.message}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">No messages sent yet</p>
+                <p className="text-gray-500 text-center py-8 text-sm sm:text-base">No messages sent yet</p>
               )}
             </div>
           )}
 
           {activeTab === 'templates' && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Message Templates</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3 sm:space-y-4">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Message Templates</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 {messageTemplates.map((template) => (
-                  <div key={template.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div key={template.id} className="p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h4 className="font-bold text-gray-900">{template.name}</h4>
+                        <h4 className="font-bold text-gray-900 text-sm sm:text-base">{template.name}</h4>
                         <span className="text-xs text-gray-600 capitalize">{template.category}</span>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-700 mb-3">{template.message}</p>
-                    <div className="text-xs text-gray-500 mb-3">
+                    <p className="text-xs sm:text-sm text-gray-700 mb-3">{template.message}</p>
+                    <div className="text-[10px] sm:text-xs text-gray-500 mb-3">
                       <p className="font-medium">Available tokens:</p>
                       <p>{'{{name}}, {{membership}}, {{time}}, {{remaining}}, {{amount}}, {{date}}'}</p>
                     </div>
                     <button
                       onClick={() => handleTemplateSelect(template)}
-                      className="w-full bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+                      className="w-full bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors min-h-[44px]"
                     >
                       Use Template
                     </button>
