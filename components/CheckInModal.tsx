@@ -36,101 +36,154 @@ export default function CheckInModal({ classData, onClose, onSuccess }: CheckInM
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
-        <div className="bg-red-600 text-white p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold">Class Roster & Check-In</h2>
-          <button onClick={onClose} className="hover:bg-red-700 p-1 rounded">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
+        <div className="bg-red-600 text-white p-3 sm:p-4 flex justify-between items-center">
+          <h2 className="text-lg sm:text-xl font-bold">Class Roster & Check-In</h2>
+          <button onClick={onClose} className="hover:bg-red-700 p-2 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
             <X size={24} />
           </button>
         </div>
 
-        <div className="p-6">
-          <div className="mb-6">
-            <h3 className="text-lg font-bold text-gray-900">{classData.name}</h3>
-            <p className="text-gray-600">{classData.dayOfWeek} at {classData.time}</p>
-            <p className="text-gray-600">
+        <div className="p-4 sm:p-6">
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900">{classData.name}</h3>
+            <p className="text-sm sm:text-base text-gray-600">{classData.dayOfWeek} at {classData.time}</p>
+            <p className="text-sm sm:text-base text-gray-600">
               {bookings.length} / {classData.capacity} booked
             </p>
           </div>
 
           {message && (
-            <div className={`mb-4 p-3 rounded ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+            <div className={`mb-4 p-3 rounded text-sm sm:text-base ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
               {message.text}
             </div>
           )}
 
-          <div className="overflow-y-auto max-h-96">
+          <div className="overflow-y-auto max-h-96 -mx-4 sm:mx-0">
             {bookings.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 text-sm sm:text-base">
                 No bookings for this class yet
               </div>
             ) : (
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Member</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Booked At</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-700">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {bookings.map(booking => (
-                    <tr key={booking.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm text-gray-900">{booking.memberName}</td>
-                      <td className="px-4 py-3 text-sm">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          booking.status === 'checked-in' ? 'bg-green-100 text-green-700' :
-                          booking.status === 'no-show' ? 'bg-red-100 text-red-700' :
-                          'bg-blue-100 text-blue-700'
-                        }`}>
-                          {booking.status === 'checked-in' ? 'Checked In' :
-                           booking.status === 'no-show' ? 'No Show' :
-                           'Booked'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {new Date(booking.bookedAt).toLocaleString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric', 
-                          hour: 'numeric', 
-                          minute: '2-digit' 
-                        })}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right">
-                        {booking.status === 'booked' && (
-                          <div className="flex gap-2 justify-end">
-                            <button
-                              onClick={() => handleCheckIn(booking.id)}
-                              className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-1"
-                            >
-                              <CheckCircle size={16} />
-                              Check In
-                            </button>
-                            <button
-                              onClick={() => handleCancel(booking.id)}
-                              className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        )}
-                        {booking.status === 'checked-in' && (
-                          <span className="text-green-600 font-medium">✓ Checked In</span>
-                        )}
-                      </td>
+              <div className="hidden sm:block">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Member</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Booked At</th>
+                      <th className="px-4 py-3 text-right text-sm font-medium text-gray-700">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {bookings.map(booking => (
+                      <tr key={booking.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm text-gray-900">{booking.memberName}</td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            booking.status === 'checked-in' ? 'bg-green-100 text-green-700' :
+                            booking.status === 'no-show' ? 'bg-red-100 text-red-700' :
+                            'bg-blue-100 text-blue-700'
+                          }`}>
+                            {booking.status === 'checked-in' ? 'Checked In' :
+                             booking.status === 'no-show' ? 'No Show' :
+                             'Booked'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {new Date(booking.bookedAt).toLocaleString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            hour: 'numeric', 
+                            minute: '2-digit' 
+                          })}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right">
+                          {booking.status === 'booked' && (
+                            <div className="flex gap-2 justify-end">
+                              <button
+                                onClick={() => handleCheckIn(booking.id)}
+                                className="px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-1 min-h-[36px]"
+                              >
+                                <CheckCircle size={16} />
+                                Check In
+                              </button>
+                              <button
+                                onClick={() => handleCancel(booking.id)}
+                                className="px-3 py-1.5 bg-gray-600 text-white rounded hover:bg-gray-700 min-h-[36px]"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          )}
+                          {booking.status === 'checked-in' && (
+                            <span className="text-green-600 font-medium">✓ Checked In</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {/* Mobile card view */}
+            {bookings.length > 0 && (
+              <div className="sm:hidden space-y-3 px-4">
+                {bookings.map(booking => (
+                  <div key={booking.id} className="border border-gray-200 rounded-lg p-3 bg-white">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="font-semibold text-gray-900 text-sm">{booking.memberName}</p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          {new Date(booking.bookedAt).toLocaleString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            hour: 'numeric', 
+                            minute: '2-digit' 
+                          })}
+                        </p>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        booking.status === 'checked-in' ? 'bg-green-100 text-green-700' :
+                        booking.status === 'no-show' ? 'bg-red-100 text-red-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
+                        {booking.status === 'checked-in' ? 'Checked In' :
+                         booking.status === 'no-show' ? 'No Show' :
+                         'Booked'}
+                      </span>
+                    </div>
+                    {booking.status === 'booked' && (
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={() => handleCheckIn(booking.id)}
+                          className="flex-1 px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center justify-center gap-1 min-h-[44px] text-sm"
+                        >
+                          <CheckCircle size={16} />
+                          Check In
+                        </button>
+                        <button
+                          onClick={() => handleCancel(booking.id)}
+                          className="flex-1 px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 min-h-[44px] text-sm"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
+                    {booking.status === 'checked-in' && (
+                      <div className="mt-2 text-green-600 font-medium text-sm">✓ Checked In</div>
+                    )}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
-          <div className="mt-6 flex justify-end">
+          <div className="mt-4 sm:mt-6 flex justify-end">
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 min-h-[44px] text-sm sm:text-base"
             >
               Close
             </button>
