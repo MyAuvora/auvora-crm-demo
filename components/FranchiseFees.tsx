@@ -124,17 +124,17 @@ export default function FranchiseFees() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Franchise Fees</h1>
-          <p className="text-gray-600 mt-1">Track monthly franchise fees from all locations</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Franchise Fees</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Track monthly franchise fees from all locations</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <select
             value={selectedMonth}
             onChange={(e) => handleMonthChange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+            className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
           >
             <option value="2024-12">December 2024</option>
             <option value="2024-11">November 2024</option>
@@ -144,111 +144,111 @@ export default function FranchiseFees() {
           </select>
           <button
             onClick={exportToCSV}
-            className="bg-[#AC1305] text-white px-4 py-2 rounded-lg hover:bg-[#8B0F04] flex items-center gap-2"
+            className="bg-[#AC1305] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#8B0F04] flex items-center justify-center gap-2 text-sm min-h-[44px]"
           >
-            <Download size={20} />
+            <Download size={18} className="sm:w-5 sm:h-5" />
             Export CSV
           </button>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white p-6 rounded-lg shadow">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-6">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">Total Revenue</span>
-            <DollarSign className="text-gray-400" size={20} />
+            <span className="text-xs sm:text-sm font-medium text-gray-600">Total Revenue</span>
+            <DollarSign className="text-gray-400" size={18} className="sm:w-5 sm:h-5" />
           </div>
-          <div className="text-2xl font-bold text-gray-900">${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-          <p className="text-xs text-gray-500 mt-1">Across all locations</p>
+          <div className="text-xl sm:text-2xl font-bold text-gray-900">${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          <p className="text-[10px] sm:text-xs text-gray-500 mt-1">Across all locations</p>
         </div>
-        <div className="bg-green-50 p-6 rounded-lg shadow">
+        <div className="bg-green-50 p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-green-700">Paid</span>
-            <CheckCircle className="text-green-600" size={20} />
+            <span className="text-xs sm:text-sm font-medium text-green-700">Paid</span>
+            <CheckCircle className="text-green-600" size={18} className="sm:w-5 sm:h-5" />
           </div>
-          <div className="text-2xl font-bold text-green-900">${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-          <p className="text-xs text-green-600 mt-1">{feePayments.filter(p => p.status === 'paid').length} locations</p>
+          <div className="text-xl sm:text-2xl font-bold text-green-900">${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          <p className="text-[10px] sm:text-xs text-green-600 mt-1">{feePayments.filter(p => p.status === 'paid').length} locations</p>
         </div>
-        <div className="bg-yellow-50 p-6 rounded-lg shadow">
+        <div className="bg-yellow-50 p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-yellow-700">Pending</span>
-            <Clock className="text-yellow-600" size={20} />
+            <span className="text-xs sm:text-sm font-medium text-yellow-700">Pending</span>
+            <Clock className="text-yellow-600" size={18} className="sm:w-5 sm:h-5" />
           </div>
-          <div className="text-2xl font-bold text-yellow-900">${totalPending.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-          <p className="text-xs text-yellow-600 mt-1">{feePayments.filter(p => p.status === 'pending').length} locations</p>
+          <div className="text-xl sm:text-2xl font-bold text-yellow-900">${totalPending.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          <p className="text-[10px] sm:text-xs text-yellow-600 mt-1">{feePayments.filter(p => p.status === 'pending').length} locations</p>
         </div>
-        <div className="bg-red-50 p-6 rounded-lg shadow">
+        <div className="bg-red-50 p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-red-700">Overdue</span>
-            <AlertCircle className="text-red-600" size={20} />
+            <span className="text-xs sm:text-sm font-medium text-red-700">Overdue</span>
+            <AlertCircle className="text-red-600" size={18} className="sm:w-5 sm:h-5" />
           </div>
-          <div className="text-2xl font-bold text-red-900">${totalOverdue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-          <p className="text-xs text-red-600 mt-1">{feePayments.filter(p => p.status === 'overdue').length} locations</p>
+          <div className="text-xl sm:text-2xl font-bold text-red-900">${totalOverdue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          <p className="text-[10px] sm:text-xs text-red-600 mt-1">{feePayments.filter(p => p.status === 'overdue').length} locations</p>
         </div>
       </div>
 
       {/* Fee Breakdown */}
-      <div className="bg-white rounded-lg shadow mb-6 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Fee Breakdown</h2>
-        <div className="grid grid-cols-3 gap-6">
+      <div className="bg-white rounded-lg shadow mb-4 sm:mb-6 p-4 sm:p-6">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Fee Breakdown</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <div>
-            <div className="text-sm text-gray-600 mb-1">Royalty Fees (7%)</div>
-            <div className="text-2xl font-bold text-gray-900">${totalRoyalties.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <div className="text-xs sm:text-sm text-gray-600 mb-1">Royalty Fees (7%)</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">${totalRoyalties.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           </div>
           <div>
-            <div className="text-sm text-gray-600 mb-1">Brand Fund (2%)</div>
-            <div className="text-2xl font-bold text-gray-900">${totalBrandFund.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <div className="text-xs sm:text-sm text-gray-600 mb-1">Brand Fund (2%)</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">${totalBrandFund.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           </div>
           <div>
-            <div className="text-sm text-gray-600 mb-1">Total Fees (9%)</div>
-            <div className="text-2xl font-bold text-[#AC1305]">${totalDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <div className="text-xs sm:text-sm text-gray-600 mb-1">Total Fees (9%)</div>
+            <div className="text-xl sm:text-2xl font-bold text-[#AC1305]">${totalDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           </div>
         </div>
       </div>
 
       {/* Payments Table */}
       <div className="bg-white rounded-lg shadow">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
           <table className="min-w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Revenue</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Royalty (7%)</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Brand Fund (2%)</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Due</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paid Date</th>
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase">Location</th>
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-medium text-gray-500 uppercase">Royalty (7%)</th>
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-medium text-gray-500 uppercase">Brand Fund (2%)</th>
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-medium text-gray-500 uppercase">Total Due</th>
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase">Paid Date</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {feePayments.map((payment) => (
                 <tr key={payment.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="font-medium text-gray-900">{payment.locationName}</div>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                    <div className="font-medium text-gray-900 text-xs sm:text-sm">{payment.locationName}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-gray-900">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right text-gray-900 text-xs sm:text-sm">
                     ${payment.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-gray-900">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right text-gray-900 text-xs sm:text-sm">
                     ${payment.royaltyAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-gray-900">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right text-gray-900 text-xs sm:text-sm">
                     ${payment.brandFundAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right font-semibold text-gray-900">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right font-semibold text-gray-900 text-xs sm:text-sm">
                     ${payment.totalDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <div className="flex items-center justify-center gap-2">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-center">
+                    <div className="flex items-center justify-center gap-1 sm:gap-2">
                       {getStatusIcon(payment.status)}
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(payment.status)}`}>
+                      <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full ${getStatusColor(payment.status)}`}>
                         {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                     {payment.paidDate || '-'}
                   </td>
                 </tr>
@@ -256,21 +256,21 @@ export default function FranchiseFees() {
             </tbody>
             <tfoot className="bg-gray-50 font-semibold">
               <tr>
-                <td className="px-6 py-4 text-gray-900">TOTAL</td>
-                <td className="px-6 py-4 text-right text-gray-900">
+                <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-900 text-xs sm:text-sm">TOTAL</td>
+                <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-gray-900 text-xs sm:text-sm">
                   ${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
-                <td className="px-6 py-4 text-right text-gray-900">
+                <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-gray-900 text-xs sm:text-sm">
                   ${totalRoyalties.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
-                <td className="px-6 py-4 text-right text-gray-900">
+                <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-gray-900 text-xs sm:text-sm">
                   ${totalBrandFund.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
-                <td className="px-6 py-4 text-right text-[#AC1305]">
+                <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[#AC1305] text-xs sm:text-sm">
                   ${totalDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
-                <td className="px-6 py-4"></td>
-                <td className="px-6 py-4"></td>
+                <td className="px-3 sm:px-6 py-3 sm:py-4"></td>
+                <td className="px-3 sm:px-6 py-3 sm:py-4"></td>
               </tr>
             </tfoot>
           </table>
