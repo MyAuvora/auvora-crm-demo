@@ -4,9 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import { X, Send, Sparkles, TrendingUp, Users, DollarSign, AlertCircle } from 'lucide-react';
 import { parseQuery, EXAMPLE_QUERIES } from '@/lib/agent/queryEngine';
 import { analyzePromoPerformance, analyzeRevenue, analyzeCancellations, generateInsights, rankCoachesByCancellations, rankMembersByActivity, computeMemberFrequency, filterMembersByFrequency } from '@/lib/agent/analytics';
-import { getAllTransactions, getAllPromotions, getMembershipCancellations, getAllMembers, getAllBookings, getAllClasses, getAllStaff } from '@/lib/dataStore';
+import { getAllTransactions, getAllPromotions, getMembershipCancellations, getAllMembers, getAllBookings, getAllClasses, getAllStaff, getCoachLeadInteractions } from '@/lib/dataStore';
 import { generateStrategicPlan, parseTimeframe } from '@/lib/agent/strategicPlanner';
 import { computeRevenueRecommendations } from '@/lib/agent/recommendations';
+import { findUpcomingBirthdays, calculateCoachConversionRates } from '@/lib/agent/flexibleAnalytics';
 import { useApp } from '@/lib/context';
 
 interface Message {
@@ -162,6 +163,129 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
             content,
             data: result,
             citations: ['Booking records', 'Member data'],
+          };
+        } else if (parsed.intent === 'upcoming_birthdays') {
+          const daysAhead = input.match(/next (\d+) days?/i)?.[1] 
+            ? parseInt(input.match(/next (\d+) days?/i)![1]) 
+            : input.match(/this week/i) ? 7
+            : input.match(/this month|next month/i) ? 30
+            : input.match(/next/i) ? 1
+            : 30;
+          
+          const birthdays = findUpcomingBirthdays(members, daysAhead);
+          
+          if (birthdays.length === 0) {
+            let content = `No member birthdays in the next ${daysAhead} days.\n\n`;
+            content += `💡 **Tip:** Try asking "Who has a birthday in the next 60 days?" to see more results.`;
+            
+            response = {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content,
+              citations: ['Member data'],
+            };
+          } else {
+            const nextBirthday = birthdays[0];
+            let content = '';
+            
+            if (input.match(/next/i) && !input.match(/next \d+/i)) {
+              content = `**${nextBirthday.memberName}** has the next birthday in **${nextBirthday.daysUntil} days** (${nextBirthday.nextBirthday.toLocaleDateString()}).\n\n`;
+              content += `They'll be turning ${nextBirthday.age} years old! 🎂\n\n`;
+            } else {
+              content = `**${birthdays.length} members** have birthdays in the next ${daysAhead} days:\n\n`;
+              
+              birthdays.slice(0, 10).forEach((b, idx) => {
+                const dateStr = b.nextBirthday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                content += `${idx + 1}. **${b.memberName}** - ${dateStr} (${b.daysUntil} days, turning ${b.age})\n`;
+              });
+              
+              if (birthdays.length > 10) {
+                content += `\n...and ${birthdays.length - 10} more members.\n`;
+              }
+            }
+            
+            content += `\n**What you can do:**\n`;
+            content += `• Send personalized birthday messages\n`;
+            content += `• Offer birthday discounts or free classes\n`;
+            content += `• Create a birthday celebration program\n`;
+            
+            response = {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content,
+              data: birthdays,
+              citations: ['Member data'],
+            };
+          }
+        } else if (parsed.intent === 'coach_conversion_rate') {
+          const interactions = getCoachLeadInteractions();
+          const timeRange = parsed.params.timeRange;
+          
+          const conversionStats = calculateCoachConversionRates(interactions, staff, timeRange);
+          
+          if (conversionStats.length === 0) {
+            let content = `No trial class data available to calculate conversion rates.\n\n`;
+            content += `**Definition:** Conversion rate = (leads who joined after trial) / (total trial classes taught)\n`;
+            content += `**Time range:** ${timeRange?.description || 'Past 90 days'}`;
+            
+            response = {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content,
+              citations: ['Lead interaction data'],
+            };
+          } else {
+            const topCoach = conversionStats[0];
+            let content = '';
+            
+            if (input.match(/highest|best|top/i)) {
+              content = `**${topCoach.coachName}** has the highest conversion rate at **${(topCoach.conversionRate * 100).toFixed(1)}%**.\n\n`;
+              content += `📊 **Details:**\n`;
+              content += `• Trial classes taught: ${topCoach.totalTrials}\n`;
+              content += `• Conversions: ${topCoach.conversions}\n`;
+              content += `• Time range: ${topCoach.timeRange}\n\n`;
+            } else {
+              content = `**Coach Conversion Rates** (${conversionStats[0].timeRange}):\n\n`;
+              
+              conversionStats.slice(0, 5).forEach((coach, idx) => {
+                content += `${idx + 1}. **${coach.coachName}** - ${(coach.conversionRate * 100).toFixed(1)}% (${coach.conversions}/${coach.totalTrials})\n`;
+              });
+              
+              if (conversionStats.length > 5) {
+                content += `\n...and ${conversionStats.length - 5} more coaches.\n`;
+              }
+              
+              content += `\n`;
+            }
+            
+            content += `**Definition:** Conversion rate = (leads who joined after trial) / (total trial classes taught)\n\n`;
+            content += `**What you can do:**\n`;
+            content += `• Have top performers mentor other coaches\n`;
+            content += `• Analyze what makes their trials successful\n`;
+            content += `• Assign more trial classes to high converters\n`;
+            
+            response = {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content,
+              data: conversionStats,
+              citations: ['Lead interaction data', 'Staff data'],
+            };
+          }
+        } else if (parsed.intent === 'generic_query') {
+          let content = `I understand you're asking about: "${input}"\n\n`;
+          content += `I can help with questions like:\n`;
+          content += `• "When is the next member birthday?"\n`;
+          content += `• "Which coach has the highest conversion rate?"\n`;
+          content += `• "How many members attend at least 3 classes per week?"\n`;
+          content += `• "Give me revenue recommendations"\n`;
+          content += `• "Who is the most active member?"\n\n`;
+          content += `Could you rephrase your question using one of these formats?`;
+          
+          response = {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content,
           };
         } else if (parsed.intent === 'list_promotions') {
           const timeRange = parsed.params.timeRange || { start: twelveMonthsAgo, end: now, description: 'Past 12 months' };

@@ -16,6 +16,15 @@ function randomDate(daysAgo: number): string {
   return date.toISOString().split('T')[0];
 }
 
+function randomBirthDate(): string {
+  const today = new Date();
+  const year = today.getFullYear() - (Math.floor(Math.random() * 40) + 20);
+  const month = Math.floor(Math.random() * 12);
+  const day = Math.floor(Math.random() * 28) + 1;
+  const birthDate = new Date(year, month, day);
+  return birthDate.toISOString().split('T')[0];
+}
+
 function generateName(): string {
   return `${randomItem(firstNames)} ${randomItem(lastNames)}`;
 }
@@ -61,6 +70,7 @@ export function generateMembers(): Member[] {
       zipCode: randomItem(tampaZipCodes),
       location: 'athletic-club',
       joinDate,
+      dateOfBirth: randomBirthDate(),
       visitsLast30Days: Math.floor(Math.random() * 20) + 1,
       paymentStatus,
       lastPaymentDate: lastPaymentDate.toISOString().split('T')[0],
