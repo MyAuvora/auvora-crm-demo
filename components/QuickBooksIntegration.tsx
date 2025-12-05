@@ -148,7 +148,7 @@ export default function QuickBooksIntegration() {
                   <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs sm:text-sm font-medium text-green-900">Connection Status</span>
-                      <CheckCircle className="text-green-600" size={18} className="sm:w-5 sm:h-5" />
+                      <CheckCircle className="text-green-600 w-[18px] h-[18px] sm:w-5 sm:h-5" />
                     </div>
                     <p className="text-xl sm:text-2xl font-bold text-green-900">Connected</p>
                     <p className="text-[10px] sm:text-xs text-green-700 mt-1">Company: {location === 'athletic-club' ? 'The Lab Tampa - Athletic' : 'The Lab Tampa - Dance'}</p>
@@ -157,7 +157,7 @@ export default function QuickBooksIntegration() {
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-blue-900">Total Synced</span>
-                      <DollarSign className="text-blue-600" size={20} />
+                      <DollarSign className="text-blue-600 w-5 h-5" />
                     </div>
                     <p className="text-2xl font-bold text-blue-900">{syncStats.totalTransactions}</p>
                     <p className="text-xs text-blue-700 mt-1">Transactions</p>
@@ -166,7 +166,7 @@ export default function QuickBooksIntegration() {
                   <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-purple-900">Today</span>
-                      <RefreshCw className="text-purple-600" size={20} />
+                      <RefreshCw className="text-purple-600 w-5 h-5" />
                     </div>
                     <p className="text-2xl font-bold text-purple-900">{syncStats.syncedToday}</p>
                     <p className="text-xs text-purple-700 mt-1">Synced today</p>
@@ -175,7 +175,7 @@ export default function QuickBooksIntegration() {
                   <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-orange-900">Pending</span>
-                      <AlertCircle className="text-orange-600" size={20} />
+                      <AlertCircle className="text-orange-600 w-5 h-5" />
                     </div>
                     <p className="text-2xl font-bold text-orange-900">{syncStats.pendingSync}</p>
                     <p className="text-xs text-orange-700 mt-1">Awaiting sync</p>
