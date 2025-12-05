@@ -54,22 +54,22 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="py-4 sm:py-6 flex items-center justify-between">
+            <div className="flex items-center gap-2 sm:gap-4">
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Back"
               >
-                <ArrowLeft size={24} />
+                <ArrowLeft size={20} className="sm:w-6 sm:h-6" />
               </button>
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <PersonStatusBadge personId={personId} />
-                  <h2 className="text-2xl font-bold text-gray-900">{person.name}</h2>
+                  <h2 className="text-lg sm:text-2xl font-bold text-gray-900">{person.name}</h2>
                 </div>
-                <p className="text-sm text-gray-600">{person.email} • {person.phone}</p>
+                <p className="text-xs sm:text-sm text-gray-600">{person.email} • {person.phone}</p>
               </div>
             </div>
           </div>
@@ -77,11 +77,11 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
       </div>
       
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="flex gap-2 sm:gap-4 overflow-x-auto">
             <button
               onClick={() => setActiveTab('account')}
-              className={`px-4 py-3 font-medium ${
+              className={`px-3 sm:px-4 py-2 sm:py-3 font-medium text-sm sm:text-base whitespace-nowrap ${
                 activeTab === 'account'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
@@ -153,10 +153,10 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
         </div>
       </div>
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
           {activeTab === 'account' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="text-sm font-medium text-gray-700">Email</label>
                   <p className="text-gray-900">{person.email}</p>
@@ -227,24 +227,24 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                 )}
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <button
                   onClick={onSendText}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                  className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
                 >
                   <MessageSquare size={16} />
                   Send Text
                 </button>
                 <button
                   onClick={() => alert('Book class feature coming soon')}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                  className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
                 >
                   <Calendar size={16} />
                   Book Class
                 </button>
                 <button
                   onClick={() => alert('Charge feature coming soon')}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                  className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
                 >
                   <CreditCard size={16} />
                   Charge

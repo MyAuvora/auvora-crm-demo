@@ -118,32 +118,32 @@ export default function TrainingTab({ memberId, currentStaffId, currentStaffName
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Tab Navigation */}
-      <div className="flex gap-4 border-b border-gray-200">
+      <div className="flex gap-2 sm:gap-4 border-b border-gray-200 overflow-x-auto">
         <button
           onClick={() => setActiveTab('goals')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+          className={`px-3 sm:px-4 py-2 font-medium border-b-2 transition-colors text-sm sm:text-base whitespace-nowrap ${
             activeTab === 'goals'
               ? 'border-[rgb(172,19,5)] text-[rgb(172,19,5)]'
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <Target size={18} />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Target size={16} className="sm:w-[18px] sm:h-[18px]" />
             Goals ({activeGoals.length})
           </div>
         </button>
         <button
           onClick={() => setActiveTab('notes')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+          className={`px-3 sm:px-4 py-2 font-medium border-b-2 transition-colors text-sm sm:text-base whitespace-nowrap ${
             activeTab === 'notes'
               ? 'border-[rgb(172,19,5)] text-[rgb(172,19,5)]'
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <FileText size={18} />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <FileText size={16} className="sm:w-[18px] sm:h-[18px]" />
             Session Notes ({notes.length})
           </div>
         </button>
@@ -151,17 +151,17 @@ export default function TrainingTab({ memberId, currentStaffId, currentStaffName
 
       {/* Goals Tab */}
       {activeTab === 'goals' && (
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-900">Client Goals</h3>
+        <div className="space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900">Client Goals</h3>
             <button
               onClick={() => {
                 setEditingGoal(null);
                 setShowGoalModal(true);
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] text-sm min-h-[44px]"
             >
-              <Plus size={18} />
+              <Plus size={16} className="sm:w-[18px] sm:h-[18px]" />
               Add Goal
             </button>
           </div>
@@ -224,17 +224,17 @@ export default function TrainingTab({ memberId, currentStaffId, currentStaffName
 
       {/* Notes Tab */}
       {activeTab === 'notes' && (
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-900">Session Notes</h3>
+        <div className="space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900">Session Notes</h3>
             <button
               onClick={() => {
                 setEditingNote(null);
                 setShowNoteModal(true);
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] text-sm min-h-[44px]"
             >
-              <Plus size={18} />
+              <Plus size={16} className="sm:w-[18px] sm:h-[18px]" />
               Add Note
             </button>
           </div>
@@ -390,11 +390,11 @@ function GoalCard({ goal, onEdit, onDelete, onUpdateStatus }: {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-3">
+    <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-0 mb-3">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <h4 className="font-semibold text-gray-900">{goal.title}</h4>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <h4 className="font-semibold text-sm sm:text-base text-gray-900">{goal.title}</h4>
             <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[goal.status]}`}>
               {goal.status}
             </span>
@@ -402,7 +402,7 @@ function GoalCard({ goal, onEdit, onDelete, onUpdateStatus }: {
               {categoryLabels[goal.category]}
             </span>
           </div>
-          <p className="text-sm text-gray-600 mb-2">{goal.description}</p>
+          <p className="text-xs sm:text-sm text-gray-600 mb-2">{goal.description}</p>
           {(goal.startValue || goal.targetValue) && (
             <p className="text-sm text-gray-500">
               Target: {goal.startValue} → {goal.targetValue} {goal.units}
