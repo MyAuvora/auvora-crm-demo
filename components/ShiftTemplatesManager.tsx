@@ -46,25 +46,25 @@ export default function ShiftTemplatesManager() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Shift Templates</h2>
-          <p className="text-sm text-gray-600 mt-1">Create reusable shift templates for quick scheduling</p>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Shift Templates</h2>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Create reusable shift templates for quick scheduling</p>
         </div>
         <button
           onClick={() => {
             setEditingTemplate(null);
             setShowModal(true);
           }}
-          className="px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center gap-2"
+          className="px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center justify-center gap-2 text-sm min-h-[44px]"
         >
           <Plus size={16} />
           Add Template
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {allTemplates.length === 0 ? (
           <div className="col-span-full bg-white rounded-lg shadow-md border border-gray-200 p-8 text-center">
             <Clock size={48} className="mx-auto text-gray-400 mb-3" />
@@ -150,14 +150,14 @@ function TemplateModal({ template, onClose, onSave }: {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[95vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">
             {template ? 'Edit Template' : 'Create Template'}
           </h2>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-3 sm:space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Template Name

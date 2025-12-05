@@ -78,17 +78,17 @@ export default function FranchisorMessaging() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Location Messaging</h1>
-          <p className="text-gray-600 mt-1">Send communications to all franchise locations</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Location Messaging</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Send communications to all franchise locations</p>
         </div>
         <button
           onClick={() => setShowComposeModal(true)}
-          className="bg-[#AC1305] text-white px-4 py-2 rounded-lg hover:bg-[#8B0F04] flex items-center gap-2"
+          className="bg-[#AC1305] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#8B0F04] flex items-center justify-center gap-2 text-sm min-h-[44px]"
         >
-          <Mail size={20} />
+          <Mail size={18} className="sm:w-5 sm:h-5" />
           Compose Message
         </button>
       </div>
@@ -138,11 +138,11 @@ export default function FranchisorMessaging() {
       {/* Compose Modal */}
       {showComposeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b">
-              <h2 className="text-2xl font-bold text-gray-900">Compose Message</h2>
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-3xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 border-b">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Compose Message</h2>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
                 <input

@@ -70,16 +70,16 @@ export default function FranchisorRevenue() {
   ];
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Franchisor Revenue</h1>
-          <p className="text-gray-600 mt-1">Track franchisor revenue from royalties and brand fund</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Franchisor Revenue</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Track franchisor revenue from royalties and brand fund</p>
         </div>
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+          className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
         >
           <option value="2024">2024</option>
           <option value="2023">2023</option>
@@ -88,14 +88,14 @@ export default function FranchisorRevenue() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div className="bg-gradient-to-br from-[#AC1305] to-[#8B0F04] p-6 rounded-lg shadow text-white">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-6">
+        <div className="bg-gradient-to-br from-[#AC1305] to-[#8B0F04] p-4 sm:p-6 rounded-lg shadow text-white">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">YTD Total Fees</span>
-            <PiggyBank size={24} />
+            <span className="text-xs sm:text-sm font-medium">YTD Total Fees</span>
+            <PiggyBank size={20} className="sm:w-6 sm:h-6" />
           </div>
-          <div className="text-3xl font-bold">${ytdTotalFees.toLocaleString()}</div>
-          <p className="text-xs mt-2 opacity-90">From {franchiseLocations.length} locations</p>
+          <div className="text-2xl sm:text-3xl font-bold">${ytdTotalFees.toLocaleString()}</div>
+          <p className="text-[10px] sm:text-xs mt-2 opacity-90">From {franchiseLocations.length} locations</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
@@ -126,15 +126,15 @@ export default function FranchisorRevenue() {
       </div>
 
       {/* Monthly Revenue Trend */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Monthly Revenue Trend</h2>
-        <ResponsiveContainer width="100%" height={300}>
+      <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-6">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Monthly Revenue Trend</h2>
+        <ResponsiveContainer width="100%" height={250}>
           <LineChart data={monthlyData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
-            <Legend />
+            <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 12 }} />
+            <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} wrapperStyle={{ fontSize: '12px' }} />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
             <Line type="monotone" dataKey="totalFees" stroke="#AC1305" strokeWidth={2} name="Total Fees" />
             <Line type="monotone" dataKey="royalties" stroke="#2563eb" strokeWidth={2} name="Royalties" />
             <Line type="monotone" dataKey="brandFund" stroke="#16a34a" strokeWidth={2} name="Brand Fund" />
@@ -143,15 +143,15 @@ export default function FranchisorRevenue() {
       </div>
 
       {/* Quarterly Breakdown */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quarterly Breakdown</h2>
-        <ResponsiveContainer width="100%" height={300}>
+      <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-6">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Quarterly Breakdown</h2>
+        <ResponsiveContainer width="100%" height={250}>
           <BarChart data={quarterlyData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="quarter" />
-            <YAxis />
-            <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
-            <Legend />
+            <XAxis dataKey="quarter" tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 12 }} />
+            <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} wrapperStyle={{ fontSize: '12px' }} />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
             <Bar dataKey="royalties" fill="#2563eb" name="Royalties (7%)" />
             <Bar dataKey="brandFund" fill="#16a34a" name="Brand Fund (2%)" />
           </BarChart>
