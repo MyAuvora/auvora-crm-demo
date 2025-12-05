@@ -123,22 +123,22 @@ export default function DashboardOpsFeed() {
 
   if (alerts.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <CheckCircle className="text-green-600" size={24} />
-          <h2 className="text-xl font-bold text-gray-900">Operations Feed</h2>
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6">
+        <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <CheckCircle className="text-green-600" size={20} />
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Operations Feed</h2>
         </div>
-        <p className="text-gray-600">All clear! No urgent actions needed right now.</p>
+        <p className="text-sm sm:text-base text-gray-600">All clear! No urgent actions needed right now.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <AlertCircle className="text-red-600" size={24} />
-        <h2 className="text-xl font-bold text-gray-900">Operations Feed</h2>
-        <span className="ml-auto px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full">
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6">
+      <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 flex-wrap">
+        <AlertCircle className="text-red-600" size={20} />
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900">Operations Feed</h2>
+        <span className="ml-auto px-2 sm:px-3 py-1 bg-red-100 text-red-700 text-xs sm:text-sm font-medium rounded-full">
           {alerts.length} Alert{alerts.length > 1 ? 's' : ''}
         </span>
       </div>
@@ -147,18 +147,18 @@ export default function DashboardOpsFeed() {
         {alerts.map((alert) => (
           <div
             key={alert.id}
-            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors gap-3"
           >
-            <div className="flex items-center gap-3 flex-1">
+            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <div className="flex-shrink-0">{alert.icon}</div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">{alert.title}</h3>
-                <p className="text-sm text-gray-600">{alert.description}</p>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{alert.title}</h3>
+                <p className="text-xs sm:text-sm text-gray-600">{alert.description}</p>
               </div>
             </div>
             <button
               onClick={alert.onAction}
-              className="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium whitespace-nowrap"
+              className="w-full sm:w-auto sm:ml-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium whitespace-nowrap min-h-[44px]"
             >
               {alert.action}
             </button>
