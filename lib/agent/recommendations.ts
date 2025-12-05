@@ -407,3 +407,104 @@ function getSeasonalContext(month: number): string {
   
   return contexts[month] || 'Focus on consistent member engagement and operational excellence.';
 }
+
+export interface Recommendation {
+  priority: 'high' | 'medium' | 'low';
+  title: string;
+  reasoning: string;
+  projectedImpact: string;
+  confidence: number;
+}
+
+export function recommendPromotion(params: {
+  currentMonth: number;
+  revenueTarget: number;
+  currentRevenue: number;
+  historicalPromos: any[];
+  recentCancellations: number;
+}): Recommendation | null {
+  const gap = params.revenueTarget - params.currentRevenue;
+  if (gap <= 0) return null;
+
+  const topPromo = params.historicalPromos[0];
+  if (!topPromo) return null;
+
+  return {
+    priority: 'high',
+    title: `Run "${topPromo.promoName}" Promotion`,
+    reasoning: `This promotion historically generated $${topPromo.revenue.toFixed(0)} revenue with ${topPromo.conversions} conversions. Given current ${gap.toFixed(0)} revenue gap, this could close ${Math.min(100, (topPromo.revenue / gap) * 100).toFixed(0)}% of shortfall.`,
+    projectedImpact: `$${topPromo.revenue.toFixed(0)} revenue, ${topPromo.conversions} conversions`,
+    confidence: 0.75,
+  };
+}
+
+export function recommendRetentionActions(params: {
+  atRiskMembers: number;
+  recentCancellations: any;
+  avgTenure: number;
+}): Recommendation[] {
+  const recommendations: Recommendation[] = [];
+
+  if (params.atRiskMembers > 10) {
+    recommendations.push({
+      priority: 'high',
+      title: 'Launch At-Risk Member Reactivation Campaign',
+      reasoning: `${params.atRiskMembers} members are at risk of churning. Early intervention can save 30-40% of at-risk members.`,
+      projectedImpact: `Save ${Math.floor(params.atRiskMembers * 0.35)} members, $${(params.atRiskMembers * 0.35 * 150).toFixed(0)} retained revenue`,
+      confidence: 0.70,
+    });
+  }
+
+  if (params.recentCancellations.cancellationRate > 5) {
+    recommendations.push({
+      priority: 'medium',
+      title: 'Address High Churn Rate',
+      reasoning: `Churn rate of ${params.recentCancellations.cancellationRate.toFixed(1)}% is above healthy threshold of 5%. Top reason: ${params.recentCancellations.topReasons[0]?.reason || 'Unknown'}`,
+      projectedImpact: `Reduce churn by 2%, save ${Math.floor(params.atRiskMembers * 0.2)} members`,
+      confidence: 0.60,
+    });
+  }
+
+  return recommendations;
+}
+
+export function recommendOperationalImprovements(params: {
+  overduePayments: number;
+  overdueAmount: number;
+  lowClassPacks: number;
+  overfilledClasses: number;
+}): Recommendation[] {
+  const recommendations: Recommendation[] = [];
+
+  if (params.overduePayments > 5) {
+    recommendations.push({
+      priority: 'high',
+      title: 'Process Overdue Payments',
+      reasoning: `${params.overduePayments} members have overdue payments totaling ~$${params.overdueAmount.toFixed(0)}. Immediate collection improves cash flow.`,
+      projectedImpact: `$${(params.overdueAmount * 0.7).toFixed(0)} collected (70% recovery rate)`,
+      confidence: 0.85,
+    });
+  }
+
+  if (params.lowClassPacks > 10) {
+    recommendations.push({
+      priority: 'medium',
+      title: 'Upsell Class Pack Renewals',
+      reasoning: `${params.lowClassPacks} clients have 2 or fewer classes remaining. Proactive renewal messaging increases conversion.`,
+      projectedImpact: `${Math.floor(params.lowClassPacks * 0.6)} renewals, $${(params.lowClassPacks * 0.6 * 140).toFixed(0)} revenue`,
+      confidence: 0.65,
+    });
+  }
+
+  if (params.overfilledClasses > 3) {
+    recommendations.push({
+      priority: 'medium',
+      title: 'Add Class Capacity for High-Demand Times',
+      reasoning: `${params.overfilledClasses} classes are at or over capacity. Adding duplicate time slots captures waitlist demand.`,
+      projectedImpact: `${params.overfilledClasses * 5} new spots, $${(params.overfilledClasses * 5 * 25 * 4).toFixed(0)} monthly revenue`,
+      confidence: 0.70,
+    });
+  }
+
+  return recommendations;
+}
