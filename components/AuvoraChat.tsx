@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllMembers, getAllClassPackClients, getAllLeads, getAllStaff, getAllClasses, getAllBookings, getAllTransactions } from '@/lib/dataStore';
+import { parseQuery } from '@/lib/agent/queryEngine';
+import { computeMemberFrequency, filterMembersByFrequency } from '@/lib/agent/analytics';
 import { MessageCircle, X, Send } from 'lucide-react';
 
 type Message = {
@@ -56,6 +58,68 @@ export default function AuvoraChat() {
 
   const getResponse = (prompt: string): string => {
     const lowerPrompt = prompt.toLowerCase();
+
+    const parsedQuery = parseQuery(prompt);
+    
+    if (parsedQuery.intent === 'member_frequency_analysis' && parsedQuery.params.frequency) {
+      const freq = parsedQuery.params.frequency;
+      
+      const frequencyStats = computeMemberFrequency(allBookings, {
+        period: freq.period,
+        metric: freq.metric,
+        timeRange: parsedQuery.params.timeRange
+      });
+      
+      const result = filterMembersByFrequency(frequencyStats, {
+        operator: freq.operator,
+        value: freq.value,
+        period: freq.period
+      });
+      
+      const operatorText = freq.operator === 'at_least' ? 'at least' :
+                          freq.operator === 'at_most' ? 'at most' :
+                          freq.operator === 'equal' ? 'exactly' : '';
+      
+      const periodText = freq.period === 'week' ? 'per week' : 'per month';
+      const metricText = freq.metric === 'checkins' ? 'check in' : 'book';
+      
+      let response = `**${result.count} members** ${metricText} ${operatorText} ${freq.value} times ${periodText} on average.\n\n`;
+      
+      response += `📊 **Analysis Details:**\n`;
+      response += `• Timeframe: ${result.summary.timeframeDescription}\n`;
+      response += `• Total members analyzed: ${result.summary.totalMembersAnalyzed}\n`;
+      response += `• Based on actual ${freq.metric === 'checkins' ? 'check-ins' : 'bookings'}\n\n`;
+      
+      if (freq.returnList || result.count <= 10) {
+        response += `**Members in this group:**\n`;
+        const membersToShow = result.members.slice(0, 10);
+        membersToShow.forEach((member, idx) => {
+          const avg = freq.period === 'week' ? member.avgPerWeek : member.avgPerMonth;
+          response += `${idx + 1}. ${member.memberName} - ${avg.toFixed(1)} ${periodText}\n`;
+        });
+        
+        if (result.count > 10) {
+          response += `\n...and ${result.count - 10} more members.\n`;
+        }
+      } else {
+        response += `💡 **Want to see the list?** Ask me "Show me the list of members who attend ${operatorText} ${freq.value} times ${periodText}"\n`;
+      }
+      
+      if (result.count > 0) {
+        response += `\n**What you can do:**\n`;
+        if (freq.operator === 'at_least' && freq.value >= 3) {
+          response += `• These are your most engaged members - consider loyalty rewards\n`;
+          response += `• Ask them for referrals or testimonials\n`;
+          response += `• Invite them to try new classes or programs\n`;
+        } else if (freq.operator === 'at_most' && freq.value <= 1) {
+          response += `• These members may be at risk - consider re-engagement campaigns\n`;
+          response += `• Send personalized check-in messages\n`;
+          response += `• Offer incentives to increase attendance\n`;
+        }
+      }
+      
+      return response;
+    }
 
     if (lowerPrompt.includes('list') && lowerPrompt.includes('current members')) {
       const total = location === 'athletic-club' 
