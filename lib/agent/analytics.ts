@@ -327,3 +327,110 @@ export function comparePeriods(
     summary: summary || 'No significant changes',
   };
 }
+
+/**
+ * Rank coaches by cancellations
+ */
+export function rankCoachesByCancellations(
+  bookings: Array<{ id: string; classId: string; memberId: string; memberName: string; status: string; bookedAt: string; checkedInAt?: string }>,
+  classes: Array<{ id: string; name: string; coachId: string }>,
+  staff: Array<{ id: string; name: string }>,
+  timeRange?: { start: Date; end: Date }
+): Array<{ coachId: string; coachName: string; cancellationCount: number; totalBookings: number; cancellationRate: number }> {
+  let filteredBookings = bookings;
+  if (timeRange) {
+    filteredBookings = bookings.filter(b => {
+      const bookingDate = new Date(b.bookedAt);
+      return bookingDate >= timeRange.start && bookingDate <= timeRange.end;
+    });
+  }
+
+  const classToCoach = new Map<string, string>();
+  classes.forEach(c => {
+    classToCoach.set(c.id, c.coachId);
+  });
+
+  const coachIdToName = new Map<string, string>();
+  staff.forEach(s => {
+    coachIdToName.set(s.id, s.name);
+  });
+
+  const coachStats = new Map<string, { cancellations: number; total: number }>();
+  
+  filteredBookings.forEach(booking => {
+    const coachId = classToCoach.get(booking.classId);
+    if (!coachId) return; // Skip if class not found
+    
+    if (!coachStats.has(coachId)) {
+      coachStats.set(coachId, { cancellations: 0, total: 0 });
+    }
+    
+    const stats = coachStats.get(coachId)!;
+    stats.total++;
+    
+    if (booking.status === 'cancelled' || booking.status === 'no-show') {
+      stats.cancellations++;
+    }
+  });
+
+  const results = Array.from(coachStats.entries())
+    .map(([coachId, stats]) => ({
+      coachId,
+      coachName: coachIdToName.get(coachId) || 'Unknown Coach',
+      cancellationCount: stats.cancellations,
+      totalBookings: stats.total,
+      cancellationRate: stats.total > 0 ? (stats.cancellations / stats.total) * 100 : 0,
+    }))
+    .sort((a, b) => b.cancellationCount - a.cancellationCount);
+
+  return results;
+}
+
+/**
+ * Rank members by activity (check-ins)
+ */
+export function rankMembersByActivity(
+  bookings: Array<{ id: string; classId: string; memberId: string; memberName: string; status: string; bookedAt: string; checkedInAt?: string }>,
+  members: Array<{ id: string; name: string }>,
+  timeRange?: { start: Date; end: Date },
+  metric: 'checkins' | 'bookings' = 'checkins'
+): Array<{ memberId: string; memberName: string; count: number; lastActivity?: string }> {
+  let filteredBookings = bookings;
+  if (timeRange) {
+    filteredBookings = bookings.filter(b => {
+      const bookingDate = new Date(b.bookedAt);
+      return bookingDate >= timeRange.start && bookingDate <= timeRange.end;
+    });
+  }
+
+  const memberActivity = new Map<string, { count: number; lastActivity?: string }>();
+  
+  filteredBookings.forEach(booking => {
+    if (metric === 'checkins' && booking.status !== 'checked-in') {
+      return; // Only count checked-in for checkins metric
+    }
+    
+    if (!memberActivity.has(booking.memberId)) {
+      memberActivity.set(booking.memberId, { count: 0 });
+    }
+    
+    const activity = memberActivity.get(booking.memberId)!;
+    activity.count++;
+    
+    const activityDate = booking.checkedInAt || booking.bookedAt;
+    if (!activity.lastActivity || activityDate > activity.lastActivity) {
+      activity.lastActivity = activityDate;
+    }
+  });
+
+  const results = Array.from(memberActivity.entries())
+    .map(([memberId, activity]) => ({
+      memberId,
+      memberName: filteredBookings.find(b => b.memberId === memberId)?.memberName || 'Unknown Member',
+      count: activity.count,
+      lastActivity: activity.lastActivity,
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  return results;
+}

@@ -16,6 +16,8 @@ interface AppContextType {
   setLocation: (location: Location) => void;
   chatOpen: boolean;
   setChatOpen: (open: boolean) => void;
+  chatQuery: string | null;
+  setChatQuery: (query: string | null) => void;
   userRole: UserRole;
   setUserRole: (role: UserRole) => void;
   activeSection: Section;
@@ -26,6 +28,7 @@ interface AppContextType {
   navigateToLead: (leadId: string) => void;
   selectedStaffId: string | null;
   setSelectedStaffId: (staffId: string | null) => void;
+  openChatWithQuery: (query: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -33,6 +36,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [location, setLocation] = useState<Location>('athletic-club');
   const [chatOpen, setChatOpen] = useState(false);
+  const [chatQuery, setChatQuery] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<UserRole>('owner');
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [deepLink, setDeepLink] = useState<DeepLink | null>(null);
@@ -48,12 +52,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setActiveSection('leads-members');
   };
 
+  const openChatWithQuery = (query: string) => {
+    setChatQuery(query);
+    setChatOpen(true);
+  };
+
   return (
     <AppContext.Provider value={{ 
       location, 
       setLocation, 
       chatOpen, 
-      setChatOpen, 
+      setChatOpen,
+      chatQuery,
+      setChatQuery,
       userRole, 
       setUserRole,
       activeSection,
@@ -63,7 +74,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       navigateToMember,
       navigateToLead,
       selectedStaffId,
-      setSelectedStaffId
+      setSelectedStaffId,
+      openChatWithQuery
     }}>
       {children}
     </AppContext.Provider>

@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { X, AlertCircle, TrendingUp, TrendingDown, DollarSign, Users, Calendar, CheckCircle } from 'lucide-react';
 import { generateDailyBrief, DailyBrief, shouldShowDailyBrief, markDailyBriefShown } from '@/lib/agent/proactive';
 import { getAllMembers, getAllTransactions, getMembershipCancellations } from '@/lib/dataStore';
+import { useApp } from '@/lib/context';
 
 export default function AgentDailyBrief() {
+  const { setActiveSection, openChatWithQuery } = useApp();
   const [brief, setBrief] = useState<DailyBrief | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -66,6 +68,16 @@ export default function AgentDailyBrief() {
       return cancelDate >= lastMonthStart && cancelDate <= lastMonthEnd;
     }).length;
 
+    const navigationHandlers = {
+      viewReports: () => setActiveSection('reports'),
+      viewPromotions: () => setActiveSection('promotions'),
+      viewPOS: () => setActiveSection('pos'),
+      viewLeadsMembers: () => setActiveSection('leads-members'),
+      viewSchedule: () => setActiveSection('schedule'),
+      viewStaff: () => setActiveSection('staff'),
+      viewMessaging: () => setActiveSection('messaging'),
+    };
+
     const generatedBrief = generateDailyBrief({
       date: now,
       revenue: {
@@ -81,11 +93,11 @@ export default function AgentDailyBrief() {
       operations: {
         overduePayments: overdueMembers.length,
         overdueAmount,
-        pendingApprovals: 5, // From existing data
+        pendingApprovals: 5,
       },
       classes: {
         today: 18,
-        overfilled: 18, // From existing data
+        overfilled: 18,
         lowAttendance: 0,
       },
       cancellations: {
@@ -94,7 +106,43 @@ export default function AgentDailyBrief() {
       },
     });
 
-    setBrief(generatedBrief);
+    const briefWithActions = {
+      ...generatedBrief,
+      cards: generatedBrief.cards.map(card => ({
+        ...card,
+        actions: card.actions.map(action => {
+          let onClick = action.onClick;
+          
+          if (card.id === 'revenue-pacing') {
+            if (action.label === 'View Recommendations') {
+              onClick = () => openChatWithQuery('Give me revenue recommendations to hit this month\'s target based on current performance. Include concrete steps and projected impact.');
+            } else if (action.label === 'Run Promotion') {
+              onClick = navigationHandlers.viewPromotions;
+            }
+          }else if (card.id === 'overdue-payments') {
+            onClick = navigationHandlers.viewPOS;
+          } else if (card.id === 'at-risk-members') {
+            if (action.label === 'View List') {
+              onClick = navigationHandlers.viewLeadsMembers;
+            } else if (action.label === 'Send Re-engagement') {
+              onClick = navigationHandlers.viewMessaging;
+            }
+          } else if (card.id === 'overfilled-classes') {
+            onClick = navigationHandlers.viewSchedule;
+          } else if (card.id === 'pending-approvals') {
+            onClick = navigationHandlers.viewStaff;
+          } else if (card.id === 'new-members') {
+            onClick = navigationHandlers.viewMessaging;
+          } else if (card.id === 'cancellation-spike') {
+            onClick = navigationHandlers.viewReports;
+          }
+          
+          return { ...action, onClick };
+        }),
+      })),
+    };
+
+    setBrief(briefWithActions);
   }, []);
 
   const handleDismiss = () => {
@@ -157,7 +205,21 @@ export default function AgentDailyBrief() {
         {brief.cards.map((card) => (
           <div
             key={card.id}
-            className={`border-2 rounded-lg p-4 ${getPriorityColor(card.priority)}`}
+            className={`border-2 rounded-lg p-4 ${getPriorityColor(card.priority)} cursor-pointer hover:shadow-lg transition-shadow`}
+            role="button"
+            tabIndex={0}
+            aria-label={`${card.title}: ${card.description}`}
+            onClick={() => {
+              if (card.actions.length > 0) {
+                card.actions[0].onClick();
+              }
+            }}
+            onKeyDown={(e) => {
+              if ((e.key === 'Enter' || e.key === ' ') && card.actions.length > 0) {
+                e.preventDefault();
+                card.actions[0].onClick();
+              }
+            }}
           >
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -182,11 +244,14 @@ export default function AgentDailyBrief() {
             )}
 
             {card.actions.length > 0 && (
-              <div className="flex gap-2">
+              <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                 {card.actions.map((action, idx) => (
                   <button
                     key={idx}
-                    onClick={action.onClick}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      action.onClick();
+                    }}
                     className={`flex-1 px-3 py-2 rounded text-sm font-medium ${
                       action.type === 'primary'
                         ? 'bg-[#AC1305] text-white hover:bg-[#8B0F04]'

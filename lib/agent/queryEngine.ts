@@ -14,6 +14,9 @@ export type QueryIntent =
   | 'recommend_promo'
   | 'show_metrics'
   | 'strategic_plan'
+  | 'rank_coaches_cancellations'
+  | 'rank_members_activity'
+  | 'revenue_recommendations'
   | 'unknown';
 
 export interface QueryParams {
@@ -111,6 +114,25 @@ function parseTimeRange(query: string): { start: Date; end: Date; description: s
 function detectIntent(query: string): QueryIntent {
   const lowerQuery = query.toLowerCase();
 
+  if (/(give|show|provide|need).* recommendations?/i.test(query) ||
+      /(grow|increase|boost|improve).* (revenue|sales)/i.test(query) ||
+      /(hit|reach|meet|achieve).* (target|goal)/i.test(query) ||
+      /(close|fill).* (gap|shortfall)/i.test(query) ||
+      /what should (we|i) do/i.test(query) ||
+      /(more|additional) (sales|revenue|money)/i.test(query) ||
+      /behind.* target/i.test(query) ||
+      /need.* \$\d+/i.test(query)) {
+    return 'revenue_recommendations';
+  }
+
+  if (/(which|what) (coach|trainer|instructor).* (most|highest|least|lowest).* (cancellations?|cancels|no[- ]?shows?)/i.test(query)) {
+    return 'rank_coaches_cancellations';
+  }
+
+  if (/(who|which member).* (most|least|highest|lowest) (active|check[- ]?ins?|visits?|attendance)/i.test(query)) {
+    return 'rank_members_activity';
+  }
+
   const strategicKeywords = [
     'prepare', 'plan', 'planning', 'strategy', 'strategic',
     'next month', 'coming month', 'forecast', 'predict',
@@ -199,8 +221,10 @@ export function parseQuery(query: string): ParsedQuery {
 }
 
 export const EXAMPLE_QUERIES = [
-  'Which promos worked best in the past 12 months?',
-  'Show me all cancellations from the past 3 months',
-  'What is our revenue this month?',
-  'Based on the last 12 months, what should we do to prepare for next month?',
+  'Give me revenue recommendations to hit this month\'s target',
+  'We need +$7k this month—what should we do?',
+  'Which coach has the most cancellations?',
+  'Who is the most active member?',
+  'Show me three high-ROI actions for this week',
+  'What\'s our revenue analysis for this month?',
 ];

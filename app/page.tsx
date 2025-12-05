@@ -31,10 +31,9 @@ import { useToast } from '@/lib/useToast';
 import { Sparkles } from 'lucide-react';
 
 export default function CRMApp() {
-  const { location, setLocation, userRole, setUserRole, activeSection, setActiveSection } = useApp();
+  const { location, setLocation, userRole, setUserRole, activeSection, setActiveSection, chatOpen, setChatOpen } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
-  const [showAskAuvora, setShowAskAuvora] = useState(false);
   const { toasts, closeToast } = useToast();
 
   useEffect(() => {
@@ -243,7 +242,7 @@ export default function CRMApp() {
 
       {activeSection !== 'kiosk' && (
         <button
-          onClick={() => setShowAskAuvora(true)}
+          onClick={() => setChatOpen(true)}
           className="fixed bottom-6 right-6 bg-gradient-to-r from-[#AC1305] to-[#8B0F04] text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow z-50"
           title="Ask Auvora"
         >
@@ -251,7 +250,7 @@ export default function CRMApp() {
         </button>
       )}
       
-      <AskAuvora isOpen={showAskAuvora} onClose={() => setShowAskAuvora(false)} />
+      <AskAuvora isOpen={chatOpen} onClose={() => setChatOpen(false)} />
       <CommandPalette 
         isOpen={showCommandPalette} 
         onClose={() => setShowCommandPalette(false)}
