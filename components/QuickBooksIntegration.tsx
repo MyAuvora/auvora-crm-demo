@@ -89,7 +89,7 @@ export default function QuickBooksIntegration() {
       {!isConnected ? (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 sm:p-6">
           <div className="flex items-start gap-2 sm:gap-3">
-            <AlertCircle className="text-yellow-600 mt-1 flex-shrink-0" size={20} className="sm:w-6 sm:h-6" />
+            <AlertCircle className="text-yellow-600 mt-1 flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6" />
             <div>
               <h3 className="text-base sm:text-lg font-semibold text-yellow-900 mb-2">QuickBooks Not Connected</h3>
               <p className="text-sm sm:text-base text-yellow-800 mb-3 sm:mb-4">
