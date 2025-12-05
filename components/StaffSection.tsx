@@ -149,35 +149,35 @@ export default function StaffSection() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Coaches & Staff</h1>
-          <p className="text-gray-600 mt-1">Manage your team and view performance</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Coaches & Staff</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your team and view performance</p>
         </div>
         <button
           onClick={() => setShowAddStaffModal(true)}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+          className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
         >
-          <Plus size={20} />
+          <Plus size={18} className="sm:w-5 sm:h-5" />
           Add Staff
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {locationStaff.map(member => {
           const metrics = member.role !== 'front-desk' ? getStaffMetrics(member.id) : null;
           
           return (
-            <div key={member.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleEditStaff(member)}>
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="bg-red-100 p-3 rounded-full">
-                    <UserCog className="text-red-600" size={24} />
+            <div key={member.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleEditStaff(member)}>
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="bg-red-100 p-2 sm:p-3 rounded-full">
+                    <UserCog className="text-red-600" size={20} className="sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">{member.name}</h3>
-                    <p className="text-sm text-gray-600 capitalize">{member.role.replace('-', ' ')}</p>
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900">{member.name}</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 capitalize">{member.role.replace('-', ' ')}</p>
                   </div>
                 </div>
                 <button
@@ -255,15 +255,15 @@ export default function StaffSection() {
 
       {showAddStaffModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">Add New Staff Member</h2>
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[95vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Add New Staff Member</h2>
               <button onClick={() => setShowAddStaffModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
-                <X size={20} />
+                <X size={18} className="sm:w-5 sm:h-5" />
               </button>
             </div>
-            <div className="p-6">
-              <div className="space-y-4">
+            <div className="p-4 sm:p-6">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                   <input
