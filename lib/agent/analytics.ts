@@ -407,7 +407,7 @@ export function rankMembersByActivity(
   
   filteredBookings.forEach(booking => {
     if (metric === 'checkins' && booking.status !== 'checked-in') {
-      return; // Only count checked-in for checkins metric
+      return;
     }
     
     if (!memberActivity.has(booking.memberId)) {
@@ -433,4 +433,169 @@ export function rankMembersByActivity(
     .sort((a, b) => b.count - a.count);
 
   return results;
+}
+
+export interface MemberFrequencyStats {
+  memberId: string;
+  memberName: string;
+  totalOccurrences: number;
+  weeksConsidered: number;
+  avgPerWeek: number;
+  avgPerMonth: number;
+  lastActivity?: string;
+}
+
+export interface FrequencyAnalysisResult {
+  count: number;
+  members: MemberFrequencyStats[];
+  summary: {
+    totalMembersAnalyzed: number;
+    timeframeDescription: string;
+    metric: 'checkins' | 'bookings';
+    period: 'week' | 'month';
+  };
+}
+
+function getISOWeek(date: Date): string {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+  const yearStart = new Date(d.getFullYear(), 0, 1);
+  const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return `${d.getFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
+function getMonthKey(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/**
+ * Compute member frequency statistics (classes per week/month on average)
+ */
+export function computeMemberFrequency(
+  bookings: Array<{ id: string; classId: string; memberId: string; memberName: string; status: string; bookedAt: string; checkedInAt?: string }>,
+  options: {
+    period?: 'week' | 'month';
+    timeRange?: { start: Date; end: Date; description: string };
+    metric?: 'checkins' | 'bookings';
+  } = {}
+): MemberFrequencyStats[] {
+  const { period = 'week', metric = 'checkins' } = options;
+  
+  const now = new Date();
+  const defaultStart = new Date(now);
+  defaultStart.setDate(defaultStart.getDate() - (8 * 7));
+  
+  const timeRange = options.timeRange || {
+    start: defaultStart,
+    end: now,
+    description: 'Last 8 weeks'
+  };
+  
+  let filteredBookings = bookings.filter(b => {
+    const bookingDate = new Date(b.bookedAt);
+    return bookingDate >= timeRange.start && bookingDate <= timeRange.end;
+  });
+  
+  if (metric === 'checkins') {
+    filteredBookings = filteredBookings.filter(b => b.status === 'checked-in');
+  }
+  
+  const memberStats = new Map<string, {
+    name: string;
+    occurrencesByPeriod: Map<string, number>;
+    lastActivity?: string;
+  }>();
+  
+  filteredBookings.forEach(booking => {
+    if (!memberStats.has(booking.memberId)) {
+      memberStats.set(booking.memberId, {
+        name: booking.memberName,
+        occurrencesByPeriod: new Map(),
+        lastActivity: undefined
+      });
+    }
+    
+    const stats = memberStats.get(booking.memberId)!;
+    const activityDate = new Date(booking.checkedInAt || booking.bookedAt);
+    const periodKey = period === 'week' ? getISOWeek(activityDate) : getMonthKey(activityDate);
+    
+    stats.occurrencesByPeriod.set(periodKey, (stats.occurrencesByPeriod.get(periodKey) || 0) + 1);
+    
+    const activityDateStr = booking.checkedInAt || booking.bookedAt;
+    if (!stats.lastActivity || activityDateStr > stats.lastActivity) {
+      stats.lastActivity = activityDateStr;
+    }
+  });
+  
+  const totalPeriods = period === 'week'
+    ? Math.ceil((timeRange.end.getTime() - timeRange.start.getTime()) / (7 * 24 * 60 * 60 * 1000))
+    : Math.ceil((timeRange.end.getTime() - timeRange.start.getTime()) / (30 * 24 * 60 * 60 * 1000));
+  
+  const results: MemberFrequencyStats[] = [];
+  
+  memberStats.forEach((stats, memberId) => {
+    const totalOccurrences = Array.from(stats.occurrencesByPeriod.values()).reduce((sum, count) => sum + count, 0);
+    const weeksConsidered = totalPeriods;
+    const avgPerWeek = totalOccurrences / weeksConsidered;
+    const avgPerMonth = avgPerWeek * 4.33;
+    
+    results.push({
+      memberId,
+      memberName: stats.name,
+      totalOccurrences,
+      weeksConsidered,
+      avgPerWeek,
+      avgPerMonth,
+      lastActivity: stats.lastActivity
+    });
+  });
+  
+  return results.sort((a, b) => b.avgPerWeek - a.avgPerWeek);
+}
+
+/**
+ * Filter members by frequency threshold
+ */
+export function filterMembersByFrequency(
+  frequencyStats: MemberFrequencyStats[],
+  options: {
+    operator: 'at_least' | 'at_most' | 'equal' | 'gt' | 'lt';
+    value: number;
+    period: 'week' | 'month';
+  }
+): FrequencyAnalysisResult {
+  const { operator, value, period } = options;
+  
+  const filtered = frequencyStats.filter(member => {
+    const compareValue = period === 'week' ? member.avgPerWeek : member.avgPerMonth;
+    
+    switch (operator) {
+      case 'at_least':
+        return compareValue >= value;
+      case 'at_most':
+        return compareValue <= value;
+      case 'equal':
+        return Math.abs(compareValue - value) < 0.5;
+      case 'gt':
+        return compareValue > value;
+      case 'lt':
+        return compareValue < value;
+      default:
+        return false;
+    }
+  });
+  
+  return {
+    count: filtered.length,
+    members: filtered,
+    summary: {
+      totalMembersAnalyzed: frequencyStats.length,
+      timeframeDescription: frequencyStats[0]?.weeksConsidered 
+        ? `${frequencyStats[0].weeksConsidered} weeks`
+        : 'Unknown timeframe',
+      metric: 'checkins',
+      period
+    }
+  };
 }
