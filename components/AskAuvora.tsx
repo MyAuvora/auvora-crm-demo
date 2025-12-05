@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Sparkles, TrendingUp, Users, DollarSign, AlertCircle } from 'lucide-react';
 import { parseQuery, EXAMPLE_QUERIES } from '@/lib/agent/queryEngine';
-import { analyzePromoPerformance, analyzeRevenue, analyzeCancellations, generateInsights } from '@/lib/agent/analytics';
-import { getAllTransactions, getAllPromotions, getMembershipCancellations, getAllMembers } from '@/lib/dataStore';
+import { analyzePromoPerformance, analyzeRevenue, analyzeCancellations, generateInsights, rankCoachesByCancellations, rankMembersByActivity } from '@/lib/agent/analytics';
+import { getAllTransactions, getAllPromotions, getMembershipCancellations, getAllMembers, getAllBookings, getAllClasses, getAllStaff } from '@/lib/dataStore';
 import { generateStrategicPlan, parseTimeframe } from '@/lib/agent/strategicPlanner';
 import { useApp } from '@/lib/context';
 
@@ -62,6 +62,9 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
         const promotions = getAllPromotions();
         const cancellations = getMembershipCancellations();
         const members = getAllMembers();
+        const bookings = getAllBookings();
+        const classes = getAllClasses();
+        const staff = getAllStaff();
 
         const now = new Date();
         const twelveMonthsAgo = new Date(now);
@@ -69,6 +72,9 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
 
         const threeMonthsAgo = new Date(now);
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+        const oneMonthAgo = new Date(now);
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
         if (parsed.intent === 'list_promotions') {
           const timeRange = parsed.params.timeRange || { start: twelveMonthsAgo, end: now, description: 'Past 12 months' };
@@ -253,11 +259,161 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
             data: plan,
             citations: plan.citations,
           };
+        } else if (parsed.intent === 'rank_coaches_cancellations') {
+          const timeRange = parsed.params.timeRange || { start: oneMonthAgo, end: now, description: 'Past month' };
+          const rankings = rankCoachesByCancellations(bookings, classes, staff, timeRange);
+
+          if (rankings.length === 0) {
+            response = {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content: `I couldn't find any coach data with cancellations in the ${timeRange.description.toLowerCase()}.`,
+            };
+          } else {
+            const top5 = rankings.slice(0, 5);
+            let content = `Here are the coaches ranked by cancellations in the ${timeRange.description.toLowerCase()}:\n\n`;
+            
+            top5.forEach((coach, idx) => {
+              content += `**${idx + 1}. ${coach.coachName}**\n`;
+              content += `• Cancellations: ${coach.cancellationCount}\n`;
+              content += `• Total Bookings: ${coach.totalBookings}\n`;
+              content += `• Cancellation Rate: ${coach.cancellationRate.toFixed(1)}%\n\n`;
+            });
+
+            if (rankings.length > 0) {
+              const topCoach = rankings[0];
+              content += `**Key Insight:** ${topCoach.coachName} has the most cancellations with ${topCoach.cancellationCount} cancelled/no-show bookings (${topCoach.cancellationRate.toFixed(1)}% rate).`;
+            }
+
+            response = {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content,
+              data: rankings,
+              citations: ['Booking records', 'Class schedule', 'Staff data'],
+            };
+          }
+        } else if (parsed.intent === 'rank_members_activity') {
+          const timeRange = parsed.params.timeRange || { start: oneMonthAgo, end: now, description: 'Past month' };
+          const rankings = rankMembersByActivity(bookings, members, timeRange, 'checkins');
+
+          if (rankings.length === 0) {
+            response = {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content: `I couldn't find any member activity data in the ${timeRange.description.toLowerCase()}.`,
+            };
+          } else {
+            const top5 = rankings.slice(0, 5);
+            let content = `Here are the most active members by check-ins in the ${timeRange.description.toLowerCase()}:\n\n`;
+            
+            top5.forEach((member, idx) => {
+              content += `**${idx + 1}. ${member.memberName}**\n`;
+              content += `• Check-ins: ${member.count}\n`;
+              if (member.lastActivity) {
+                const lastDate = new Date(member.lastActivity);
+                content += `• Last Activity: ${lastDate.toLocaleDateString()}\n`;
+              }
+              content += `\n`;
+            });
+
+            if (rankings.length > 0) {
+              const topMember = rankings[0];
+              content += `**Key Insight:** ${topMember.memberName} is the most active member with ${topMember.count} check-ins in the ${timeRange.description.toLowerCase()}.`;
+            }
+
+            response = {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content,
+              data: rankings,
+              citations: ['Booking records', 'Member data'],
+            };
+          }
+        } else if (parsed.intent === 'analyze_churn') {
+          const timeRange = parsed.params.timeRange || { start: threeMonthsAgo, end: now, description: 'Past 3 months' };
+          const analysis = analyzeCancellations(
+            cancellations.map(c => ({
+              cancellationDate: c.cancellationDate,
+              reason: c.reason || 'Not specified',
+              tenure: 6,
+            })),
+            members.length,
+            timeRange
+          );
+
+          let content = `**Churn Analysis for ${timeRange.description}**\n\n`;
+          content += `• Total Cancellations: ${analysis.totalCancellations}\n`;
+          content += `• Churn Rate: ${analysis.cancellationRate.toFixed(1)}%\n`;
+          content += `• Average Tenure: ${analysis.avgTenure.toFixed(1)} months\n\n`;
+
+          if (analysis.topReasons.length > 0) {
+            content += `**Top Reasons:**\n`;
+            analysis.topReasons.slice(0, 3).forEach((reason, idx) => {
+              content += `${idx + 1}. ${reason.reason} (${reason.count} members, ${reason.percentage.toFixed(0)}%)\n`;
+            });
+          }
+
+          response = {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content,
+            data: analysis,
+            citations: ['Cancellation records', 'Member data'],
+          };
+        } else if (parsed.intent === 'analyze_attendance') {
+          const checkedInBookings = bookings.filter(b => b.status === 'checked-in');
+          const totalBookings = bookings.length;
+          const attendanceRate = totalBookings > 0 ? (checkedInBookings.length / totalBookings) * 100 : 0;
+
+          const classAttendance = new Map<string, { total: number; checkedIn: number }>();
+          bookings.forEach(b => {
+            if (!classAttendance.has(b.classId)) {
+              classAttendance.set(b.classId, { total: 0, checkedIn: 0 });
+            }
+            const stats = classAttendance.get(b.classId)!;
+            stats.total++;
+            if (b.status === 'checked-in') {
+              stats.checkedIn++;
+            }
+          });
+
+          const classRates = Array.from(classAttendance.entries())
+            .map(([classId, stats]) => {
+              const cls = classes.find(c => c.id === classId);
+              return {
+                className: cls?.name || 'Unknown Class',
+                rate: stats.total > 0 ? (stats.checkedIn / stats.total) * 100 : 0,
+                total: stats.total,
+                checkedIn: stats.checkedIn,
+              };
+            })
+            .sort((a, b) => b.rate - a.rate);
+
+          let content = `**Attendance Analysis**\n\n`;
+          content += `• Overall Attendance Rate: ${attendanceRate.toFixed(1)}%\n`;
+          content += `• Total Bookings: ${totalBookings}\n`;
+          content += `• Check-ins: ${checkedInBookings.length}\n\n`;
+
+          if (classRates.length > 0) {
+            content += `**Top Classes by Attendance:**\n`;
+            classRates.slice(0, 5).forEach((cls, idx) => {
+              content += `${idx + 1}. ${cls.className}: ${cls.rate.toFixed(1)}% (${cls.checkedIn}/${cls.total})\n`;
+            });
+          }
+
+          response = {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content,
+            data: { attendanceRate, classRates },
+            citations: ['Booking records', 'Class schedule'],
+          };
         } else {
           response = {
             id: Date.now().toString(),
             role: 'assistant',
-            content: "I'm not sure how to answer that. Try asking me about:\n• Promotion performance\n• Cancellations and churn\n• Revenue analysis\n• Strategic planning and forecasts",
+            content: "I'm not sure how to answer that. Try asking me about:\n• Promotion performance\n• Cancellations and churn\n• Revenue analysis\n• Strategic planning and forecasts\n• Which coach has the most cancellations\n• Who is the most active member",
           };
         }
       } catch (error) {

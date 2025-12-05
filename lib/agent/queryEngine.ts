@@ -14,6 +14,8 @@ export type QueryIntent =
   | 'recommend_promo'
   | 'show_metrics'
   | 'strategic_plan'
+  | 'rank_coaches_cancellations'
+  | 'rank_members_activity'
   | 'unknown';
 
 export interface QueryParams {
@@ -110,6 +112,14 @@ function parseTimeRange(query: string): { start: Date; end: Date; description: s
 
 function detectIntent(query: string): QueryIntent {
   const lowerQuery = query.toLowerCase();
+
+  if (/(which|what) (coach|trainer|instructor).* (most|highest|least|lowest).* (cancellations?|cancels|no[- ]?shows?)/i.test(query)) {
+    return 'rank_coaches_cancellations';
+  }
+
+  if (/(who|which member).* (most|least|highest|lowest) (active|check[- ]?ins?|visits?|attendance)/i.test(query)) {
+    return 'rank_members_activity';
+  }
 
   const strategicKeywords = [
     'prepare', 'plan', 'planning', 'strategy', 'strategic',
