@@ -246,7 +246,7 @@ export default function FrontDeskDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Booking Modal */}
       {selectedClass && (
         <BookingModal
@@ -259,19 +259,19 @@ export default function FrontDeskDashboard() {
         />
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Front Desk Dashboard</h1>
-          <p className="text-gray-600 mt-1">Manage daily operations and track performance</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Front Desk Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage daily operations and track performance</p>
         </div>
         
         {locationFrontDesk.length > 1 && (
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">Viewing:</label>
+            <label className="text-xs sm:text-sm font-medium text-gray-700">Viewing:</label>
             <select
               value={selectedFrontDeskId}
               onChange={(e) => setSelectedStaffId(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent text-sm min-h-[44px]"
             >
               {locationFrontDesk.map(fd => (
                 <option key={fd.id} value={fd.id}>{fd.name}</option>
@@ -283,26 +283,26 @@ export default function FrontDeskDashboard() {
 
       {/* Metric Detail Modal */}
       {details && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">{details.title}</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[95vh] sm:max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between gap-3">
+              <h2 className="text-lg sm:text-2xl font-bold text-gray-900 flex-1 min-w-0 truncate">{details.title}</h2>
               <button
                 onClick={() => setSelectedMetric(null)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-gray-100 rounded-lg flex-shrink-0"
               >
-                <span className="text-2xl">×</span>
+                <span className="text-xl sm:text-2xl">×</span>
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               {/* Breakdown Section for Revenue */}
               {details.breakdown && (
-                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-semibold text-gray-700 mb-3">Category Breakdown:</p>
+                <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
+                  <p className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Category Breakdown:</p>
                   <div className="space-y-2">
                     {Object.entries(details.breakdown).map(([category, amount]) => (
                       amount > 0 && (
-                        <div key={category} className="flex justify-between items-center text-sm">
+                        <div key={category} className="flex justify-between items-center text-xs sm:text-sm">
                           <span className="text-gray-600">{category}</span>
                           <span className="font-semibold text-gray-900">${amount.toFixed(2)}</span>
                         </div>
@@ -313,29 +313,29 @@ export default function FrontDeskDashboard() {
               )}
 
               {details.items.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">No items found</p>
+                <p className="text-center text-gray-500 py-8 text-sm">No items found</p>
               ) : (
                 <div className="space-y-2">
                   {details.items.map(item => (
                     <div
                       key={item.id}
-                      className="p-4 bg-gray-50 rounded-lg"
+                      className="p-3 sm:p-4 bg-gray-50 rounded-lg"
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                         <button
                           onClick={item.onClick}
-                          className="flex-1 text-left hover:bg-gray-100 rounded p-2 -m-2 transition-colors"
+                          className="flex-1 text-left hover:bg-gray-100 rounded p-2 -m-2 transition-colors min-w-0"
                         >
-                          <p className="font-semibold text-gray-900">{item.name}</p>
-                          <p className="text-sm text-gray-600 mt-1">{item.detail}</p>
+                          <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">{item.name}</p>
+                          <p className="text-xs sm:text-sm text-gray-600 mt-1">{item.detail}</p>
                         </button>
                         {item.showProcessButton && (
                           <button
                             onClick={() => handleProcessPayment(item.id)}
                             disabled={processingPayment === item.id}
-                            className="ml-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                            className="sm:ml-4 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px] text-xs sm:text-sm"
                           >
-                            <CreditCard size={16} />
+                            <CreditCard size={14} className="sm:w-4 sm:h-4" />
                             {processingPayment === item.id ? 'Processing...' : 'Process Payment'}
                           </button>
                         )}
@@ -349,29 +349,29 @@ export default function FrontDeskDashboard() {
         </div>
       )}
 
-      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Front Desk Dashboard</h1>
-        <p className="text-gray-600">Welcome back! Here&apos;s today&apos;s overview.</p>
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Front Desk Dashboard</h1>
+        <p className="text-sm sm:text-base text-gray-600">Welcome back! Here&apos;s today&apos;s overview.</p>
       </div>
 
       {/* Revenue Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {/* Today's Total Revenue */}
         <button
           onClick={() => setSelectedMetric('todays-revenue')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <DollarSign className="text-green-600" size={24} />
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+              <DollarSign className="text-green-600" size={20} />
             </div>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">Today&apos;s Revenue</h2>
-              <p className="text-sm text-gray-600">All sales today</p>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">Today&apos;s Revenue</h2>
+              <p className="text-xs sm:text-sm text-gray-600">All sales today</p>
             </div>
           </div>
-          <p className="text-3xl font-bold text-gray-900">${todayRevenue.toFixed(2)}</p>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900">${todayRevenue.toFixed(2)}</p>
+          <p className="text-xs sm:text-sm text-gray-600 mt-2">
             {todayTransactions.length} transactions • Click to view details
           </p>
         </button>
@@ -380,19 +380,19 @@ export default function FrontDeskDashboard() {
         {currentStaff && (
           <button
             onClick={() => setSelectedMetric('my-sales')}
-            className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
+            className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <TrendingUp className="text-blue-600" size={24} />
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                <TrendingUp className="text-blue-600" size={20} />
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">My Sales Today</h2>
-                <p className="text-sm text-gray-600">{currentStaff.name}</p>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-base sm:text-lg font-bold text-gray-900">My Sales Today</h2>
+                <p className="text-xs sm:text-sm text-gray-600 truncate">{currentStaff.name}</p>
               </div>
             </div>
-            <p className="text-3xl font-bold text-gray-900">${myRevenue.toFixed(2)}</p>
-            <p className="text-sm text-gray-600 mt-2">
+            <p className="text-2xl sm:text-3xl font-bold text-gray-900">${myRevenue.toFixed(2)}</p>
+            <p className="text-xs sm:text-sm text-gray-600 mt-2">
               {todayTransactions.filter(t => t.sellerId === currentStaff.id).length} transactions • Click to view details
             </p>
           </button>
@@ -400,46 +400,46 @@ export default function FrontDeskDashboard() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <button
           onClick={() => setSelectedMetric('new-leads')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
         >
           <div className="flex items-center justify-between mb-2">
-            <UserPlus className="text-blue-600" size={24} />
-            <span className="text-2xl font-bold text-gray-900">{todayLeads.length}</span>
+            <UserPlus className="text-blue-600" size={20} />
+            <span className="text-xl sm:text-2xl font-bold text-gray-900">{todayLeads.length}</span>
           </div>
-          <p className="text-sm font-semibold text-gray-700">New Leads Today</p>
+          <p className="text-xs sm:text-sm font-semibold text-gray-700">New Leads Today</p>
         </button>
 
         <button
           onClick={() => setSelectedMetric('check-ins')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
         >
           <div className="flex items-center justify-between mb-2">
-            <Calendar className="text-green-600" size={24} />
-            <span className="text-2xl font-bold text-gray-900">{todayCheckIns}</span>
+            <Calendar className="text-green-600" size={20} />
+            <span className="text-xl sm:text-2xl font-bold text-gray-900">{todayCheckIns}</span>
           </div>
-          <p className="text-sm font-semibold text-gray-700">Check-Ins Today</p>
+          <p className="text-xs sm:text-sm font-semibold text-gray-700">Check-Ins Today</p>
         </button>
 
         <button
           onClick={() => setSelectedMetric('missed-payments')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
         >
           <div className="flex items-center justify-between mb-2">
-            <AlertCircle className="text-red-600" size={24} />
-            <span className="text-2xl font-bold text-gray-900">{missedPayments.length}</span>
+            <AlertCircle className="text-red-600" size={20} />
+            <span className="text-xl sm:text-2xl font-bold text-gray-900">{missedPayments.length}</span>
           </div>
-          <p className="text-sm font-semibold text-gray-700">Missed Payments</p>
+          <p className="text-xs sm:text-sm font-semibold text-gray-700">Missed Payments</p>
         </button>
       </div>
 
       {/* Today's Schedule */}
-      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Today&apos;s Class Schedule</h2>
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Today&apos;s Class Schedule</h2>
         {todayClasses.length === 0 ? (
-          <p className="text-gray-500">No classes scheduled for today</p>
+          <p className="text-sm text-gray-500">No classes scheduled for today</p>
         ) : (
           <div className="space-y-3">
             {todayClasses.map(cls => {
@@ -450,15 +450,15 @@ export default function FrontDeskDashboard() {
                 <button
                   key={cls.id}
                   onClick={() => setSelectedClass(cls)}
-                  className="w-full border border-gray-200 rounded-lg p-4 hover:bg-gray-50 hover:border-red-300 transition-colors text-left"
+                  className="w-full border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 hover:border-red-300 transition-colors text-left"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-gray-900">{cls.name}</p>
-                      <p className="text-sm text-gray-600">{cls.time} • {cls.duration} min • {coach?.name || 'TBD'}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 text-sm sm:text-base">{cls.name}</p>
+                      <p className="text-xs sm:text-sm text-gray-600">{cls.time} • {cls.duration} min • {coach?.name || 'TBD'}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-gray-700">
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-xs sm:text-sm font-semibold text-gray-700">
                         {classBookings.length}/{cls.capacity}
                       </p>
                       <p className="text-xs text-gray-500">
@@ -482,58 +482,58 @@ export default function FrontDeskDashboard() {
         if (!monthReport) return null;
         
         return (
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">My Commission Report - This Month</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">My Commission Report - This Month</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Total Sales:</span>
-                    <span className="font-bold text-gray-900">${monthReport.totalSales.toFixed(2)}</span>
+                    <span className="text-sm sm:text-base text-gray-600">Total Sales:</span>
+                    <span className="font-bold text-gray-900 text-sm sm:text-base">${monthReport.totalSales.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Transactions:</span>
-                    <span className="font-bold text-gray-900">{monthReport.transactionCount}</span>
+                    <span className="text-sm sm:text-base text-gray-600">Transactions:</span>
+                    <span className="font-bold text-gray-900 text-sm sm:text-base">{monthReport.transactionCount}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Commission Rate:</span>
-                    <span className="font-bold text-gray-900">{(monthReport.commissionRate * 100).toFixed(0)}%</span>
+                    <span className="text-sm sm:text-base text-gray-600">Commission Rate:</span>
+                    <span className="font-bold text-gray-900 text-sm sm:text-base">{(monthReport.commissionRate * 100).toFixed(0)}%</span>
                   </div>
-                  <div className="flex justify-between items-center pt-3 border-t border-gray-200">
-                    <span className="text-gray-900 font-semibold">Total Commission:</span>
-                    <span className="font-bold text-green-600 text-xl">${monthReport.commissionAmount.toFixed(2)}</span>
+                  <div className="flex justify-between items-center pt-2 sm:pt-3 border-t border-gray-200">
+                    <span className="text-gray-900 font-semibold text-sm sm:text-base">Total Commission:</span>
+                    <span className="font-bold text-green-600 text-lg sm:text-xl">${monthReport.commissionAmount.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-700 mb-2">Sales Breakdown:</p>
+                <p className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Sales Breakdown:</p>
                 <div className="space-y-2">
                   {monthReport.categoryBreakdown.memberships > 0 && (
-                    <div className="flex justify-between items-center text-sm">
+                    <div className="flex justify-between items-center text-xs sm:text-sm">
                       <span className="text-gray-600">Memberships</span>
                       <span className="font-semibold text-gray-900">${monthReport.categoryBreakdown.memberships.toFixed(2)}</span>
                     </div>
                   )}
                   {monthReport.categoryBreakdown.classPacks > 0 && (
-                    <div className="flex justify-between items-center text-sm">
+                    <div className="flex justify-between items-center text-xs sm:text-sm">
                       <span className="text-gray-600">Class Packs</span>
                       <span className="font-semibold text-gray-900">${monthReport.categoryBreakdown.classPacks.toFixed(2)}</span>
                     </div>
                   )}
                   {monthReport.categoryBreakdown.dropIn > 0 && (
-                    <div className="flex justify-between items-center text-sm">
+                    <div className="flex justify-between items-center text-xs sm:text-sm">
                       <span className="text-gray-600">Drop-In</span>
                       <span className="font-semibold text-gray-900">${monthReport.categoryBreakdown.dropIn.toFixed(2)}</span>
                     </div>
                   )}
                   {monthReport.categoryBreakdown.retail > 0 && (
-                    <div className="flex justify-between items-center text-sm">
+                    <div className="flex justify-between items-center text-xs sm:text-sm">
                       <span className="text-gray-600">Retail</span>
                       <span className="font-semibold text-gray-900">${monthReport.categoryBreakdown.retail.toFixed(2)}</span>
                     </div>
                   )}
                   {monthReport.categoryBreakdown.other > 0 && (
-                    <div className="flex justify-between items-center text-sm">
+                    <div className="flex justify-between items-center text-xs sm:text-sm">
                       <span className="text-gray-600">Other</span>
                       <span className="font-semibold text-gray-900">${monthReport.categoryBreakdown.other.toFixed(2)}</span>
                     </div>
