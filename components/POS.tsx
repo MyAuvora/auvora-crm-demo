@@ -253,28 +253,29 @@ export default function POS() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">POS & Inventory</h1>
-        <p className="text-gray-600 mt-1">Manage sales and inventory</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">POS & Inventory</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Manage sales and inventory</p>
       </div>
 
       <div className="bg-white rounded-lg shadow-md border border-gray-200">
-        <div className="border-b border-gray-200">
-          <div className="flex">
+        <div className="border-b border-gray-200 overflow-x-auto">
+          <div className="flex min-w-max sm:min-w-0">
             <button
               onClick={() => setActiveTab('pos')}
-              className={`px-6 py-3 font-medium ${
+              className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'pos'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Point of Sale
+              <span className="hidden sm:inline">Point of Sale</span>
+              <span className="sm:hidden">POS</span>
             </button>
             <button
               onClick={() => setActiveTab('inventory')}
-              className={`px-6 py-3 font-medium ${
+              className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'inventory'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
@@ -284,7 +285,7 @@ export default function POS() {
             </button>
             <button
               onClick={() => setActiveTab('transactions')}
-              className={`px-6 py-3 font-medium ${
+              className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'transactions'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
@@ -294,7 +295,7 @@ export default function POS() {
             </button>
             <button
               onClick={() => setActiveTab('invoices')}
-              className={`px-6 py-3 font-medium ${
+              className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'invoices'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
