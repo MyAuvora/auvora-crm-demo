@@ -256,7 +256,6 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
           content += `**🎯 Top Recommendations**\n`;
           plan.recommendations.slice(0, 3).forEach((rec, idx) => {
             content += `**${idx + 1}. ${rec.title}** (${rec.priority} priority)\n`;
-            content += `   ${rec.description}\n`;
             content += `   *Why:* ${rec.reasoning}\n`;
             content += `   *Impact:* ${rec.projectedImpact}\n`;
             content += `   *Confidence:* ${(rec.confidence * 100).toFixed(0)}%\n\n`;
