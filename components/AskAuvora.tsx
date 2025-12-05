@@ -28,7 +28,7 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
     {
       id: '1',
       role: 'assistant',
-      content: "Hello! I'm Auvora, your AI business consultant. I specialize in revenue optimization, member retention, and operational efficiency for fitness businesses.\n\nI can help you:\n• Generate revenue recommendations with ROI projections\n• Analyze performance metrics and identify opportunities\n• Rank coaches and members by key metrics\n• Provide strategic planning and forecasts\n• Answer specific business questions with data-driven insights\n\nWhat would you like to know?",
+      content: "Hello! I'm Auvora, your AI business consultant (Frequency v1). I specialize in revenue optimization, member retention, and operational efficiency for fitness businesses.\n\nI can help you:\n• Generate revenue recommendations with ROI projections\n• Analyze performance metrics and identify opportunities\n• Rank coaches and members by key metrics\n• Provide strategic planning and forecasts\n• Answer specific business questions with data-driven insights\n\nWhat would you like to know?",
     },
   ]);
   const [input, setInput] = useState('');
