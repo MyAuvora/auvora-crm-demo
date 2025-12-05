@@ -426,13 +426,9 @@ export function rankMembersByActivity(
   const results = Array.from(memberActivity.entries())
     .map(([memberId, activity]) => ({
       memberId,
-      memberName: booking => filteredBookings.find(b => b.memberId === memberId)?.memberName || 'Unknown Member',
+      memberName: filteredBookings.find(b => b.memberId === memberId)?.memberName || 'Unknown Member',
       count: activity.count,
       lastActivity: activity.lastActivity,
-    }))
-    .map(item => ({
-      ...item,
-      memberName: filteredBookings.find(b => b.memberId === item.memberId)?.memberName || 'Unknown Member',
     }))
     .sort((a, b) => b.count - a.count);
 
