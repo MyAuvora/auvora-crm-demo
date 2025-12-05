@@ -285,111 +285,111 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <button 
           onClick={() => setSelectedMetric('checkins')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left min-h-[100px] active:scale-95 transition-transform"
         >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 font-medium">Check-ins Today</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{totalCheckIns}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{totalCheckIns}</p>
             </div>
-            <div className="bg-red-100 p-3 rounded-full">
-              <Users className="text-red-600" size={24} />
+            <div className="bg-red-100 p-2 sm:p-3 rounded-full">
+              <Users className="text-red-600" size={20} />
             </div>
           </div>
         </button>
 
         <button 
           onClick={() => setSelectedMetric('leads')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left min-h-[100px] active:scale-95 transition-transform"
         >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 font-medium">New Leads Today</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{todayLeads.length}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{todayLeads.length}</p>
             </div>
-            <div className="bg-green-100 p-3 rounded-full">
-              <UserPlus className="text-green-600" size={24} />
+            <div className="bg-green-100 p-2 sm:p-3 rounded-full">
+              <UserPlus className="text-green-600" size={20} />
             </div>
           </div>
         </button>
 
         <button 
           onClick={() => setSelectedMetric('members')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left min-h-[100px] active:scale-95 transition-transform"
         >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 font-medium">Active Members</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{totalActiveMembers}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{totalActiveMembers}</p>
             </div>
-            <div className="bg-purple-100 p-3 rounded-full">
-              <TrendingUp className="text-purple-600" size={24} />
+            <div className="bg-purple-100 p-2 sm:p-3 rounded-full">
+              <TrendingUp className="text-purple-600" size={20} />
             </div>
           </div>
         </button>
         
         <button 
           onClick={() => setSelectedMetric('mtd')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left min-h-[100px] active:scale-95 transition-transform"
         >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 font-medium">Month-to-Date Revenue</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">${monthToDateRevenue.toFixed(0)}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">${monthToDateRevenue.toFixed(0)}</p>
             </div>
-            <div className="bg-green-100 p-3 rounded-full">
-              <DollarSign className="text-green-600" size={24} />
+            <div className="bg-green-100 p-2 sm:p-3 rounded-full">
+              <DollarSign className="text-green-600" size={20} />
             </div>
           </div>
         </button>
         
         <button 
           onClick={() => setSelectedMetric('ytd')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left min-h-[100px] active:scale-95 transition-transform"
         >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 font-medium">Year-to-Date Revenue</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">${yearToDateRevenue.toFixed(0)}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">${yearToDateRevenue.toFixed(0)}</p>
             </div>
-            <div className="bg-yellow-100 p-3 rounded-full">
-              <DollarSign className="text-yellow-600" size={24} />
+            <div className="bg-yellow-100 p-2 sm:p-3 rounded-full">
+              <DollarSign className="text-yellow-600" size={20} />
             </div>
           </div>
         </button>
         
         <button 
           onClick={() => setSelectedMetric('missed-payments')}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left min-h-[100px] active:scale-95 transition-transform"
         >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 font-medium">Missed Payments</p>
-              <p className="text-3xl font-bold text-red-600 mt-2">{missedPayments.length}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-red-600 mt-2">{missedPayments.length}</p>
             </div>
-            <div className="bg-red-100 p-3 rounded-full">
-              <AlertCircle className="text-red-600" size={24} />
+            <div className="bg-red-100 p-2 sm:p-3 rounded-full">
+              <AlertCircle className="text-red-600" size={20} />
             </div>
           </div>
         </button>
       </div>
       
       {selectedMetric && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-gray-900">{getMetricDetails(selectedMetric).title}</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden">
+            <div className="p-4 sm:p-6 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900">{getMetricDetails(selectedMetric).title}</h3>
               <button
                 onClick={() => setSelectedMetric(null)}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="p-2 hover:bg-gray-100 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
                 <X size={20} />
               </button>
             </div>
-            <div className="p-6 overflow-y-auto max-h-[60vh]">
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[70vh] sm:max-h-[60vh]">
               {getMetricDetails(selectedMetric).items.length > 0 ? (
                 getMetricDetails(selectedMetric).isChart ? (
                   <div>

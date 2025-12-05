@@ -185,27 +185,27 @@ export default function AgentDailyBrief() {
   };
 
   return (
-    <div className="mb-6 bg-white rounded-lg shadow-lg border-2 border-[#AC1305] p-6">
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+    <div className="mb-4 sm:mb-6 bg-white rounded-lg shadow-lg border-2 border-[#AC1305] p-4 sm:p-6">
+      <div className="flex items-start justify-between mb-3 sm:mb-4 gap-2">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
             <span className="text-[#AC1305]">🤖</span> Daily Brief by Auvora
           </h2>
-          <p className="text-gray-600 mt-1">{brief.summary}</p>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">{brief.summary}</p>
         </div>
         <button
           onClick={handleDismiss}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-gray-400 hover:text-gray-600 min-w-[44px] min-h-[44px] flex items-center justify-center flex-shrink-0"
         >
           <X size={20} />
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {brief.cards.map((card) => (
           <div
             key={card.id}
-            className={`border-2 rounded-lg p-4 ${getPriorityColor(card.priority)} cursor-pointer hover:shadow-lg transition-shadow`}
+            className={`border-2 rounded-lg p-3 sm:p-4 ${getPriorityColor(card.priority)} cursor-pointer hover:shadow-lg transition-shadow active:scale-95`}
             role="button"
             tabIndex={0}
             aria-label={`${card.title}: ${card.description}`}
@@ -224,17 +224,17 @@ export default function AgentDailyBrief() {
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
                 {getPriorityIcon(card.priority)}
-                <h3 className="font-semibold text-gray-900">{card.title}</h3>
+                <h3 className="font-semibold text-sm sm:text-base text-gray-900">{card.title}</h3>
               </div>
             </div>
 
-            <p className="text-sm text-gray-700 mb-3">{card.description}</p>
+            <p className="text-xs sm:text-sm text-gray-700 mb-3">{card.description}</p>
 
             {card.metric && (
-              <div className="bg-white rounded p-3 mb-3">
+              <div className="bg-white rounded p-2 sm:p-3 mb-3">
                 <div className="text-xs text-gray-600 mb-1">{card.metric.label}</div>
                 <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-gray-900">{card.metric.value}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{card.metric.value}</div>
                   {card.metric.trend && getTrendIcon(card.metric.trend)}
                 </div>
                 {card.metric.change && (
@@ -244,7 +244,7 @@ export default function AgentDailyBrief() {
             )}
 
             {card.actions.length > 0 && (
-              <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row gap-2" onClick={(e) => e.stopPropagation()}>
                 {card.actions.map((action, idx) => (
                   <button
                     key={idx}
@@ -252,10 +252,10 @@ export default function AgentDailyBrief() {
                       e.stopPropagation();
                       action.onClick();
                     }}
-                    className={`flex-1 px-3 py-2 rounded text-sm font-medium ${
+                    className={`flex-1 px-3 py-2.5 rounded text-sm font-medium min-h-[44px] ${
                       action.type === 'primary'
-                        ? 'bg-[#AC1305] text-white hover:bg-[#8B0F04]'
-                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                        ? 'bg-[#AC1305] text-white hover:bg-[#8B0F04] active:bg-[#6B0A03]'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
                     }`}
                   >
                     {action.label}

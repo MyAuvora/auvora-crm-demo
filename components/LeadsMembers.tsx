@@ -144,18 +144,18 @@ export default function LeadsMembers() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Leads & Members</h1>
-        <p className="text-gray-600 mt-1">Manage your leads and member database</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Leads & Members</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your leads and member database</p>
       </div>
 
       <div className="bg-white rounded-lg shadow-md border border-gray-200">
-        <div className="border-b border-gray-200">
-          <div className="flex">
+        <div className="border-b border-gray-200 overflow-x-auto">
+          <div className="flex min-w-max sm:min-w-0">
             <button
               onClick={() => { setActiveTab('leads'); setSelectedItem(null); }}
-              className={`px-6 py-3 font-medium ${
+              className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'leads'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
@@ -165,7 +165,7 @@ export default function LeadsMembers() {
             </button>
             <button
               onClick={() => { setActiveTab('members'); setSelectedItem(null); }}
-              className={`px-6 py-3 font-medium ${
+              className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'members'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
@@ -175,7 +175,7 @@ export default function LeadsMembers() {
             </button>
             <button
               onClick={() => { setActiveTab('class-packs'); setSelectedItem(null); }}
-              className={`px-6 py-3 font-medium ${
+              className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'class-packs'
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-600 hover:text-gray-900'
@@ -186,8 +186,8 @@ export default function LeadsMembers() {
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="p-3 sm:p-6">
+          <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 text-gray-400" size={20} />
               <input
@@ -195,16 +195,16 @@ export default function LeadsMembers() {
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-base min-h-[44px]"
               />
             </div>
             
             {activeTab === 'leads' && (
-              <>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
                 >
                   <option value="all">All Statuses</option>
                   <option value="new-lead">New Lead</option>
@@ -217,7 +217,7 @@ export default function LeadsMembers() {
                 <select
                   value={sourceFilter}
                   onChange={(e) => setSourceFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
                 >
                   <option value="all">All Sources</option>
                   <option value="website">Website</option>
@@ -225,15 +225,15 @@ export default function LeadsMembers() {
                   <option value="facebook">Facebook</option>
                   <option value="walk-in">Walk-in</option>
                 </select>
-              </>
+              </div>
             )}
 
             {activeTab === 'members' && (
-              <>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
                 <select
                   value={membershipFilter}
                   onChange={(e) => setMembershipFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
                 >
                   <option value="all">All Types</option>
                   {location === 'athletic-club' && (
@@ -250,25 +250,26 @@ export default function LeadsMembers() {
                 </select>
                 {selectedRows.size > 0 && (
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">{selectedRows.size} selected</span>
+                    <span className="text-xs sm:text-sm text-gray-600">{selectedRows.size} selected</span>
                     <button
                       onClick={() => setShowBulkActions(!showBulkActions)}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                      className="px-3 sm:px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 text-sm min-h-[44px]"
                     >
                       <MoreVertical size={16} />
-                      Bulk Actions
+                      <span className="hidden sm:inline">Bulk Actions</span>
+                      <span className="sm:hidden">Actions</span>
                     </button>
                   </div>
                 )}
-              </>
+              </div>
             )}
 
             {activeTab === 'class-packs' && (
-              <>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
                 <select
                   value={packTypeFilter}
                   onChange={(e) => setPackTypeFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
                 >
                   <option value="all">All Pack Types</option>
                   <option value="5-pack">5-Pack</option>
@@ -279,17 +280,18 @@ export default function LeadsMembers() {
                 </select>
                 {selectedRows.size > 0 && (
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">{selectedRows.size} selected</span>
+                    <span className="text-xs sm:text-sm text-gray-600">{selectedRows.size} selected</span>
                     <button
                       onClick={() => setShowBulkActions(!showBulkActions)}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                      className="px-3 sm:px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 text-sm min-h-[44px]"
                     >
                       <MoreVertical size={16} />
-                      Bulk Actions
+                      <span className="hidden sm:inline">Bulk Actions</span>
+                      <span className="sm:hidden">Actions</span>
                     </button>
                   </div>
                 )}
-              </>
+              </div>
             )}
           </div>
 

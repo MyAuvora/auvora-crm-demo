@@ -105,23 +105,23 @@ export default function CRMApp() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-black text-white shadow-lg sticky top-0 z-40">
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 hover:bg-gray-800 rounded"
+              className="lg:hidden p-2 hover:bg-gray-800 rounded min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             <div className="flex flex-col leading-tight">
-              <span className="text-2xl font-bold text-white">The Lab</span>
+              <span className="text-xl sm:text-2xl font-bold text-white">The Lab</span>
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
             <button
               onClick={() => setShowCommandPalette(true)}
-              className="bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-700 hover:bg-gray-700 flex items-center gap-2"
+              className="bg-gray-800 text-white px-2 sm:px-3 py-2 rounded-lg border border-gray-700 hover:bg-gray-700 flex items-center gap-2 min-h-[44px]"
               title="Search (Cmd+K or Ctrl+K)"
             >
               <Search size={16} />
@@ -132,7 +132,7 @@ export default function CRMApp() {
             <select
               value={location}
               onChange={(e) => setLocation(e.target.value as 'athletic-club' | 'dance-studio' | 'all')}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600"
+              className="bg-gray-800 text-white px-2 sm:px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
             >
               {userRole === 'franchisor' ? (
                 <>
@@ -156,7 +156,7 @@ export default function CRMApp() {
                   setLocation('all');
                 }
               }}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600"
+              className="bg-gray-800 text-white px-2 sm:px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px] hidden sm:block"
             >
               <option value="owner">Owner/Admin</option>
               <option value="manager">Manager</option>
@@ -174,11 +174,11 @@ export default function CRMApp() {
       </header>
 
       <div className="flex">
-        <nav className={`${mobileMenuOpen ? 'block' : 'hidden'} lg:block fixed lg:sticky top-16 lg:top-16 left-0 w-64 bg-white border-r border-gray-200 h-[calc(100vh-4rem)] overflow-y-auto z-30`}>
-          <div className="p-4">
-            <div className="mb-6">
-              <h2 className="text-lg font-bold text-gray-900">{locationName}</h2>
-              <p className="text-sm text-gray-500">CRM Dashboard</p>
+        <nav className={`${mobileMenuOpen ? 'block' : 'hidden'} lg:block fixed lg:sticky top-16 lg:top-16 left-0 w-full sm:w-72 lg:w-64 bg-white border-r border-gray-200 h-[calc(100vh-4rem)] overflow-y-auto z-30`}>
+          <div className="p-3 sm:p-4">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">{locationName}</h2>
+              <p className="text-xs sm:text-sm text-gray-500">CRM Dashboard</p>
             </div>
             
             <ul className="space-y-1">
@@ -192,16 +192,16 @@ export default function CRMApp() {
                         setActiveSection(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative ${
+                      className={`w-full flex items-center gap-3 px-3 sm:px-4 py-3 sm:py-3.5 rounded-lg transition-colors relative min-h-[48px] ${
                         isActive
                           ? 'bg-red-600 text-white'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
                       }`}
                     >
                       <Icon size={20} />
-                      <span className="font-medium">{item.label}</span>
+                      <span className="font-medium text-sm sm:text-base">{item.label}</span>
                       {item.badge && item.badge > 0 && (
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                        <span className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-red-600 text-white text-xs font-bold rounded-full min-w-[24px] h-6 flex items-center justify-center px-1">
                           {item.badge}
                         </span>
                       )}
@@ -213,7 +213,7 @@ export default function CRMApp() {
           </div>
         </nav>
 
-        <main className="flex-1 p-4 lg:p-8">
+        <main className="flex-1 p-3 sm:p-4 lg:p-8">
           {activeSection === 'dashboard' && (
             userRole === 'franchisor' ? <FranchisorDashboard /> :
             userRole === 'head-coach' ? <HeadCoachDashboard /> :
