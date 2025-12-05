@@ -180,68 +180,68 @@ export default function CoachDashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-600">Week to Date</h3>
-            <TrendingUp size={20} className="text-blue-600" />
+            <h3 className="text-xs sm:text-sm font-medium text-gray-600">Week to Date</h3>
+            <TrendingUp size={18} className="text-blue-600 sm:w-5 sm:h-5" />
           </div>
-          <div className="text-3xl font-bold text-gray-900">{wtdStats.conversionRate.toFixed(1)}%</div>
-          <p className="text-sm text-gray-600 mt-1">
+          <div className="text-2xl sm:text-3xl font-bold text-gray-900">{wtdStats.conversionRate.toFixed(1)}%</div>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">
             {wtdStats.convertedLeads} of {wtdStats.totalLeads} leads converted
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-600">Month to Date</h3>
-            <TrendingUp size={20} className="text-green-600" />
+            <h3 className="text-xs sm:text-sm font-medium text-gray-600">Month to Date</h3>
+            <TrendingUp size={18} className="text-green-600 sm:w-5 sm:h-5" />
           </div>
-          <div className="text-3xl font-bold text-gray-900">{mtdStats.conversionRate.toFixed(1)}%</div>
-          <p className="text-sm text-gray-600 mt-1">
+          <div className="text-2xl sm:text-3xl font-bold text-gray-900">{mtdStats.conversionRate.toFixed(1)}%</div>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">
             {mtdStats.convertedLeads} of {mtdStats.totalLeads} leads converted
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-600">Year to Date</h3>
-            <TrendingUp size={20} className="text-purple-600" />
+            <h3 className="text-xs sm:text-sm font-medium text-gray-600">Year to Date</h3>
+            <TrendingUp size={18} className="text-purple-600 sm:w-5 sm:h-5" />
           </div>
-          <div className="text-3xl font-bold text-gray-900">{ytdStats.conversionRate.toFixed(1)}%</div>
-          <p className="text-sm text-gray-600 mt-1">
+          <div className="text-2xl sm:text-3xl font-bold text-gray-900">{ytdStats.conversionRate.toFixed(1)}%</div>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">
             {ytdStats.convertedLeads} of {ytdStats.totalLeads} leads converted
           </p>
         </div>
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Calendar size={24} className="text-red-600" />
-              <h2 className="text-xl font-bold text-gray-900">Today&apos;s Classes - {format(today, 'MMMM d, yyyy')}</h2>
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Calendar size={20} className="text-red-600 sm:w-6 sm:h-6" />
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Today&apos;s Classes - {format(today, 'MMMM d, yyyy')}</h2>
             </div>
-            <span className="text-sm text-gray-600">{todaysClasses.length} classes</span>
+            <span className="text-xs sm:text-sm text-gray-600">{todaysClasses.length} classes</span>
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {todaysClasses.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <Calendar size={48} className="mx-auto mb-3 text-gray-400" />
-              <p>No classes scheduled for today</p>
+              <Calendar size={40} className="mx-auto mb-3 text-gray-400 sm:w-12 sm:h-12" />
+              <p className="text-sm sm:text-base">No classes scheduled for today</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {todaysClasses.map(cls => (
-                <div key={cls.id} className="border border-gray-200 rounded-lg p-4 hover:border-red-300 transition-colors">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{cls.name}</h3>
-                      <p className="text-sm text-gray-600">{cls.time} • {cls.duration} min • {cls.type}</p>
+                <div key={cls.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:border-red-300 transition-colors">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                    <div className="flex-1">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900">{cls.name}</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1">{cls.time} • {cls.duration} min • {cls.type}</p>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-gray-900">{cls.bookedCount}/{cls.capacity}</div>
+                        <div className="text-xl sm:text-2xl font-bold text-gray-900">{cls.bookedCount}/{cls.capacity}</div>
                         <div className="text-xs text-gray-600">booked</div>
                       </div>
                       <button
@@ -249,22 +249,23 @@ export default function CoachDashboard() {
                           setSelectedClassForSub(cls);
                           setShowSubstitutionModal(true);
                         }}
-                        className="px-3 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 flex items-center gap-2"
+                        className="px-2 sm:px-3 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 flex items-center gap-1.5 sm:gap-2 min-h-[44px] text-xs sm:text-sm"
                       >
                         <ArrowLeftRight size={16} />
-                        Request Sub
+                        <span className="hidden sm:inline">Request Sub</span>
+                        <span className="sm:hidden">Sub</span>
                       </button>
                     </div>
                   </div>
                   {cls.bookings.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-gray-200">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Booked Members:</p>
-                      <div className="flex flex-wrap gap-2">
+                      <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">Booked Members:</p>
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
                         {cls.bookings.map(booking => (
                           <button
                             key={booking.id}
                             onClick={() => handlePersonClick(booking.memberId)}
-                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 flex items-center gap-1.5"
+                            className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs sm:text-sm hover:bg-gray-200 flex items-center gap-1 sm:gap-1.5 min-h-[36px]"
                           >
                             <PersonStatusBadge personId={booking.memberId} />
                             {booking.memberName}
