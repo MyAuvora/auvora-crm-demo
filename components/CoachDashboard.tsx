@@ -145,20 +145,20 @@ export default function CoachDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Welcome, {currentCoach.name}!</h1>
-          <p className="text-gray-600 mt-1">Your personalized coach dashboard</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Welcome, {currentCoach.name}!</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Your personalized coach dashboard</p>
         </div>
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
           {locationCoaches.length > 1 && (
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Viewing as:</label>
+              <label className="text-xs sm:text-sm font-medium text-gray-700">Viewing as:</label>
               <select
                 value={selectedCoachId}
                 onChange={(e) => setSelectedStaffId(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm"
+                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm min-h-[44px]"
               >
                 {locationCoaches.map(coach => (
                   <option key={coach.id} value={coach.id}>
@@ -170,15 +170,16 @@ export default function CoachDashboard() {
           )}
           <button
             onClick={() => setShowTimeOffModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 min-h-[44px] text-sm sm:text-base"
           >
             <UserX size={20} />
-            Request Time Off
+            <span className="hidden sm:inline">Request Time Off</span>
+            <span className="sm:hidden">Time Off</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-gray-600">Week to Date</h3>
