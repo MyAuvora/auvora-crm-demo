@@ -292,20 +292,20 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
   };
 
   return (
-    <div className="space-y-4" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="space-y-3 sm:space-y-4" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Staff Schedule</h2>
-            <p className="text-sm text-gray-600 mt-1">Weekly staff shift schedule</p>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Staff Schedule</h2>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">Weekly staff shift schedule</p>
           </div>
           {allLocationStaff.length > 0 && (
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Viewing:</label>
+              <label className="text-xs sm:text-sm font-medium text-gray-700">Viewing:</label>
               <select
                 value={selectedStaffId || 'all'}
                 onChange={(e) => setSelectedStaffId(e.target.value === 'all' ? null : e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
               >
                 <option value="all">All Staff</option>
                 {allLocationStaff.map(staff => (
@@ -321,7 +321,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
               setEditingShift(null);
               setShowShiftModal(true);
             }}
-            className="px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center gap-2"
+            className="px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center justify-center gap-2 text-sm min-h-[44px]"
           >
             <Plus size={16} />
             Add Shift
@@ -330,7 +330,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
       </div>
 
       {conflicts.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
               <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
@@ -350,8 +350,8 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
       )}
 
       <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className={`w-full border-collapse ${isDragging ? 'select-none' : ''}`}>
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className={`w-full border-collapse min-w-[800px] ${isDragging ? 'select-none' : ''}`}>
             <thead>
               <tr className="bg-gray-50">
                 <th className="px-2 py-3 text-left text-xs font-medium text-gray-700 border-r border-gray-200 w-24">Time</th>

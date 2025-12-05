@@ -78,30 +78,30 @@ export default function Settings() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your CRM configuration and preferences</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Settings</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your CRM configuration and preferences</p>
       </div>
 
       <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-4">
           {/* Sidebar */}
           <div className="lg:col-span-1 bg-gray-50 border-r border-gray-200">
-            <nav className="p-4 space-y-1">
+            <nav className="p-3 sm:p-4 space-y-1 overflow-x-auto">
               {sections.map((section) => {
                 const Icon = section.icon;
                 return (
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-left transition-colors text-sm sm:text-base ${
                       activeSection === section.id
                         ? 'bg-red-600 text-white'
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    <Icon size={20} />
+                    <Icon size={18} className="sm:w-5 sm:h-5" />
                     <span className="font-medium">{section.label}</span>
                   </button>
                 );
@@ -110,15 +110,15 @@ export default function Settings() {
           </div>
 
           {/* Content */}
-          <div className="lg:col-span-3 p-6">
+          <div className="lg:col-span-3 p-4 sm:p-6">
             {activeSection === 'business' && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Business Information</h2>
-                  <p className="text-sm text-gray-600 mb-6">Update your business details and contact information</p>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Business Information</h2>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6">Update your business details and contact information</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
                     <input
