@@ -7,7 +7,7 @@ import { getAllMembers, getAllTransactions, getMembershipCancellations } from '@
 import { useApp } from '@/lib/context';
 
 export default function AgentDailyBrief() {
-  const { setActiveSection } = useApp();
+  const { setActiveSection, openChatWithQuery } = useApp();
   const [brief, setBrief] = useState<DailyBrief | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -115,11 +115,11 @@ export default function AgentDailyBrief() {
           
           if (card.id === 'revenue-pacing') {
             if (action.label === 'View Recommendations') {
-              onClick = navigationHandlers.viewReports;
+              onClick = () => openChatWithQuery('Give me revenue recommendations to hit this month\'s target based on current performance. Include concrete steps and projected impact.');
             } else if (action.label === 'Run Promotion') {
               onClick = navigationHandlers.viewPromotions;
             }
-          } else if (card.id === 'overdue-payments') {
+          }else if (card.id === 'overdue-payments') {
             onClick = navigationHandlers.viewPOS;
           } else if (card.id === 'at-risk-members') {
             if (action.label === 'View List') {

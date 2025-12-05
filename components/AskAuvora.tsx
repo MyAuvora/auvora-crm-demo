@@ -6,6 +6,7 @@ import { parseQuery, EXAMPLE_QUERIES } from '@/lib/agent/queryEngine';
 import { analyzePromoPerformance, analyzeRevenue, analyzeCancellations, generateInsights, rankCoachesByCancellations, rankMembersByActivity } from '@/lib/agent/analytics';
 import { getAllTransactions, getAllPromotions, getMembershipCancellations, getAllMembers, getAllBookings, getAllClasses, getAllStaff } from '@/lib/dataStore';
 import { generateStrategicPlan, parseTimeframe } from '@/lib/agent/strategicPlanner';
+import { computeRevenueRecommendations } from '@/lib/agent/recommendations';
 import { useApp } from '@/lib/context';
 
 interface Message {
@@ -22,21 +23,43 @@ interface AskAuvoraProps {
 }
 
 export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
-  const { location } = useApp();
+  const { location, chatQuery, setChatQuery } = useApp();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
-      content: "Hi! I'm Auvora, your AI business assistant. I can help you analyze your business data, answer questions about performance, and provide recommendations. Try asking me:\n\n• Which promos worked best in the past 12 months?\n• Show me all cancellations from the past 3 months\n• What is our revenue this month?\n• Based on the last 12 months, what should we do to prepare for next month?",
+      content: "Hello! I'm Auvora, your AI business consultant. I specialize in revenue optimization, member retention, and operational efficiency for fitness businesses.\n\nI can help you:\n• Generate revenue recommendations with ROI projections\n• Analyze performance metrics and identify opportunities\n• Rank coaches and members by key metrics\n• Provide strategic planning and forecasts\n• Answer specific business questions with data-driven insights\n\nWhat would you like to know?",
     },
   ]);
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const hasAutoSentRef = useRef(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (isOpen && chatQuery && !hasAutoSentRef.current && !isProcessing) {
+      hasAutoSentRef.current = true;
+      setInput(chatQuery);
+      setChatQuery(null);
+      
+      setTimeout(() => {
+        const form = document.querySelector('form');
+        if (form) {
+          form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        }
+      }, 100);
+    }
+  }, [isOpen, chatQuery, setChatQuery, isProcessing]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      hasAutoSentRef.current = false;
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -259,6 +282,66 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
             data: plan,
             citations: plan.citations,
           };
+        } else if (parsed.intent === 'revenue_recommendations') {
+          const plan = computeRevenueRecommendations(
+            transactions,
+            members,
+            bookings,
+            classes,
+            promotions
+          );
+
+          let content = `EXECUTIVE SUMMARY\n${plan.executiveSummary}\n\n`;
+          content += `CURRENT SITUATION\n`;
+          content += `• Current Revenue: $${plan.currentRevenue.toFixed(0)}\n`;
+          content += `• Target Revenue: $${plan.targetRevenue.toFixed(0)}\n`;
+          if (plan.gap > 0) {
+            content += `• Gap: $${plan.gap.toFixed(0)} (${plan.gapPercentage.toFixed(0)}%)\n`;
+          }
+          content += `\n${plan.seasonalContext}\n\n`;
+
+          content += `TOP RECOMMENDED ACTIONS\n\n`;
+          plan.recommendations.forEach((rec, idx) => {
+            content += `${idx + 1}. ${rec.title}\n`;
+            content += `   Priority: ${'⭐'.repeat(4 - rec.priority)}\n`;
+            content += `   Why Now: ${rec.whyNow}\n\n`;
+            content += `   Segment: ${rec.segmentSize} ${rec.segmentDescription}\n`;
+            content += `   Timeline: ${rec.timelineDays} days\n\n`;
+            content += `   Steps:\n`;
+            rec.steps.forEach((step, stepIdx) => {
+              content += `   ${stepIdx + 1}. ${step}\n`;
+            });
+            content += `\n`;
+            content += `   Projected Impact: $${rec.projectedImpact.toFixed(0)}\n`;
+            content += `   Formula: ${rec.segmentSize} × ${(rec.assumedConversionRate * 100).toFixed(0)}% CR × $${rec.arpu.toFixed(0)} ARPU = $${rec.projectedImpact.toFixed(0)}\n`;
+            content += `   Confidence: ${(rec.confidence * 100).toFixed(0)}%\n\n`;
+            content += `   Risk: ${rec.risk}\n`;
+            content += `   Mitigation: ${rec.mitigation}\n\n`;
+          });
+
+          const totalImpact = plan.recommendations.reduce((sum, r) => sum + r.projectedImpact, 0);
+          content += `TOTAL PROJECTED IMPACT: $${totalImpact.toFixed(0)}\n\n`;
+
+          content += `ASSUMPTIONS\n`;
+          plan.assumptions.forEach(assumption => {
+            content += `• ${assumption}\n`;
+          });
+          content += `\n`;
+
+          content += `NEXT STEPS\n`;
+          if (plan.recommendations.length > 0) {
+            const topRec = plan.recommendations[0];
+            content += `I recommend starting with "${topRec.title}" as it has the highest priority and can be executed in ${topRec.timelineDays} days.\n\n`;
+            content += `Would you like me to help you execute this action? I can draft the messaging, identify the segment, or provide more details.`;
+          }
+
+          response = {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content,
+            data: plan,
+            citations: ['Transaction history', 'Member data', 'Class bookings', 'Historical performance'],
+          };
         } else if (parsed.intent === 'rank_coaches_cancellations') {
           const timeRange = parsed.params.timeRange || { start: oneMonthAgo, end: now, description: 'Past month' };
           const rankings = rankCoachesByCancellations(bookings, classes, staff, timeRange);
@@ -413,7 +496,7 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
           response = {
             id: Date.now().toString(),
             role: 'assistant',
-            content: "I'm not sure how to answer that. Try asking me about:\n• Promotion performance\n• Cancellations and churn\n• Revenue analysis\n• Strategic planning and forecasts\n• Which coach has the most cancellations\n• Who is the most active member",
+            content: "I'm not sure how to answer that specific question. Here's what I can help you with:\n\nREVENUE & GROWTH\n• Generate revenue recommendations with ROI projections\n• Analyze revenue trends and identify opportunities\n• Recommend promotions based on historical performance\n\nMEMBER INSIGHTS\n• Rank members by activity and engagement\n• Identify at-risk members and churn patterns\n• Analyze cancellation reasons and trends\n\nOPERATIONAL ANALYTICS\n• Rank coaches by performance metrics\n• Analyze class attendance and capacity\n• Strategic planning and forecasting\n\nTry asking: 'Give me revenue recommendations' or 'Which coach has the most cancellations?'",
           };
         }
       } catch (error) {
