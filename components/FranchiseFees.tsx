@@ -157,7 +157,7 @@ export default function FranchiseFees() {
         <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs sm:text-sm font-medium text-gray-600">Total Revenue</span>
-            <DollarSign className="text-gray-400" size={18} className="sm:w-5 sm:h-5" />
+            <DollarSign className="text-gray-400 w-[18px] h-[18px] sm:w-5 sm:h-5" />
           </div>
           <div className="text-xl sm:text-2xl font-bold text-gray-900">${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           <p className="text-[10px] sm:text-xs text-gray-500 mt-1">Across all locations</p>
@@ -165,7 +165,7 @@ export default function FranchiseFees() {
         <div className="bg-green-50 p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs sm:text-sm font-medium text-green-700">Paid</span>
-            <CheckCircle className="text-green-600" size={18} className="sm:w-5 sm:h-5" />
+            <CheckCircle className="text-green-600 w-[18px] h-[18px] sm:w-5 sm:h-5" />
           </div>
           <div className="text-xl sm:text-2xl font-bold text-green-900">${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           <p className="text-[10px] sm:text-xs text-green-600 mt-1">{feePayments.filter(p => p.status === 'paid').length} locations</p>
@@ -173,7 +173,7 @@ export default function FranchiseFees() {
         <div className="bg-yellow-50 p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs sm:text-sm font-medium text-yellow-700">Pending</span>
-            <Clock className="text-yellow-600" size={18} className="sm:w-5 sm:h-5" />
+            <Clock className="text-yellow-600 w-[18px] h-[18px] sm:w-5 sm:h-5" />
           </div>
           <div className="text-xl sm:text-2xl font-bold text-yellow-900">${totalPending.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           <p className="text-[10px] sm:text-xs text-yellow-600 mt-1">{feePayments.filter(p => p.status === 'pending').length} locations</p>
@@ -181,7 +181,7 @@ export default function FranchiseFees() {
         <div className="bg-red-50 p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs sm:text-sm font-medium text-red-700">Overdue</span>
-            <AlertCircle className="text-red-600" size={18} className="sm:w-5 sm:h-5" />
+            <AlertCircle className="text-red-600 w-[18px] h-[18px] sm:w-5 sm:h-5" />
           </div>
           <div className="text-xl sm:text-2xl font-bold text-red-900">${totalOverdue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           <p className="text-[10px] sm:text-xs text-red-600 mt-1">{feePayments.filter(p => p.status === 'overdue').length} locations</p>
