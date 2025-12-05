@@ -248,22 +248,22 @@ export default function StaffScheduleTimeline({ onShiftClick }: StaffScheduleTim
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Header with week navigation */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-gray-900">Staff Schedule</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Staff Schedule</h2>
           <div className="flex items-center gap-2">
             <button
               onClick={goToPreviousWeek}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label="Previous week"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
             </button>
             <button
               onClick={goToToday}
-              className="px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               Today
             </button>
@@ -272,22 +272,22 @@ export default function StaffScheduleTimeline({ onShiftClick }: StaffScheduleTim
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label="Next week"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={18} className="sm:w-5 sm:h-5" />
             </button>
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-xs sm:text-sm text-gray-600">
             {weekDates[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {weekDates[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </div>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
           {(userRole === 'owner' || userRole === 'manager') && (
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Viewing:</label>
+              <label className="text-xs sm:text-sm font-medium text-gray-700">Viewing:</label>
               <select
                 value={selectedStaffId || 'all'}
                 onChange={(e) => setSelectedStaffId(e.target.value === 'all' ? null : e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
               >
                 <option value="all">All Staff</option>
                 {locationStaff.map(staff => (
@@ -302,7 +302,7 @@ export default function StaffScheduleTimeline({ onShiftClick }: StaffScheduleTim
                 setEditingShift(null);
                 setShowShiftModal(true);
               }}
-              className="px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center gap-2"
+              className="px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center justify-center gap-2 text-sm min-h-[44px]"
             >
               <Plus size={16} />
               Add Shift
@@ -313,7 +313,7 @@ export default function StaffScheduleTimeline({ onShiftClick }: StaffScheduleTim
 
       {/* Timeline calendar */}
       <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
           <div className="inline-block min-w-full">
             {/* Header row */}
             <div className="flex border-b border-gray-200 bg-gray-50 sticky top-0 z-10">

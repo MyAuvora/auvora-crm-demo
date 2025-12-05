@@ -196,22 +196,22 @@ export default function StaffScheduleView({ staffId, staffName }: StaffScheduleV
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">
             {currentStaff ? `${currentStaff.name}'s Schedule` : 'My Schedule'}
           </h2>
-          <p className="text-sm text-gray-600 mt-1">View shifts and request changes</p>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">View shifts and request changes</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           {showStaffSelector && (
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Viewing:</label>
+              <label className="text-xs sm:text-sm font-medium text-gray-700">Viewing:</label>
               <select
                 value={effectiveStaffId}
                 onChange={(e) => setSelectedStaffId(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
               >
                 {roleStaff.map(s => (
                   <option key={s.id} value={s.id}>{s.name}</option>
@@ -219,33 +219,33 @@ export default function StaffScheduleView({ staffId, staffName }: StaffScheduleV
               </select>
             </div>
           )}
-          <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+          <div className="flex gap-1 sm:gap-2 bg-gray-100 p-1 rounded-lg overflow-x-auto">
             <button
               onClick={() => setViewMode('my-schedule')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                 viewMode === 'my-schedule' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <div className="flex items-center gap-2">
-                <Calendar size={16} />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Calendar size={14} className="sm:w-4 sm:h-4" />
                 My Schedule
               </div>
             </button>
             <button
               onClick={() => setViewMode('team-schedule')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                 viewMode === 'team-schedule' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <div className="flex items-center gap-2">
-                <Users size={16} />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Users size={14} className="sm:w-4 sm:h-4" />
                 Team Schedule
               </div>
             </button>
           </div>
           <button
             onClick={handleRequestTimeOff}
-            className="px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center gap-2"
+            className="px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center justify-center gap-2 text-sm min-h-[44px]"
           >
             <Clock size={16} />
             Request Time Off
@@ -255,9 +255,9 @@ export default function StaffScheduleView({ staffId, staffName }: StaffScheduleV
 
 {viewMode === 'team-schedule' ? (
         // Simple grid layout for Team Schedule
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="text-xs sm:text-sm text-gray-600">
               {weekStart.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - {weekDates[6].toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
             </div>
             <div className="flex gap-2">
@@ -285,8 +285,8 @@ export default function StaffScheduleView({ staffId, staffName }: StaffScheduleV
           </div>
 
           <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <table className="w-full border-collapse min-w-[800px]">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-r border-gray-200 w-40">
