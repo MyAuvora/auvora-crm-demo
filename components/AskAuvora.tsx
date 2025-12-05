@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Sparkles, TrendingUp, Users, DollarSign, AlertCircle } from 'lucide-react';
 import { parseQuery, EXAMPLE_QUERIES } from '@/lib/agent/queryEngine';
-import { analyzePromoPerformance, analyzeRevenue, analyzeCancellations, generateInsights, rankCoachesByCancellations, rankMembersByActivity } from '@/lib/agent/analytics';
+import { analyzePromoPerformance, analyzeRevenue, analyzeCancellations, generateInsights, rankCoachesByCancellations, rankMembersByActivity, computeMemberFrequency, filterMembersByFrequency } from '@/lib/agent/analytics';
 import { getAllTransactions, getAllPromotions, getMembershipCancellations, getAllMembers, getAllBookings, getAllClasses, getAllStaff } from '@/lib/dataStore';
 import { generateStrategicPlan, parseTimeframe } from '@/lib/agent/strategicPlanner';
 import { computeRevenueRecommendations } from '@/lib/agent/recommendations';
@@ -99,7 +99,71 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
         const oneMonthAgo = new Date(now);
         oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-        if (parsed.intent === 'list_promotions') {
+        if (parsed.intent === 'member_frequency_analysis' && parsed.params.frequency) {
+          const freq = parsed.params.frequency;
+          
+          const frequencyStats = computeMemberFrequency(bookings, {
+            period: freq.period,
+            metric: freq.metric,
+            timeRange: parsed.params.timeRange
+          });
+          
+          const result = filterMembersByFrequency(frequencyStats, {
+            operator: freq.operator,
+            value: freq.value,
+            period: freq.period
+          });
+          
+          const operatorText = freq.operator === 'at_least' ? 'at least' :
+                              freq.operator === 'at_most' ? 'at most' :
+                              freq.operator === 'equal' ? 'exactly' : '';
+          
+          const periodText = freq.period === 'week' ? 'per week' : 'per month';
+          const metricText = freq.metric === 'checkins' ? 'check in' : 'book';
+          
+          let content = `**${result.count} members** ${metricText} ${operatorText} ${freq.value} times ${periodText} on average.\n\n`;
+          
+          content += `📊 **Analysis Details:**\n`;
+          content += `• Timeframe: ${result.summary.timeframeDescription}\n`;
+          content += `• Total members analyzed: ${result.summary.totalMembersAnalyzed}\n`;
+          content += `• Based on actual ${freq.metric === 'checkins' ? 'check-ins' : 'bookings'}\n\n`;
+          
+          if (freq.returnList || result.count <= 10) {
+            content += `**Members in this group:**\n`;
+            const membersToShow = result.members.slice(0, 10);
+            membersToShow.forEach((member, idx) => {
+              const avg = freq.period === 'week' ? member.avgPerWeek : member.avgPerMonth;
+              content += `${idx + 1}. ${member.memberName} - ${avg.toFixed(1)} ${periodText}\n`;
+            });
+            
+            if (result.count > 10) {
+              content += `\n...and ${result.count - 10} more members.\n`;
+            }
+          } else {
+            content += `💡 **Want to see the list?** Ask me "Show me the list of members who attend ${operatorText} ${freq.value} times ${periodText}"\n`;
+          }
+          
+          if (result.count > 0) {
+            content += `\n**What you can do:**\n`;
+            if (freq.operator === 'at_least' && freq.value >= 3) {
+              content += `• These are your most engaged members - consider loyalty rewards\n`;
+              content += `• Ask them for referrals or testimonials\n`;
+              content += `• Invite them to try new classes or programs\n`;
+            } else if (freq.operator === 'at_most' && freq.value <= 1) {
+              content += `• These members may be at risk - consider re-engagement campaigns\n`;
+              content += `• Send personalized check-in messages\n`;
+              content += `• Offer incentives to increase attendance\n`;
+            }
+          }
+          
+          response = {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content,
+            data: result,
+            citations: ['Booking records', 'Member data'],
+          };
+        } else if (parsed.intent === 'list_promotions') {
           const timeRange = parsed.params.timeRange || { start: twelveMonthsAgo, end: now, description: 'Past 12 months' };
           const promoPerformance = analyzePromoPerformance(transactions, timeRange);
 
