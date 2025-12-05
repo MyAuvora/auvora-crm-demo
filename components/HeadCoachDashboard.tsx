@@ -394,37 +394,37 @@ export default function HeadCoachDashboard() {
 
             {pendingTimeOffRequests.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Time Off Requests ({pendingTimeOffRequests.length})</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Time Off Requests ({pendingTimeOffRequests.length})</h3>
                 <div className="space-y-3">
                   {pendingTimeOffRequests.map((request) => (
-                    <div key={request.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-start justify-between">
+                    <div key={request.id} className="border border-gray-200 rounded-lg p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Clock size={16} className="text-gray-400" />
-                            <span className="font-medium text-gray-900">{request.coachName}</span>
-                            <span className="text-sm text-gray-500">• {request.startDate} to {request.endDate}</span>
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                            <Clock size={14} className="text-gray-400 sm:w-4 sm:h-4" />
+                            <span className="font-medium text-gray-900 text-sm sm:text-base">{request.coachName}</span>
+                            <span className="text-xs sm:text-sm text-gray-500">• {request.startDate} to {request.endDate}</span>
                           </div>
-                          <p className="text-sm text-gray-600 mb-2">
+                          <p className="text-xs sm:text-sm text-gray-600 mb-2">
                             Reason: {request.reason}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-xs sm:text-sm text-gray-500">
                             Affects {request.affectedClassIds.length} class{request.affectedClassIds.length !== 1 ? 'es' : ''}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
+                        <div className="flex items-center gap-2 sm:ml-4">
                           <button
                             onClick={() => handleApproveTimeOff(request.id)}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] text-xs sm:text-sm"
                           >
-                            <CheckCircle size={16} />
+                            <CheckCircle size={14} className="sm:w-4 sm:h-4" />
                             Approve
                           </button>
                           <button
                             onClick={() => handleDenyTimeOff(request.id)}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] text-xs sm:text-sm"
                           >
-                            <XCircle size={16} />
+                            <XCircle size={14} className="sm:w-4 sm:h-4" />
                             Deny
                           </button>
                         </div>
