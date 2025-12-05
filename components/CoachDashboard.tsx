@@ -285,44 +285,45 @@ export default function CoachDashboard() {
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <Clock size={24} className="text-red-600" />
-            <h2 className="text-xl font-bold text-gray-900">This Week&apos;s Schedule</h2>
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Clock size={20} className="text-red-600 sm:w-6 sm:h-6" />
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">This Week&apos;s Schedule</h2>
           </div>
         </div>
-        <div className="p-6">
-          <div className="space-y-6">
+        <div className="p-4 sm:p-6">
+          <div className="space-y-4 sm:space-y-6">
             {weeklyClasses.map(({ day, classes: dayClasses }) => (
               <div key={day}>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">{day}</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">{day}</h3>
                 {dayClasses.length === 0 ? (
-                  <p className="text-sm text-gray-500 ml-4">No classes scheduled</p>
+                  <p className="text-xs sm:text-sm text-gray-500 ml-2 sm:ml-4">No classes scheduled</p>
                 ) : (
                   <div className="space-y-2">
                     {dayClasses.map(cls => (
                       <div
                         key={cls.id}
-                        className="ml-4 border border-gray-200 rounded-lg p-3 hover:border-red-300 transition-colors"
+                        className="ml-0 sm:ml-4 border border-gray-200 rounded-lg p-2 sm:p-3 hover:border-red-300 transition-colors"
                       >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="font-medium text-gray-900">{cls.name}</span>
-                            <span className="text-sm text-gray-600 ml-3">{cls.time} • {cls.duration} min</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                          <div className="flex-1">
+                            <span className="font-medium text-gray-900 text-sm sm:text-base">{cls.name}</span>
+                            <span className="text-xs sm:text-sm text-gray-600 ml-2 sm:ml-3">{cls.time} • {cls.duration} min</span>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-gray-700">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <span className="text-xs sm:text-sm font-medium text-gray-700">
                                 {cls.bookedCount}/{cls.capacity}
                               </span>
-                              <Users size={16} className="text-gray-500" />
+                              <Users size={14} className="text-gray-500 sm:w-4 sm:h-4" />
                             </div>
                             <button
                               onClick={() => handleClassClick(cls)}
-                              className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 flex items-center gap-1.5 text-sm"
+                              className="px-2 sm:px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm min-h-[36px]"
                             >
-                              <ArrowLeftRight size={14} />
-                              Request Sub
+                              <ArrowLeftRight size={12} className="sm:w-3.5 sm:h-3.5" />
+                              <span className="hidden sm:inline">Request Sub</span>
+                              <span className="sm:hidden">Sub</span>
                             </button>
                           </div>
                         </div>
@@ -357,30 +358,30 @@ export default function CoachDashboard() {
       </div>
 
       {showSubstitutionModal && selectedClassForSub && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">Request Substitution</h2>
-              <p className="text-sm text-gray-600 mt-1">{selectedClassForSub.name} - {selectedClassForSub.time}</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[95vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Request Substitution</h2>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">{selectedClassForSub.name} - {selectedClassForSub.time}</p>
             </div>
-            <div className="p-6">
-              <p className="text-sm text-gray-700 mb-4">
+            <div className="p-4 sm:p-6">
+              <p className="text-xs sm:text-sm text-gray-700 mb-3 sm:mb-4">
                 Choose how you&apos;d like to handle this class:
               </p>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <button
                   onClick={() => handleRequestSubstitution('available')}
-                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-left"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-left min-h-[44px]"
                 >
-                  <div className="font-medium">Make Available for Substitution</div>
-                  <div className="text-sm text-blue-100 mt-1">Any coach can take this class</div>
+                  <div className="font-medium text-sm sm:text-base">Make Available for Substitution</div>
+                  <div className="text-xs sm:text-sm text-blue-100 mt-1">Any coach can take this class</div>
                 </button>
                 <button
                   onClick={() => handleRequestSubstitution('switch')}
-                  className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-left"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-left min-h-[44px]"
                 >
-                  <div className="font-medium">Request Switch with Specific Coach</div>
-                  <div className="text-sm text-purple-100 mt-1">Swap classes with another coach</div>
+                  <div className="font-medium text-sm sm:text-base">Request Switch with Specific Coach</div>
+                  <div className="text-xs sm:text-sm text-purple-100 mt-1">Swap classes with another coach</div>
                 </button>
               </div>
               <button
@@ -388,7 +389,7 @@ export default function CoachDashboard() {
                   setShowSubstitutionModal(false);
                   setSelectedClassForSub(null);
                 }}
-                className="w-full mt-4 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                className="w-full mt-3 sm:mt-4 px-3 sm:px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 min-h-[44px] text-sm sm:text-base"
               >
                 Cancel
               </button>
@@ -472,53 +473,53 @@ function TimeOffRequestModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Request Time Off</h2>
-          <p className="text-sm text-gray-600 mt-1">{coachName}</p>
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[95vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Request Time Off</h2>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">{coachName}</p>
         </div>
-        <div className="p-6">
-          <div className="space-y-4">
+        <div className="p-4 sm:p-6">
+          <div className="space-y-3 sm:space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Start Date *</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm sm:text-base min-h-[44px]"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">End Date *</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">End Date *</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm sm:text-base min-h-[44px]"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Reason *</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Reason *</label>
               <textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Vacation, personal, medical, etc."
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm sm:text-base"
               />
             </div>
           </div>
-          <div className="flex gap-3 mt-6">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
             <button
               onClick={handleSubmit}
-              className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              className="flex-1 px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 min-h-[44px] text-sm sm:text-base"
             >
               Submit Request
             </button>
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              className="px-3 sm:px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 min-h-[44px] text-sm sm:text-base sm:flex-none"
             >
               Cancel
             </button>
