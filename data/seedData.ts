@@ -1,4 +1,4 @@
-import { Member, ClassPackClient, Lead, Staff, Class, Promotion, Product } from '@/lib/types';
+import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, Product, Goal, Note, SubstitutionRequest, TimeOffRequest, CoachLeadInteraction, StaffSettings, StaffShift, FranchiseLocation, FranchiseSummary } from '@/lib/types';
 
 const tampaZipCodes = ['33602', '33603', '33606', '33607', '33609', '33611', '33612', '33613', '33614', '33615'];
 
@@ -34,6 +34,22 @@ export function generateMembers(): Member[] {
   
   for (let i = 0; i < 150; i++) {
     const name = generateName();
+    const joinDate = randomDate(365);
+    const joinDateObj = new Date(joinDate);
+    
+    const lastPaymentDate = new Date(joinDateObj);
+    lastPaymentDate.setMonth(lastPaymentDate.getMonth() + Math.floor((new Date().getTime() - joinDateObj.getTime()) / (30 * 24 * 60 * 60 * 1000)));
+    
+    const nextPaymentDue = new Date(lastPaymentDate);
+    nextPaymentDue.setMonth(nextPaymentDue.getMonth() + 1);
+    
+    const isOverdue = Math.random() < 0.15;
+    const paymentStatus: 'current' | 'overdue' = isOverdue ? 'overdue' : 'current';
+    
+    if (isOverdue) {
+      nextPaymentDue.setDate(nextPaymentDue.getDate() - Math.floor(Math.random() * 30 + 5)); // 5-35 days overdue
+    }
+    
     members.push({
       id: `member-${i + 1}`,
       name,
@@ -44,8 +60,11 @@ export function generateMembers(): Member[] {
       lastVisit: randomDate(30),
       zipCode: randomItem(tampaZipCodes),
       location: 'athletic-club',
-      joinDate: randomDate(365),
-      visitsLast30Days: Math.floor(Math.random() * 20) + 1
+      joinDate,
+      visitsLast30Days: Math.floor(Math.random() * 20) + 1,
+      paymentStatus,
+      lastPaymentDate: lastPaymentDate.toISOString().split('T')[0],
+      nextPaymentDue: nextPaymentDue.toISOString().split('T')[0]
     });
   }
   
@@ -56,7 +75,7 @@ export function generateClassPackClients(): ClassPackClient[] {
   const clients: ClassPackClient[] = [];
   const packTypes: ('5-pack' | '10-pack' | '20-pack')[] = ['5-pack', '10-pack', '20-pack'];
   
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 20; i++) {
     const name = generateName();
     const packType = randomItem(packTypes);
     const totalClasses = parseInt(packType.split('-')[0]);
@@ -76,7 +95,7 @@ export function generateClassPackClients(): ClassPackClient[] {
     });
   }
   
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 15; i++) {
     const name = generateName();
     const packType = randomItem(packTypes);
     const totalClasses = parseInt(packType.split('-')[0]);
@@ -93,6 +112,50 @@ export function generateClassPackClients(): ClassPackClient[] {
       zipCode: randomItem(tampaZipCodes),
       location: 'dance-studio',
       purchaseDate: randomDate(90)
+    });
+  }
+  
+  return clients;
+}
+
+export function generateDropInClients(): DropInClient[] {
+  const clients: DropInClient[] = [];
+  
+  for (let i = 0; i < 30; i++) {
+    const name = generateName();
+    const firstVisit = randomDate(180);
+    const lastVisit = randomDate(30);
+    const totalVisits = Math.floor(Math.random() * 15) + 1;
+    
+    clients.push({
+      id: `dropin-ac-${i + 1}`,
+      name,
+      email: generateEmail(name),
+      phone: generatePhone(),
+      totalVisits,
+      lastVisit,
+      zipCode: randomItem(tampaZipCodes),
+      location: 'athletic-club',
+      firstVisit
+    });
+  }
+  
+  for (let i = 0; i < 20; i++) {
+    const name = generateName();
+    const firstVisit = randomDate(180);
+    const lastVisit = randomDate(30);
+    const totalVisits = Math.floor(Math.random() * 12) + 1;
+    
+    clients.push({
+      id: `dropin-ds-${i + 1}`,
+      name,
+      email: generateEmail(name),
+      phone: generatePhone(),
+      totalVisits,
+      lastVisit,
+      zipCode: randomItem(tampaZipCodes),
+      location: 'dance-studio',
+      firstVisit
     });
   }
   
@@ -136,12 +199,31 @@ export function generateLeads(): Lead[] {
 export function generateStaff(): Staff[] {
   const staff: Staff[] = [];
   
+  const headCoachNames = ['Chris Johnson', 'Pat Williams'];
   const coachNames = ['Alex Rivera', 'Jordan Martinez', 'Casey Thompson', 'Morgan Lee', 'Taylor Anderson', 'Jamie Wilson'];
-  const frontDeskNames = ['Sam Brown', 'Riley Davis', 'Avery Garcia'];
+  const frontDeskNames = ['Sam Brown', 'Riley Davis', 'Avery Garcia', 'Jessica Chen'];
   const instructorNames = ['Quinn Rodriguez', 'Skylar Hernandez', 'Dakota Lopez', 'Cameron Gonzalez', 'Parker Torres'];
   
   const specialties = ['strength', 'conditioning', 'beginners', 'advanced', 'HIIT', 'endurance'];
   const danceStyles = ['Zumba', 'Salsa', 'Hip-Hop'];
+  
+  staff.push({
+    id: 'head-coach-1',
+    name: headCoachNames[0],
+    email: generateEmail(headCoachNames[0]),
+    role: 'head-coach',
+    location: 'athletic-club',
+    specialties: ['leadership', 'program-design', 'strength', 'conditioning']
+  });
+  
+  staff.push({
+    id: 'head-coach-2',
+    name: headCoachNames[1],
+    email: generateEmail(headCoachNames[1]),
+    role: 'head-coach',
+    location: 'dance-studio',
+    styles: ['choreography', 'performance', 'Salsa', 'Hip-Hop']
+  });
   
   coachNames.forEach((name, i) => {
     staff.push({
@@ -164,6 +246,17 @@ export function generateStaff(): Staff[] {
     });
   });
   
+  const dsFrontDeskNames = ['Taylor Kim', 'Jordan Lee', 'Alex Martinez'];
+  dsFrontDeskNames.forEach((name, i) => {
+    staff.push({
+      id: `desk-ds-${i + 1}`,
+      name,
+      email: generateEmail(name),
+      role: 'front-desk',
+      location: 'dance-studio'
+    });
+  });
+  
   instructorNames.forEach((name, i) => {
     staff.push({
       id: `instructor-${i + 1}`,
@@ -180,69 +273,61 @@ export function generateStaff(): Staff[] {
 
 export function generateClasses(): Class[] {
   const classes: Class[] = [];
-  const coaches = generateStaff().filter(s => s.role === 'coach');
-  const instructors = generateStaff().filter(s => s.role === 'instructor');
+  const coaches = generateStaff().filter(s => s.role === 'coach' || s.role === 'head-coach');
+  const instructors = generateStaff().filter(s => s.role === 'instructor' || s.role === 'head-coach');
   
-  const athleticClassNames = ['Circuit Training', 'HIIT Blast', 'Strength & Conditioning', 'Bootcamp', 'Core Power', 'Cardio Burn', 'Total Body'];
-  const danceClassTypes = ['Zumba', 'Salsa', 'Hip-Hop'];
+  const athleticClassNames = ['Circuit Training', 'HIIT Blast', 'Strength & Conditioning', 'Bootcamp', 'Core Power', 'Cardio Burn', 'Total Body', 'Functional Fitness', 'Athletic Performance', 'CrossFit'];
+  const danceClassTypes = ['Zumba', 'Salsa', 'Hip-Hop', 'Contemporary', 'Ballet', 'Jazz', 'Bachata', 'Ballroom'];
   
-  const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const athleticTimes = ['6:00 AM', '7:00 AM', '9:00 AM', '12:00 PM', '5:00 PM', '6:00 PM', '7:00 PM'];
-  const saturdayTimes = ['9:00 AM', '10:00 AM'];
-  const danceTimes = ['6:00 PM', '7:00 PM', '8:00 PM'];
+  const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  
+  const athleticTimes = [
+    '5:30 AM', '6:00 AM', '6:30 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', 
+    '11:00 AM', '12:00 PM', '1:00 PM', '4:30 PM', '5:00 PM', '5:30 PM', '6:00 PM', 
+    '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM'
+  ];
+  const danceTimes = ['5:00 PM', '6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM', '8:30 PM'];
   
   let classId = 1;
   
-  weekdays.forEach(day => {
-    athleticTimes.forEach(time => {
-      const coach = randomItem(coaches);
-      const duration = Math.random() > 0.5 ? 30 : 60;
+  const acCoaches = coaches.filter(c => c.location === 'athletic-club');
+  allDays.forEach(day => {
+    const timesForDay = day === 'Saturday' || day === 'Sunday' 
+      ? ['8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM']
+      : athleticTimes;
+    
+    timesForDay.forEach(time => {
+      const coach = randomItem(acCoaches);
+      const className = randomItem(athleticClassNames);
+      const duration = className === 'HIIT Blast' || className === 'Core Power' ? 30 : 60;
       const capacity = 20;
-      const bookedCount = Math.floor(Math.random() * capacity);
       
       classes.push({
         id: `class-ac-${classId++}`,
-        name: randomItem(athleticClassNames),
-        type: 'Circuit Training',
+        name: className,
+        type: className,
         duration,
         dayOfWeek: day,
         time,
         coachId: coach.id,
         capacity,
         location: 'athletic-club',
-        bookedCount,
+        bookedCount: 0,
         attendees: []
       });
     });
   });
   
-  saturdayTimes.forEach(time => {
-    const coach = randomItem(coaches);
-    const duration = Math.random() > 0.5 ? 30 : 60;
-    const capacity = 20;
-    const bookedCount = Math.floor(Math.random() * capacity);
+  const dsInstructors = instructors.filter(i => i.location === 'dance-studio');
+  allDays.forEach(day => {
+    const timesForDay = day === 'Saturday' || day === 'Sunday'
+      ? ['10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM']
+      : danceTimes;
     
-    classes.push({
-      id: `class-ac-${classId++}`,
-      name: randomItem(athleticClassNames),
-      type: 'Circuit Training',
-      duration,
-      dayOfWeek: 'Saturday',
-      time,
-      coachId: coach.id,
-      capacity,
-      location: 'athletic-club',
-      bookedCount,
-      attendees: []
-    });
-  });
-  
-  weekdays.forEach(day => {
-    danceTimes.forEach(time => {
-      const instructor = randomItem(instructors);
+    timesForDay.forEach(time => {
+      const instructor = randomItem(dsInstructors);
       const classType = randomItem(danceClassTypes);
       const capacity = 25;
-      const bookedCount = Math.floor(Math.random() * capacity);
       
       classes.push({
         id: `class-ds-${classId++}`,
@@ -254,7 +339,7 @@ export function generateClasses(): Class[] {
         coachId: instructor.id,
         capacity,
         location: 'dance-studio',
-        bookedCount,
+        bookedCount: 0,
         attendees: []
       });
     });
@@ -316,10 +401,506 @@ export function generateProducts(): Product[] {
   ];
 }
 
+export function generateGoals(): Goal[] {
+  const goals: Goal[] = [];
+  const members = generateMembers();
+  const staff = generateStaff().filter(s => s.role === 'coach');
+  
+  const goalTemplates = [
+    { category: 'weight-loss' as const, title: 'Lose 10 pounds', description: 'Achieve healthy weight loss through consistent training and nutrition', startValue: '180', targetValue: '170', units: 'lbs' },
+    { category: 'weight-loss' as const, title: 'Lose 20 pounds', description: 'Long-term weight loss goal with sustainable habits', startValue: '200', targetValue: '180', units: 'lbs' },
+    { category: 'strength' as const, title: 'Increase bench press by 20%', description: 'Build upper body strength progressively', startValue: '135', targetValue: '162', units: 'lbs' },
+    { category: 'strength' as const, title: 'Complete 10 pull-ups', description: 'Develop back and arm strength', startValue: '3', targetValue: '10', units: 'reps' },
+    { category: 'attendance' as const, title: 'Attend 3x per week', description: 'Build consistent training habit', startValue: '1', targetValue: '3', units: 'days/week' },
+    { category: 'attendance' as const, title: 'Attend 4x per week', description: 'Increase training frequency', startValue: '2', targetValue: '4', units: 'days/week' },
+    { category: 'mobility' as const, title: 'Touch toes without bending knees', description: 'Improve hamstring flexibility', startValue: '', targetValue: '', units: '' },
+    { category: 'mobility' as const, title: 'Full squat depth', description: 'Achieve proper squat form and mobility', startValue: '', targetValue: '', units: '' },
+    { category: 'rehab' as const, title: 'Return to training post-injury', description: 'Safely rebuild strength and mobility after knee injury', startValue: '', targetValue: '', units: '' },
+    { category: 'strength' as const, title: 'Deadlift 200 pounds', description: 'Build lower body and back strength', startValue: '135', targetValue: '200', units: 'lbs' },
+  ];
+  
+  for (let i = 0; i < 12; i++) {
+    const member = members[i];
+    const coach = randomItem(staff);
+    const template = randomItem(goalTemplates);
+    const daysAgo = Math.floor(Math.random() * 60);
+    const createdDate = new Date();
+    createdDate.setDate(createdDate.getDate() - daysAgo);
+    
+    const targetDate = new Date(createdDate);
+    targetDate.setDate(targetDate.getDate() + 90);
+    
+    const isCompleted = Math.random() < 0.3;
+    const status = isCompleted ? 'completed' as const : 'active' as const;
+    const progress = isCompleted ? 100 : Math.floor(Math.random() * 70) + 10;
+    
+    const currentValue = template.startValue && template.targetValue ? 
+      (parseInt(template.startValue) + (parseInt(template.targetValue) - parseInt(template.startValue)) * (progress / 100)).toString() : 
+      '';
+    
+    goals.push({
+      id: `goal-${i + 1}`,
+      memberId: member.id,
+      title: template.title,
+      description: template.description,
+      category: template.category,
+      targetDate: targetDate.toISOString().split('T')[0],
+      startValue: template.startValue,
+      targetValue: template.targetValue,
+      currentValue,
+      units: template.units,
+      status,
+      progress,
+      assignedCoach: coach.id,
+      memberVisible: true,
+      privateNotes: Math.random() < 0.5 ? 'Client is very motivated and consistent' : '',
+      createdDate: createdDate.toISOString(),
+      updatedDate: new Date().toISOString(),
+      completedDate: isCompleted ? new Date().toISOString() : undefined,
+    });
+  }
+  
+  return goals;
+}
+
+export function generateNotes(): Note[] {
+  const notes: Note[] = [];
+  const members = generateMembers();
+  const staff = generateStaff().filter(s => s.role === 'coach');
+  
+  const noteTemplates = [
+    { type: 'session' as const, title: 'Great Training Session', content: 'Focus: Upper body strength\nExercises completed: Bench press, rows, shoulder press\nRPE: 8/10\nNotes: Client showed excellent form and pushed hard today. Ready to increase weight next session.' },
+    { type: 'session' as const, title: 'Lower Body Focus', content: 'Focus: Legs and core\nExercises completed: Squats, deadlifts, lunges, planks\nRPE: 9/10\nNotes: Client struggled with squat depth but improved throughout the session.' },
+    { type: 'assessment' as const, title: 'Monthly Fitness Assessment', content: 'Strengths: Cardiovascular endurance has improved significantly\nAreas for improvement: Core stability, upper body strength\nRecommendations: Add 2 core-focused sessions per week' },
+    { type: 'injury' as const, title: 'Knee Discomfort', content: 'Injury: Right knee slight discomfort during squats\nStatus: Minor, no swelling\nModifications needed: Reduce squat depth, avoid jumping movements\nNext steps: Monitor for 1 week, ice after workouts' },
+    { type: 'nutrition' as const, title: 'Nutrition Check-in', content: 'Current habits: Eating 3 meals per day, drinking plenty of water\nChallenges: Late night snacking, weekend overeating\nRecommendations: Meal prep on Sundays, keep healthy snacks available' },
+    { type: 'general' as const, title: 'Progress Update', content: 'Client is making excellent progress toward their goals. Attendance has been consistent at 3-4x per week. Energy levels are up and they report feeling stronger.' },
+    { type: 'session' as const, title: 'HIIT Workout', content: 'Focus: Cardio and conditioning\nExercises completed: Burpees, mountain climbers, jump rope, kettlebell swings\nRPE: 9/10\nNotes: Client kept up with the pace well. Heart rate recovery is improving.' },
+    { type: 'assessment' as const, title: 'Initial Assessment', content: 'Strengths: Good mobility, motivated mindset\nAreas for improvement: Overall strength, endurance\nRecommendations: Start with 2-3 sessions per week, focus on compound movements' },
+  ];
+  
+  for (let i = 0; i < 20; i++) {
+    const member = members[i % 12];
+    const coach = randomItem(staff);
+    const template = randomItem(noteTemplates);
+    const daysAgo = Math.floor(Math.random() * 45);
+    const createdDate = new Date();
+    createdDate.setDate(createdDate.getDate() - daysAgo);
+    
+    const visibilityOptions: ('private' | 'team' | 'member')[] = ['private', 'team', 'member'];
+    const visibility = template.type === 'injury' ? 'team' : randomItem(visibilityOptions);
+    
+    notes.push({
+      id: `note-${i + 1}`,
+      memberId: member.id,
+      type: template.type,
+      title: template.title,
+      content: template.content,
+      authorId: coach.id,
+      authorName: coach.name,
+      visibility,
+      createdDate: createdDate.toISOString(),
+      updatedDate: createdDate.toISOString(),
+    });
+  }
+  
+  return notes;
+}
+
 export const members = generateMembers();
 export const classPackClients = generateClassPackClients();
+export const dropInClients = generateDropInClients();
 export const leads = generateLeads();
 export const staff = generateStaff();
 export const classes = generateClasses();
 export const promotions = generatePromotions();
 export const products = generateProducts();
+export const goals = generateGoals();
+export const notes = generateNotes();
+
+export function generateCoachLeadInteractions(): CoachLeadInteraction[] {
+  const interactions: CoachLeadInteraction[] = [];
+  const coaches = staff.filter(s => s.role === 'coach');
+  const allLeads = leads;
+  const allClasses = classes;
+  
+  for (let i = 0; i < 60; i++) {
+    const lead = randomItem(allLeads);
+    const coach = randomItem(coaches);
+    const classItem = allClasses.find(c => c.coachId === coach.id);
+    
+    if (classItem) {
+      const interactionDate = randomDate(90);
+      const converted = Math.random() < 0.25;
+      
+      interactions.push({
+        id: `coach-lead-${i + 1}`,
+        leadId: lead.id,
+        coachId: coach.id,
+        classId: classItem.id,
+        interactionDate,
+        interactionType: 'trial-class',
+        converted,
+        conversionDate: converted ? new Date(new Date(interactionDate).getTime() + Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : undefined,
+        location: lead.location,
+      });
+    }
+  }
+  
+  return interactions;
+}
+
+export function generateSubstitutionRequests(): SubstitutionRequest[] {
+  const requests: SubstitutionRequest[] = [];
+  const coaches = staff.filter(s => s.role === 'coach');
+  const allClasses = classes;
+  
+  for (let i = 0; i < 3; i++) {
+    const requestingCoach = randomItem(coaches);
+    const classItem = allClasses.find(c => c.coachId === requestingCoach.id);
+    
+    if (classItem) {
+      const type: 'switch' | 'available' = i % 2 === 0 ? 'switch' : 'available';
+      const targetCoach = type === 'switch' ? coaches.find(c => c.id !== requestingCoach.id) : undefined;
+      
+      requests.push({
+        id: `sub-req-${i + 1}`,
+        classId: classItem.id,
+        className: classItem.name,
+        classDate: new Date(Date.now() + (i + 1) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        classTime: classItem.time,
+        requestingCoachId: requestingCoach.id,
+        requestingCoachName: requestingCoach.name,
+        type,
+        targetCoachId: targetCoach?.id,
+        targetCoachName: targetCoach?.name,
+        status: 'pending',
+        reason: type === 'switch' ? 'Personal appointment' : 'Available for coverage',
+        createdDate: new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString(),
+        location: classItem.location,
+      });
+    }
+  }
+  
+  return requests;
+}
+
+export function generateTimeOffRequests(): TimeOffRequest[] {
+  const requests: TimeOffRequest[] = [];
+  const coaches = staff.filter(s => s.role === 'coach');
+  const allClasses = classes;
+  
+  for (let i = 0; i < 2; i++) {
+    const coach = randomItem(coaches);
+    const startDate = new Date(Date.now() + (i + 2) * 14 * 24 * 60 * 60 * 1000);
+    const endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    const affectedClasses = allClasses
+      .filter(c => c.coachId === coach.id)
+      .slice(0, 3)
+      .map(c => c.id);
+    
+    requests.push({
+      id: `time-off-${i + 1}`,
+      coachId: coach.id,
+      coachName: coach.name,
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      reason: i === 0 ? 'Family vacation' : 'Medical appointment',
+      status: 'pending',
+      affectedClassIds: affectedClasses,
+      createdDate: new Date(Date.now() - Math.random() * 2 * 24 * 60 * 60 * 1000).toISOString(),
+      location: coach.location,
+    });
+  }
+  
+  return requests;
+}
+
+export function generateStaffSettings(): StaffSettings[] {
+  return staff.map(s => ({
+    staffId: s.id,
+    posAccess: true, // Default to true for all staff
+    location: s.location,
+  }));
+}
+
+export function generateStaffShifts(): StaffShift[] {
+  const shifts: StaffShift[] = [];
+  
+  const tampaFrontDesk = staff.filter(s => s.location === 'athletic-club' && s.role === 'front-desk');
+  const stPeteFrontDesk = staff.filter(s => s.location === 'dance-studio' && s.role === 'front-desk');
+  
+  if (tampaFrontDesk.length > 0) {
+    shifts.push({
+      id: `shift-tampa-morning-${Date.now()}`,
+      location: 'athletic-club',
+      assignedStaffId: tampaFrontDesk[0].id,
+      assignedStaffName: tampaFrontDesk[0].name,
+      templateType: 'front-desk',
+      notes: 'Morning front desk coverage',
+      recurrence: {
+        type: 'weekly',
+        dayOfWeek: 1, // Monday
+        startTime: '6:00 AM',
+        endTime: '2:00 PM',
+      },
+      status: 'scheduled',
+      createdBy: 'system',
+      createdAt: new Date().toISOString(),
+    });
+    
+    shifts.push({
+      id: `shift-tampa-morning-tue-${Date.now()}`,
+      location: 'athletic-club',
+      assignedStaffId: tampaFrontDesk[0].id,
+      assignedStaffName: tampaFrontDesk[0].name,
+      templateType: 'front-desk',
+      notes: 'Morning front desk coverage',
+      recurrence: {
+        type: 'weekly',
+        dayOfWeek: 2, // Tuesday
+        startTime: '6:00 AM',
+        endTime: '2:00 PM',
+      },
+      status: 'scheduled',
+      createdBy: 'system',
+      createdAt: new Date().toISOString(),
+    });
+    
+    shifts.push({
+      id: `shift-tampa-morning-wed-${Date.now()}`,
+      location: 'athletic-club',
+      assignedStaffId: tampaFrontDesk[0].id,
+      assignedStaffName: tampaFrontDesk[0].name,
+      templateType: 'front-desk',
+      notes: 'Morning front desk coverage',
+      recurrence: {
+        type: 'weekly',
+        dayOfWeek: 3, // Wednesday
+        startTime: '6:00 AM',
+        endTime: '2:00 PM',
+      },
+      status: 'scheduled',
+      createdBy: 'system',
+      createdAt: new Date().toISOString(),
+    });
+    
+    if (tampaFrontDesk.length > 1) {
+      shifts.push({
+        id: `shift-tampa-afternoon-${Date.now()}`,
+        location: 'athletic-club',
+        assignedStaffId: tampaFrontDesk[1].id,
+        assignedStaffName: tampaFrontDesk[1].name,
+        templateType: 'front-desk',
+        notes: 'Afternoon front desk coverage',
+        recurrence: {
+          type: 'weekly',
+          dayOfWeek: 1, // Monday
+          startTime: '2:00 PM',
+          endTime: '9:00 PM',
+        },
+        status: 'scheduled',
+        createdBy: 'system',
+        createdAt: new Date().toISOString(),
+      });
+      
+      shifts.push({
+        id: `shift-tampa-afternoon-thu-${Date.now()}`,
+        location: 'athletic-club',
+        assignedStaffId: tampaFrontDesk[1].id,
+        assignedStaffName: tampaFrontDesk[1].name,
+        templateType: 'front-desk',
+        notes: 'Afternoon front desk coverage',
+        recurrence: {
+          type: 'weekly',
+          dayOfWeek: 4, // Thursday
+          startTime: '2:00 PM',
+          endTime: '9:00 PM',
+        },
+        status: 'scheduled',
+        createdBy: 'system',
+        createdAt: new Date().toISOString(),
+      });
+    }
+  }
+  
+  if (stPeteFrontDesk.length > 0) {
+    shifts.push({
+      id: `shift-stpete-morning-${Date.now()}`,
+      location: 'dance-studio',
+      assignedStaffId: stPeteFrontDesk[0].id,
+      assignedStaffName: stPeteFrontDesk[0].name,
+      templateType: 'front-desk',
+      notes: 'Morning front desk coverage',
+      recurrence: {
+        type: 'weekly',
+        dayOfWeek: 1, // Monday
+        startTime: '6:00 AM',
+        endTime: '2:00 PM',
+      },
+      status: 'scheduled',
+      createdBy: 'system',
+      createdAt: new Date().toISOString(),
+    });
+    
+    shifts.push({
+      id: `shift-stpete-morning-fri-${Date.now()}`,
+      location: 'dance-studio',
+      assignedStaffId: stPeteFrontDesk[0].id,
+      assignedStaffName: stPeteFrontDesk[0].name,
+      templateType: 'front-desk',
+      notes: 'Morning front desk coverage',
+      recurrence: {
+        type: 'weekly',
+        dayOfWeek: 5, // Friday
+        startTime: '6:00 AM',
+        endTime: '2:00 PM',
+      },
+      status: 'scheduled',
+      createdBy: 'system',
+      createdAt: new Date().toISOString(),
+    });
+  }
+  
+  const today = new Date();
+  const nextSaturday = new Date(today);
+  nextSaturday.setDate(today.getDate() + (6 - today.getDay()));
+  
+  shifts.push({
+    id: `shift-event-${Date.now()}`,
+    location: 'athletic-club',
+    assignedStaffId: undefined,
+    assignedStaffName: undefined,
+    templateType: 'event',
+    notes: 'Open House Event - need staff coverage',
+    recurrence: {
+      type: 'none',
+    },
+    date: nextSaturday.toISOString().split('T')[0],
+    startTime: '10:00 AM',
+    endTime: '2:00 PM',
+    status: 'open',
+    createdBy: 'system',
+    createdAt: new Date().toISOString(),
+  });
+  
+  return shifts;
+}
+
+export const coachLeadInteractions = generateCoachLeadInteractions();
+export const substitutionRequests = generateSubstitutionRequests();
+export const timeOffRequests = generateTimeOffRequests();
+export const staffSettings = generateStaffSettings();
+export const staffShifts = generateStaffShifts();
+
+// Franchise Locations - 26 total (Tampa + 25 other cities)
+export function generateFranchiseLocations(): FranchiseLocation[] {
+  const cities = [
+    { city: 'Tampa', state: 'FL', id: 'athletic-club' }, // The original Tampa location (clickable)
+    { city: 'Austin', state: 'TX', id: 'lab-austin' },
+    { city: 'Miami', state: 'FL', id: 'lab-miami' },
+    { city: 'Denver', state: 'CO', id: 'lab-denver' },
+    { city: 'Seattle', state: 'WA', id: 'lab-seattle' },
+    { city: 'Portland', state: 'OR', id: 'lab-portland' },
+    { city: 'Phoenix', state: 'AZ', id: 'lab-phoenix' },
+    { city: 'San Diego', state: 'CA', id: 'lab-san-diego' },
+    { city: 'Dallas', state: 'TX', id: 'lab-dallas' },
+    { city: 'Houston', state: 'TX', id: 'lab-houston' },
+    { city: 'Atlanta', state: 'GA', id: 'lab-atlanta' },
+    { city: 'Charlotte', state: 'NC', id: 'lab-charlotte' },
+    { city: 'Nashville', state: 'TN', id: 'lab-nashville' },
+    { city: 'Orlando', state: 'FL', id: 'lab-orlando' },
+    { city: 'Las Vegas', state: 'NV', id: 'lab-las-vegas' },
+    { city: 'San Antonio', state: 'TX', id: 'lab-san-antonio' },
+    { city: 'Jacksonville', state: 'FL', id: 'lab-jacksonville' },
+    { city: 'Fort Worth', state: 'TX', id: 'lab-fort-worth' },
+    { city: 'Columbus', state: 'OH', id: 'lab-columbus' },
+    { city: 'Indianapolis', state: 'IN', id: 'lab-indianapolis' },
+    { city: 'Raleigh', state: 'NC', id: 'lab-raleigh' },
+    { city: 'Memphis', state: 'TN', id: 'lab-memphis' },
+    { city: 'Louisville', state: 'KY', id: 'lab-louisville' },
+    { city: 'Richmond', state: 'VA', id: 'lab-richmond' },
+    { city: 'Oklahoma City', state: 'OK', id: 'lab-oklahoma-city' },
+    { city: 'Tucson', state: 'AZ', id: 'lab-tucson' },
+  ];
+
+  return cities.map(({ city, state, id }) => ({
+    id,
+    name: `The Lab ${city}`,
+    city,
+    state,
+    type: 'athletic-club' as const,
+    clickable: id === 'athletic-club', // Only Tampa is clickable
+  }));
+}
+
+// Generate realistic franchise summaries for non-Tampa locations
+export function generateFranchiseSummaries(): Record<string, FranchiseSummary> {
+  const locations = generateFranchiseLocations();
+  const summaries: Record<string, FranchiseSummary> = {};
+
+  // Seeded random number generator for consistent results
+  function seededRandom(seed: string): number {
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+      hash = hash & hash;
+    }
+    return Math.abs(Math.sin(hash) * 10000) % 1;
+  }
+
+  locations.forEach((location, index) => {
+    // Skip Tampa - it has real data
+    if (location.id === 'athletic-club') return;
+
+    const seed = location.id;
+    const rand1 = seededRandom(seed + '1');
+    const rand2 = seededRandom(seed + '2');
+    const rand3 = seededRandom(seed + '3');
+    const rand4 = seededRandom(seed + '4');
+    const rand5 = seededRandom(seed + '5');
+    const rand6 = seededRandom(seed + '6');
+
+    // Generate realistic metrics with variation
+    const mtdRevenue = Math.floor(12000 + rand1 * 33000); // 12k-45k
+    const lastMonthRevenue = Math.floor(mtdRevenue * (0.85 + rand2 * 0.30)); // ±15%
+    const ytdRevenue = Math.floor(mtdRevenue * (10 + rand3 * 2)); // ~10-12 months
+    const yoyGrowth = -5 + rand4 * 30; // -5% to 25%
+    
+    const activeMembers = Math.floor(100 + (mtdRevenue / 150)); // Correlated with revenue
+    const newMembers = Math.floor(5 + rand5 * 35); // 5-40
+    const cancelled = Math.floor(rand6 * 20); // 0-20
+    
+    const leads = Math.floor(100 + rand1 * 300); // 100-400
+    const conversion = Math.min(0.45, Math.max(0.15, newMembers / leads)); // 15%-45%
+    
+    const avgFillRate = 0.45 + rand2 * 0.40; // 45%-85%
+    const churnRate = 0.01 + rand3 * 0.05; // 1%-6%
+    
+    const totalStaff = Math.floor(8 + rand4 * 8); // 8-16
+    const totalClasses = Math.floor(60 + rand5 * 80); // 60-140
+
+    summaries[location.id] = {
+      locationId: location.id,
+      mtdRevenue,
+      lastMonthRevenue,
+      ytdRevenue,
+      yoyGrowth,
+      activeMembers,
+      newMembers,
+      cancelled,
+      leads,
+      conversion,
+      avgFillRate,
+      churnRate,
+      totalStaff,
+      totalClasses,
+    };
+  });
+
+  return summaries;
+}
+
+export const franchiseLocations = generateFranchiseLocations();
+export const franchiseSummaries = generateFranchiseSummaries();
