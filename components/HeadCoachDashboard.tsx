@@ -225,42 +225,43 @@ export default function HeadCoachDashboard() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Coach Performance</h2>
-          <p className="text-sm text-gray-600 mt-1">Individual coach metrics for {timeRange}</p>
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Coach Performance</h2>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Individual coach metrics for {timeRange}</p>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left">
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left">
                   <button
                     onClick={() => handleSort('name')}
-                    className="flex items-center gap-2 text-xs font-medium text-gray-600 uppercase tracking-wider hover:text-gray-900"
+                    className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs font-medium text-gray-600 uppercase tracking-wider hover:text-gray-900"
                   >
                     Coach
-                    <ArrowUpDown size={14} />
+                    <ArrowUpDown size={12} className="sm:w-3.5 sm:h-3.5" />
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left">
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left">
                   <button
                     onClick={() => handleSort('conversionRate')}
-                    className="flex items-center gap-2 text-xs font-medium text-gray-600 uppercase tracking-wider hover:text-gray-900"
+                    className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs font-medium text-gray-600 uppercase tracking-wider hover:text-gray-900"
                   >
-                    Conversion Rate
-                    <ArrowUpDown size={14} />
+                    Conv Rate
+                    <ArrowUpDown size={12} className="sm:w-3.5 sm:h-3.5" />
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left">
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left">
                   <button
                     onClick={() => handleSort('averageClassSize')}
-                    className="flex items-center gap-2 text-xs font-medium text-gray-600 uppercase tracking-wider hover:text-gray-900"
+                    className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs font-medium text-gray-600 uppercase tracking-wider hover:text-gray-900"
                   >
-                    Avg Class Size
-                    <ArrowUpDown size={14} />
+                    <span className="hidden sm:inline">Avg Class Size</span>
+                    <span className="sm:hidden">Avg Size</span>
+                    <ArrowUpDown size={12} className="sm:w-3.5 sm:h-3.5" />
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-gray-600 uppercase tracking-wider">
                   Details
                 </th>
               </tr>
