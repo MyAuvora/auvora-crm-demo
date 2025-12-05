@@ -439,23 +439,23 @@ export default function HeadCoachDashboard() {
       )}
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+        <div className="p-4 sm:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Schedule Management</h2>
-            <p className="text-sm text-gray-600 mt-1">Manage all classes and coach assignments</p>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Schedule Management</h2>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">Manage all classes and coach assignments</p>
           </div>
           <button
             onClick={() => setShowScheduleManager(!showScheduleManager)}
-            className="px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center gap-2"
+            className="px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center justify-center gap-2 min-h-[44px] text-sm sm:text-base"
           >
             <Plus size={16} />
             {showScheduleManager ? 'Hide Schedule' : 'Manage Schedule'}
           </button>
         </div>
         {showScheduleManager && (
-          <div className="p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm text-gray-600">Total Classes: {classes.length}</p>
+          <div className="p-4 sm:p-6">
+            <div className="mb-3 sm:mb-4 flex items-center justify-between">
+              <p className="text-xs sm:text-sm text-gray-600">Total Classes: {classes.length}</p>
             </div>
             
             {/* Weekly Calendar View */}
