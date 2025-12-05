@@ -50,7 +50,7 @@ export default function PersonStatusBadge({ personId, className = '' }: PersonSt
 
   return (
     <span
-      className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${status.color} ${status.textColor} text-[10px] font-bold ${className}`}
+      className={`inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 rounded-full ${status.color} ${status.textColor} text-[8px] sm:text-[10px] font-bold ${className}`}
       title={
         status.type === 'member' ? 'Recurring Member' :
         status.type === 'pack' ? 'Class Pack Holder' :
