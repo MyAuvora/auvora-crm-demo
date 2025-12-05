@@ -291,48 +291,48 @@ export default function AuvoraChat() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col z-50">
-      <div className="bg-red-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100vw-2rem)] sm:w-96 h-[calc(100vh-2rem)] sm:h-[600px] max-h-[600px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col z-50">
+      <div className="bg-red-600 text-white p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <MessageCircle size={20} />
-          <h3 className="font-bold">Ask Auvora</h3>
+          <MessageCircle size={18} className="sm:w-5 sm:h-5" />
+          <h3 className="font-bold text-sm sm:text-base">Ask Auvora</h3>
         </div>
         <button
           onClick={() => setChatOpen(false)}
           className="hover:bg-red-700 p-1 rounded"
         >
-          <X size={20} />
+          <X size={18} className="sm:w-5 sm:h-5" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
         {messages.map(message => (
           <div
             key={message.id}
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] p-3 rounded-lg ${
+              className={`max-w-[85%] sm:max-w-[80%] p-2.5 sm:p-3 rounded-lg ${
                 message.sender === 'user'
                   ? 'bg-red-600 text-white'
                   : 'bg-gray-100 text-gray-900'
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+              <p className="text-xs sm:text-sm whitespace-pre-wrap">{message.text}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="p-4 border-t border-gray-200">
-        <div className="mb-3">
-          <p className="text-xs text-gray-600 mb-2">Suggested prompts:</p>
-          <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
+      <div className="p-3 sm:p-4 border-t border-gray-200">
+        <div className="mb-2 sm:mb-3">
+          <p className="text-[10px] sm:text-xs text-gray-600 mb-1.5 sm:mb-2">Suggested prompts:</p>
+          <div className="flex flex-wrap gap-1 max-h-16 sm:max-h-20 overflow-y-auto">
             {examplePrompts.slice(0, 6).map((prompt, i) => (
               <button
                 key={i}
                 onClick={() => handleSend(prompt)}
-                className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded text-gray-700"
+                className="text-[10px] sm:text-xs bg-gray-100 hover:bg-gray-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-gray-700"
               >
                 {prompt.length > 30 ? prompt.substring(0, 30) + '...' : prompt}
               </button>
@@ -347,13 +347,13 @@ export default function AuvoraChat() {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Ask me anything..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm"
+            className="flex-1 px-2.5 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-xs sm:text-sm"
           />
           <button
             onClick={() => handleSend()}
-            className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-700 transition-colors"
+            className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-700 transition-colors flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
-            <Send size={20} />
+            <Send size={18} className="sm:w-5 sm:h-5" />
           </button>
         </div>
       </div>
