@@ -210,12 +210,12 @@ export default function AgentDailyBrief() {
             tabIndex={0}
             aria-label={`${card.title}: ${card.description}`}
             onClick={() => {
-              if (card.actions.length > 0 && card.actions[0].onClick) {
+              if (card.actions.length > 0) {
                 card.actions[0].onClick();
               }
             }}
             onKeyDown={(e) => {
-              if ((e.key === 'Enter' || e.key === ' ') && card.actions.length > 0 && card.actions[0].onClick) {
+              if ((e.key === 'Enter' || e.key === ' ') && card.actions.length > 0) {
                 e.preventDefault();
                 card.actions[0].onClick();
               }
