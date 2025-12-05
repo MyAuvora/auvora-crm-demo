@@ -122,32 +122,32 @@ export default function Promotions() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Promotions</h1>
-          <p className="text-gray-600 mt-1">Manage promotional campaigns</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Promotions</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage promotional campaigns</p>
         </div>
         <button
           onClick={handleCreate}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+          className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-sm min-h-[44px]"
         >
-          <Plus size={20} />
+          <Plus size={18} className="sm:w-5 sm:h-5" />
           Create Promotion
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {locationPromotions.map(promo => (
-          <div key={promo.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-red-100 p-3 rounded-full">
-                  <Tag className="text-red-600" size={24} />
+          <div key={promo.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6">
+            <div className="flex items-start justify-between mb-3 sm:mb-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="bg-red-100 p-2 sm:p-3 rounded-full">
+                  <Tag className="text-red-600" size={20} className="sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">{promo.name}</h3>
-                  <p className="text-sm text-gray-600">{promo.type}</p>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900">{promo.name}</h3>
+                  <p className="text-xs sm:text-sm text-gray-600">{promo.type}</p>
                 </div>
               </div>
               <span className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -223,21 +223,21 @@ export default function Promotions() {
       {/* Create/Edit Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                 {editingPromo ? 'Edit Promotion' : 'Create New Promotion'}
               </h2>
               <button
                 onClick={() => setShowCreateModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
               >
-                <X size={24} />
+                <X size={20} className="sm:w-6 sm:h-6" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Promotion Name *
@@ -285,27 +285,27 @@ export default function Promotions() {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                       Start Date *
                     </label>
                     <input
                       type="date"
                       value={formData.startDate}
                       onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                       End Date *
                     </label>
                     <input
                       type="date"
                       value={formData.endDate}
                       onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                     />
                   </div>
                 </div>
@@ -323,9 +323,9 @@ export default function Promotions() {
                   />
                 </div>
 
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <h3 className="text-sm font-semibold text-yellow-900 mb-3">Promo Code (Optional)</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <h3 className="text-xs sm:text-sm font-semibold text-yellow-900 mb-2 sm:mb-3">Promo Code (Optional)</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Promo Code
