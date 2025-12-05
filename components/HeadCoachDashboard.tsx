@@ -270,58 +270,58 @@ export default function HeadCoachDashboard() {
               {coachStats.map((coach) => (
                 <React.Fragment key={coach.coachId}>
                   <tr className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{coach.coachName}</div>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                      <div className="font-medium text-gray-900 text-sm sm:text-base">{coach.coachName}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-gray-900">{coach.conversionRate.toFixed(1)}%</span>
-                        <span className="text-sm text-gray-500">({coach.convertedLeads}/{coach.totalLeads})</span>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <span className="text-lg sm:text-2xl font-bold text-gray-900">{coach.conversionRate.toFixed(1)}%</span>
+                        <span className="text-xs sm:text-sm text-gray-500">({coach.convertedLeads}/{coach.totalLeads})</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-gray-900">{coach.averageClassSize.toFixed(1)}</span>
-                        <span className="text-sm text-gray-500">({coach.totalBookings} bookings)</span>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <span className="text-lg sm:text-2xl font-bold text-gray-900">{coach.averageClassSize.toFixed(1)}</span>
+                        <span className="text-xs sm:text-sm text-gray-500">({coach.totalBookings})</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       <button
                         onClick={() => setExpandedCoach(expandedCoach === coach.coachId ? null : coach.coachId)}
-                        className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                        className="text-blue-600 hover:text-blue-700 flex items-center gap-1 text-xs sm:text-sm min-h-[36px]"
                       >
-                        {expandedCoach === coach.coachId ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        {expandedCoach === coach.coachId ? <ChevronUp size={14} className="sm:w-4 sm:h-4" /> : <ChevronDown size={14} className="sm:w-4 sm:h-4" />}
                         {expandedCoach === coach.coachId ? 'Hide' : 'Show'}
                       </button>
                     </td>
                   </tr>
                   {expandedCoach === coach.coachId && (
                     <tr>
-                      <td colSpan={4} className="px-6 py-4 bg-gray-50">
-                        <div className="grid grid-cols-3 gap-4">
+                      <td colSpan={4} className="px-3 sm:px-6 py-3 sm:py-4 bg-gray-50">
+                        <div className="grid grid-cols-3 gap-3 sm:gap-4">
                           <div>
-                            <p className="text-sm font-medium text-gray-600">Total Classes</p>
+                            <p className="text-xs sm:text-sm font-medium text-gray-600">Total Classes</p>
                             <button
                               onClick={() => setDrillDownModal({ type: 'classes', coachId: coach.coachId, coachName: coach.coachName })}
-                              className="text-lg font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                              className="text-base sm:text-lg font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
                             >
                               {coach.totalClasses}
                             </button>
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-600">Total Bookings</p>
+                            <p className="text-xs sm:text-sm font-medium text-gray-600">Total Bookings</p>
                             <button
                               onClick={() => setDrillDownModal({ type: 'bookings', coachId: coach.coachId, coachName: coach.coachName })}
-                              className="text-lg font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                              className="text-base sm:text-lg font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
                             >
                               {coach.totalBookings}
                             </button>
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-600">Leads Worked With</p>
+                            <p className="text-xs sm:text-sm font-medium text-gray-600">Leads Worked With</p>
                             <button
                               onClick={() => setDrillDownModal({ type: 'leads', coachId: coach.coachId, coachName: coach.coachName })}
-                              className="text-lg font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                              className="text-base sm:text-lg font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
                             >
                               {coach.totalLeads}
                             </button>
