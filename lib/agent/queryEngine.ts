@@ -18,6 +18,9 @@ export type QueryIntent =
   | 'rank_members_activity'
   | 'revenue_recommendations'
   | 'member_frequency_analysis'
+  | 'upcoming_birthdays'
+  | 'coach_conversion_rate'
+  | 'generic_query'
   | 'unknown';
 
 export interface FrequencyParams {
@@ -177,6 +180,15 @@ function parseFrequency(query: string): FrequencyParams | undefined {
 function detectIntent(query: string): QueryIntent {
   const lowerQuery = query.toLowerCase();
 
+  if (/(birthday|birthdays|bday|b-day|turning)/i.test(query)) {
+    return 'upcoming_birthdays';
+  }
+
+  if (/(coach|trainer|instructor).*(conversion|close rate|signup rate|trial.*member|lead.*member)/i.test(query) ||
+      /(conversion|close rate|signup rate).*(coach|trainer|instructor)/i.test(query)) {
+    return 'coach_conversion_rate';
+  }
+
   const frequencyParams = parseFrequency(query);
   if (frequencyParams) {
     return 'member_frequency_analysis';
@@ -259,6 +271,10 @@ function detectIntent(query: string): QueryIntent {
     return 'strategic_plan';
   }
 
+  if (/(how many|what|which|who|when|where|show|list|find|get)/i.test(query)) {
+    return 'generic_query';
+  }
+
   return 'unknown';
 }
 
@@ -294,10 +310,10 @@ export function parseQuery(query: string): ParsedQuery {
 export const EXAMPLE_QUERIES = [
   'Give me revenue recommendations to hit this month\'s target',
   'We need +$7k this month—what should we do?',
-  'Which coach has the most cancellations?',
-  'Who is the most active member?',
+  'Which coach has the highest conversion rate?',
+  'When is the next member birthday?',
   'How many members attend at least 3 classes per week?',
   'Show me members who check in 4+ times per week',
-  'Show me three high-ROI actions for this week',
+  'Who is the most active member?',
   'What\'s our revenue analysis for this month?',
 ];

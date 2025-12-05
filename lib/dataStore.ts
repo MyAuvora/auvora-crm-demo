@@ -4,7 +4,7 @@ import { Member, ClassPackClient, DropInClient, Lead, Staff, Class, Promotion, P
 import { members as seedMembers, classPackClients as seedClassPackClients, dropInClients as seedDropInClients, leads as seedLeads, staff as seedStaff, classes as seedClasses, promotions as seedPromotions, products as seedProducts, goals as seedGoals, notes as seedNotes, coachLeadInteractions as seedCoachLeadInteractions, substitutionRequests as seedSubstitutionRequests, timeOffRequests as seedTimeOffRequests, staffSettings as seedStaffSettings, staffShifts as seedStaffShifts, franchiseLocations as seedFranchiseLocations, franchiseSummaries as seedFranchiseSummaries } from '@/data/seedData';
 import { generateHistoricalData } from './historyGenerator';
 
-const STORAGE_VERSION = 6;
+const STORAGE_VERSION = 7;
 const STORAGE_KEY = 'auvora-crm-data';
 
 export interface Booking {
@@ -391,6 +391,26 @@ function migratePaymentFields(members: Member[]): Member[] {
   });
 }
 
+function migrateBirthDates(members: Member[]): Member[] {
+  return members.map(m => {
+    if (m.dateOfBirth) {
+      return m;
+    }
+    
+    const memberIdNum = parseInt(m.id.replace(/\D/g, '')) || 0;
+    const today = new Date();
+    const year = today.getFullYear() - (20 + (memberIdNum % 40));
+    const month = memberIdNum % 12;
+    const day = 1 + (memberIdNum % 28);
+    const birthDate = new Date(year, month, day);
+    
+    return {
+      ...m,
+      dateOfBirth: birthDate.toISOString().split('T')[0]
+    };
+  });
+}
+
 function migrateTransactionNames(transactions: Transaction[]): Transaction[] {
   const allMembers = seedMembers;
   const allPackClients = seedClassPackClients;
@@ -559,7 +579,8 @@ function initializeStore(): DataStore {
           needsSave = true;
         }
         
-        const migratedMembers = migratePaymentFields(parsed.members);
+        let migratedMembers = migratePaymentFields(parsed.members);
+        migratedMembers = migrateBirthDates(migratedMembers);
         if (migratedMembers.some((m, i) => m !== parsed.members[i])) {
           parsed.members = migratedMembers;
           needsSave = true;
@@ -850,6 +871,10 @@ export function getCommunicationLogs() {
 
 export function getWeeklyUsage() {
   return getStore().weeklyUsage;
+}
+
+export function getCoachLeadInteractions() {
+  return getStore().coachLeadInteractions;
 }
 
 export function bookClass(classId: string, memberId: string, memberName: string): { success: boolean; message: string; booking?: Booking } {

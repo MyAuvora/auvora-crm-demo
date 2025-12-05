@@ -44,6 +44,7 @@ export interface Member {
   zipCode: string;
   location: Location;
   joinDate: string;
+  dateOfBirth?: string; // YYYY-MM-DD format
   visitsLast30Days: number;
   paymentStatus?: 'current' | 'overdue';
   lastPaymentDate?: string;
