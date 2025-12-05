@@ -339,25 +339,25 @@ export default function HeadCoachDashboard() {
 
       {(pendingSubRequests.length > 0 || pendingTimeOffRequests.length > 0) && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">Pending Approvals</h2>
-            <p className="text-sm text-gray-600 mt-1">Review and approve requests from your coaching team</p>
+          <div className="p-4 sm:p-6 border-b border-gray-200">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Pending Approvals</h2>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">Review and approve requests from your coaching team</p>
           </div>
-          <div className="p-6 space-y-6">
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
             {pendingSubRequests.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Substitution Requests ({pendingSubRequests.length})</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Substitution Requests ({pendingSubRequests.length})</h3>
                 <div className="space-y-3">
                   {pendingSubRequests.map((request) => (
-                    <div key={request.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-start justify-between">
+                    <div key={request.id} className="border border-gray-200 rounded-lg p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar size={16} className="text-gray-400" />
-                            <span className="font-medium text-gray-900">{request.className}</span>
-                            <span className="text-sm text-gray-500">• {request.classDate} at {request.classTime}</span>
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                            <Calendar size={14} className="text-gray-400 sm:w-4 sm:h-4" />
+                            <span className="font-medium text-gray-900 text-sm sm:text-base">{request.className}</span>
+                            <span className="text-xs sm:text-sm text-gray-500">• {request.classDate} at {request.classTime}</span>
                           </div>
-                          <p className="text-sm text-gray-600 mb-2">
+                          <p className="text-xs sm:text-sm text-gray-600 mb-2">
                             <span className="font-medium">{request.requestingCoachName}</span> requests{' '}
                             {request.type === 'switch' ? (
                               <>to switch with <span className="font-medium">{request.targetCoachName}</span></>
@@ -366,22 +366,22 @@ export default function HeadCoachDashboard() {
                             )}
                           </p>
                           {request.reason && (
-                            <p className="text-sm text-gray-500 italic">Reason: {request.reason}</p>
+                            <p className="text-xs sm:text-sm text-gray-500 italic">Reason: {request.reason}</p>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
+                        <div className="flex items-center gap-2 sm:ml-4">
                           <button
                             onClick={() => handleApproveSubstitution(request.id)}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] text-xs sm:text-sm"
                           >
-                            <CheckCircle size={16} />
+                            <CheckCircle size={14} className="sm:w-4 sm:h-4" />
                             Approve
                           </button>
                           <button
                             onClick={() => handleDenySubstitution(request.id)}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] text-xs sm:text-sm"
                           >
-                            <XCircle size={16} />
+                            <XCircle size={14} className="sm:w-4 sm:h-4" />
                             Deny
                           </button>
                         </div>
