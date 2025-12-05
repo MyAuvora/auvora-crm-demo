@@ -143,7 +143,7 @@ export default function Promotions() {
             <div className="flex items-start justify-between mb-3 sm:mb-4">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="bg-red-100 p-2 sm:p-3 rounded-full">
-                  <Tag className="text-red-600" size={20} className="sm:w-6 sm:h-6" />
+                  <Tag className="text-red-600 w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-gray-900">{promo.name}</h3>
