@@ -37,17 +37,17 @@ export default function KioskMode() {
     .sort((a, b) => a.time.localeCompare(b.time));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex flex-col items-center mb-4">
-            <span className="text-5xl font-bold text-white">The LAB</span>
-            <span className="text-3xl font-semibold text-white">Tampa</span>
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="flex flex-col items-center mb-3 sm:mb-4">
+            <span className="text-3xl sm:text-5xl font-bold text-white">The LAB</span>
+            <span className="text-2xl sm:text-3xl font-semibold text-white">Tampa</span>
           </div>
-          <p className="text-2xl text-gray-300 mb-2">Welcome! Check in to your class</p>
-          <p className="text-4xl font-bold text-red-500">{format(currentTime, 'h:mm:ss a')}</p>
-          <p className="text-xl text-gray-400">{format(currentTime, 'EEEE, MMMM d, yyyy')}</p>
+          <p className="text-lg sm:text-2xl text-gray-300 mb-2">Welcome! Check in to your class</p>
+          <p className="text-2xl sm:text-4xl font-bold text-red-500">{format(currentTime, 'h:mm:ss a')}</p>
+          <p className="text-base sm:text-xl text-gray-400">{format(currentTime, 'EEEE, MMMM d, yyyy')}</p>
         </div>
 
         {/* Booking Modal */}
@@ -67,7 +67,7 @@ export default function KioskMode() {
 
         {/* Message Display */}
         {message && (
-          <div className={`mb-6 p-6 rounded-lg text-center text-2xl font-bold ${
+          <div className={`mb-4 sm:mb-6 p-4 sm:p-6 rounded-lg text-center text-lg sm:text-2xl font-bold ${
             message.type === 'success' 
               ? 'bg-green-600 text-white' 
               : 'bg-red-600 text-white'
@@ -77,15 +77,15 @@ export default function KioskMode() {
         )}
 
         {/* Today's Classes */}
-        <div className="bg-gray-800 rounded-lg p-8 shadow-2xl">
-          <h2 className="text-3xl font-bold text-white mb-6">Today&apos;s Classes - {todayDayName}</h2>
+        <div className="bg-gray-800 rounded-lg p-4 sm:p-8 shadow-2xl">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">Today&apos;s Classes - {todayDayName}</h2>
           
           {todayClasses.length === 0 ? (
-            <div className="text-center py-12 text-gray-400 text-xl">
+            <div className="text-center py-8 sm:py-12 text-gray-400 text-base sm:text-xl">
               No classes scheduled for {todayDayName}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {todayClasses.map(cls => {
                 const classBookings = bookings.filter(b => b.classId === cls.id && b.status !== 'cancelled');
                 const checkedIn = classBookings.filter(b => b.status === 'checked-in').length;
@@ -95,13 +95,13 @@ export default function KioskMode() {
                   <button
                     key={cls.id}
                     onClick={() => setSelectedClass(cls)}
-                    className="p-6 rounded-lg text-left transition-all bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 cursor-pointer transform hover:scale-105"
+                    className="p-4 sm:p-6 rounded-lg text-left transition-all bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 cursor-pointer transform hover:scale-105 min-h-[120px]"
                   >
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start justify-between mb-3 sm:mb-4">
                       <div>
-                        <h3 className="text-2xl font-bold text-white mb-2">{cls.name}</h3>
-                        <div className="flex items-center gap-2 text-lg text-gray-200">
-                          <Clock size={20} />
+                        <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{cls.name}</h3>
+                        <div className="flex items-center gap-2 text-base sm:text-lg text-gray-200">
+                          <Clock size={18} className="sm:w-5 sm:h-5" />
                           <span>{cls.time}</span>
                           <span>•</span>
                           <span>{cls.duration} min</span>
@@ -109,7 +109,7 @@ export default function KioskMode() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center justify-between text-lg">
+                    <div className="flex items-center justify-between text-sm sm:text-lg">
                       <div className="text-gray-200">
                         <span className="font-semibold">{checkedIn}</span> checked in
                       </div>
@@ -125,7 +125,7 @@ export default function KioskMode() {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-gray-500 text-lg">
+        <div className="mt-6 sm:mt-8 text-center text-gray-500 text-base sm:text-lg">
           <p>Need help? Please see the front desk</p>
         </div>
       </div>

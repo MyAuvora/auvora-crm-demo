@@ -218,40 +218,40 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: CommandP
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-20">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[600px] flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <Search size={20} className="text-gray-400" />
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-4 sm:pt-20 p-4">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] sm:max-h-[600px] flex flex-col">
+        <div className="p-3 sm:p-4 border-b border-gray-200">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Search size={18} className="text-gray-400 sm:w-5 sm:h-5" />
             <input
               type="text"
               value={query}
               onChange={(e) => handleQueryChange(e.target.value)}
               onFocus={(e) => e.target.select()}
               placeholder="Search members, leads, staff, classes, invoices..."
-              className="flex-1 outline-none text-lg"
+              className="flex-1 outline-none text-base sm:text-lg"
               autoFocus
             />
             <button
               onClick={onClose}
               className="p-1 hover:bg-gray-100 rounded"
             >
-              <X size={20} className="text-gray-400" />
+              <X size={18} className="text-gray-400 sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           {query && results.length === 0 && (
-            <div className="p-8 text-center text-gray-500">
+            <div className="p-6 sm:p-8 text-center text-gray-500 text-sm sm:text-base">
               No results found for &quot;{query}&quot;
             </div>
           )}
 
           {!query && (
-            <div className="p-8 text-center text-gray-500">
-              <p className="mb-2">Start typing to search...</p>
-              <p className="text-sm">Search for members, leads, staff, classes, or invoices</p>
+            <div className="p-6 sm:p-8 text-center text-gray-500">
+              <p className="mb-2 text-sm sm:text-base">Start typing to search...</p>
+              <p className="text-xs sm:text-sm">Search for members, leads, staff, classes, or invoices</p>
             </div>
           )}
 
@@ -261,14 +261,14 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: CommandP
                 <button
                   key={`${result.type}-${result.id}`}
                   onClick={result.action}
-                  className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 transition-colors ${
                     index === selectedIndex ? 'bg-blue-50' : ''
                   }`}
                 >
                   <div className="flex-shrink-0">{result.icon}</div>
-                  <div className="flex-1 text-left">
-                    <div className="font-medium text-gray-900">{result.title}</div>
-                    <div className="text-sm text-gray-600">{result.subtitle}</div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{result.title}</div>
+                    <div className="text-xs sm:text-sm text-gray-600 truncate">{result.subtitle}</div>
                   </div>
                 </button>
               ))}
@@ -276,20 +276,20 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: CommandP
           )}
         </div>
 
-        <div className="p-3 border-t border-gray-200 bg-gray-50 text-xs text-gray-600 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1">
-              <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">↑</kbd>
-              <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">↓</kbd>
-              <span className="ml-1">to navigate</span>
+        <div className="p-2 sm:p-3 border-t border-gray-200 bg-gray-50 text-[10px] sm:text-xs text-gray-600 flex items-center justify-between overflow-x-auto">
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+            <span className="flex items-center gap-1 whitespace-nowrap">
+              <kbd className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-white border border-gray-300 rounded text-[10px] sm:text-xs">↑</kbd>
+              <kbd className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-white border border-gray-300 rounded text-[10px] sm:text-xs">↓</kbd>
+              <span className="ml-1 hidden sm:inline">to navigate</span>
             </span>
-            <span className="flex items-center gap-1">
-              <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">Enter</kbd>
-              <span className="ml-1">to select</span>
+            <span className="flex items-center gap-1 whitespace-nowrap">
+              <kbd className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-white border border-gray-300 rounded text-[10px] sm:text-xs">Enter</kbd>
+              <span className="ml-1 hidden sm:inline">to select</span>
             </span>
-            <span className="flex items-center gap-1">
-              <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">Esc</kbd>
-              <span className="ml-1">to close</span>
+            <span className="flex items-center gap-1 whitespace-nowrap">
+              <kbd className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-white border border-gray-300 rounded text-[10px] sm:text-xs">Esc</kbd>
+              <span className="ml-1 hidden sm:inline">to close</span>
             </span>
           </div>
         </div>
