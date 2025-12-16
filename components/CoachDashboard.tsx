@@ -218,7 +218,7 @@ export default function CoachDashboard() {
         <div className="p-4 sm:p-6 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Calendar size={20} className="text-red-600 sm:w-6 sm:h-6" />
+              <Calendar size={20} className="text-auvora-teal sm:w-6 sm:h-6" />
               <h2 className="text-lg sm:text-xl font-bold text-gray-900">Today&apos;s Classes - {format(today, 'MMMM d, yyyy')}</h2>
             </div>
             <span className="text-xs sm:text-sm text-gray-600">{todaysClasses.length} classes</span>
@@ -287,7 +287,7 @@ export default function CoachDashboard() {
       <div className="bg-white rounded-lg shadow">
         <div className="p-4 sm:p-6 border-b border-gray-200">
           <div className="flex items-center gap-2 sm:gap-3">
-            <Clock size={20} className="text-red-600 sm:w-6 sm:h-6" />
+            <Clock size={20} className="text-auvora-teal sm:w-6 sm:h-6" />
             <h2 className="text-lg sm:text-xl font-bold text-gray-900">This Week&apos;s Schedule</h2>
           </div>
         </div>
@@ -513,7 +513,7 @@ function TimeOffRequestModal({
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
             <button
               onClick={handleSubmit}
-              className="flex-1 px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 min-h-[44px] text-sm sm:text-base"
+              className="flex-1 px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark min-h-[44px] text-sm sm:text-base"
             >
               Submit Request
             </button>

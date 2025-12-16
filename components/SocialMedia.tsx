@@ -26,7 +26,7 @@ const getSamplePosts = (): SocialPost[] => {
     {
       id: 'post-1',
       platform: ['facebook', 'instagram'],
-      content: '💪 New class alert! Join us for High-Intensity Interval Training every Monday and Wednesday at 6 PM. First class is FREE for new members! #FitnessGoals #TheLab Tampa',
+      content: '💪 New class alert! Join us for High-Intensity Interval Training every Monday and Wednesday at 6 PM. First class is FREE for new members! #FitnessGoals #YourBusiness Tampa',
       mediaType: 'image',
       status: 'published',
       publishedAt: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -122,7 +122,7 @@ export default function SocialMedia() {
               onClick={() => setActiveTab('compose')}
               className={`px-4 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
                 activeTab === 'compose'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -133,7 +133,7 @@ export default function SocialMedia() {
               onClick={() => setActiveTab('scheduled')}
               className={`px-4 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
                 activeTab === 'scheduled'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -144,7 +144,7 @@ export default function SocialMedia() {
               onClick={() => setActiveTab('published')}
               className={`px-4 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
                 activeTab === 'published'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -186,9 +186,9 @@ export default function SocialMedia() {
                 <textarea
                   value={postContent}
                   onChange={(e) => setPostContent(e.target.value)}
-                  placeholder="What's happening at The Lab Tampa?"
+                  placeholder="What's happening at Your Business?"
                   rows={6}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-600 resize-none"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-auvora-gold resize-none"
                 />
                 <p className="text-xs sm:text-sm text-gray-600 mt-2">
                   {postContent.length} characters
@@ -218,7 +218,7 @@ export default function SocialMedia() {
                       type="date"
                       value={scheduleDate}
                       onChange={(e) => setScheduleDate(e.target.value)}
-                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
                   <div className="flex-1">
@@ -227,7 +227,7 @@ export default function SocialMedia() {
                       type="time"
                       value={scheduleTime}
                       onChange={(e) => setScheduleTime(e.target.value)}
-                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
                 </div>
@@ -236,7 +236,7 @@ export default function SocialMedia() {
               <button
                 onClick={handlePublish}
                 disabled={!postContent.trim() || selectedPlatforms.length === 0}
-                className="w-full bg-red-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium text-sm sm:text-base hover:bg-red-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px]"
+                className="w-full bg-auvora-teal text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium text-sm sm:text-base hover:bg-auvora-teal-dark transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px]"
               >
                 <Send size={18} className="sm:w-5 sm:h-5" />
                 {scheduleDate && scheduleTime ? 'Schedule Post' : 'Publish Now'}

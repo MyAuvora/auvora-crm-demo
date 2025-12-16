@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Auvora CRM - The LAB Tampa",
-  description: "Gym and Dance Studio CRM with AI Assistant",
+  title: "Auvora Fitness CRM",
+  description: "Fitness Studio CRM with AI Assistant - Powered by Auvora",
 };
 
 export default function RootLayout({

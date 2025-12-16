@@ -51,7 +51,7 @@ export default function SendTextModal({ recipientName, recipientPhone, onClose }
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Type your message here..."
               rows={6}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600 resize-none"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold resize-none"
             />
             <p className="text-xs sm:text-sm text-gray-600 mt-2">
               {message.length} characters • Estimated {Math.ceil(message.length / 160)} SMS segment(s)
@@ -69,7 +69,7 @@ export default function SendTextModal({ recipientName, recipientPhone, onClose }
           <button
             onClick={handleSend}
             disabled={!message.trim()}
-            className="flex-1 px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm min-h-[44px]"
+            className="flex-1 px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm min-h-[44px]"
           >
             <Send size={14} className="sm:w-4 sm:h-4" />
             Send

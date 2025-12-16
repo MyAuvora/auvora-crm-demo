@@ -32,7 +32,7 @@ export function ToastItem({ toast, onClose }: ToastProps) {
       case 'success':
         return <CheckCircle size={20} className="text-green-600" />;
       case 'error':
-        return <XCircle size={20} className="text-red-600" />;
+        return <XCircle size={20} className="text-auvora-teal" />;
       case 'warning':
         return <AlertCircle size={20} className="text-yellow-600" />;
       case 'info':

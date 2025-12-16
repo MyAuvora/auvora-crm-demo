@@ -379,7 +379,7 @@ export default function HeadCoachDashboard() {
                           </button>
                           <button
                             onClick={() => handleDenySubstitution(request.id)}
-                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] text-xs sm:text-sm"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] text-xs sm:text-sm"
                           >
                             <XCircle size={14} className="sm:w-4 sm:h-4" />
                             Deny
@@ -422,7 +422,7 @@ export default function HeadCoachDashboard() {
                           </button>
                           <button
                             onClick={() => handleDenyTimeOff(request.id)}
-                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] text-xs sm:text-sm"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] text-xs sm:text-sm"
                           >
                             <XCircle size={14} className="sm:w-4 sm:h-4" />
                             Deny
@@ -446,7 +446,7 @@ export default function HeadCoachDashboard() {
           </div>
           <button
             onClick={() => setShowScheduleManager(!showScheduleManager)}
-            className="px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center justify-center gap-2 min-h-[44px] text-sm sm:text-base"
+            className="px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 min-h-[44px] text-sm sm:text-base"
           >
             <Plus size={16} />
             {showScheduleManager ? 'Hide Schedule' : 'Manage Schedule'}
@@ -514,7 +514,7 @@ export default function HeadCoachDashboard() {
                                     className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded p-0.5 hover:bg-red-50"
                                     title="Delete class"
                                   >
-                                    <Trash2 size={12} className="text-red-600" />
+                                    <Trash2 size={12} className="text-auvora-teal" />
                                   </button>
                                 </div>
                               );

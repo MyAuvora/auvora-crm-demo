@@ -160,7 +160,7 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: CommandP
             type: 'class',
             title: cls.name,
             subtitle: `Class • ${cls.dayOfWeek} ${cls.time} • ${cls.duration}min`,
-            icon: <Calendar size={20} className="text-red-600" />,
+            icon: <Calendar size={20} className="text-auvora-teal" />,
             action: () => {
               onNavigate('schedule');
               onClose();

@@ -79,7 +79,7 @@ export default function FranchisorRevenue() {
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
-          className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+          className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-teal"
         >
           <option value="2024">2024</option>
           <option value="2023">2023</option>
@@ -89,7 +89,7 @@ export default function FranchisorRevenue() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-6">
-        <div className="bg-gradient-to-br from-[#AC1305] to-[#8B0F04] p-4 sm:p-6 rounded-lg shadow text-white">
+        <div className="bg-gradient-to-br from-auvora-teal to-auvora-teal-dark p-4 sm:p-6 rounded-lg shadow text-white">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs sm:text-sm font-medium">YTD Total Fees</span>
             <PiggyBank size={20} className="sm:w-6 sm:h-6" />
@@ -116,9 +116,9 @@ export default function FranchisorRevenue() {
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-600">MoM Growth</span>
-            <TrendingUp className={momGrowth >= 0 ? 'text-green-600' : 'text-red-600'} size={20} />
+            <TrendingUp className={momGrowth >= 0 ? 'text-green-600' : 'text-auvora-teal'} size={20} />
           </div>
-          <div className={`text-2xl font-bold ${momGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <div className={`text-2xl font-bold ${momGrowth >= 0 ? 'text-green-600' : 'text-auvora-teal'}`}>
             {momGrowth >= 0 ? '+' : ''}{momGrowth.toFixed(1)}%
           </div>
           <p className="text-xs text-gray-500 mt-1">vs previous month</p>
@@ -135,7 +135,7 @@ export default function FranchisorRevenue() {
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} wrapperStyle={{ fontSize: '12px' }} />
             <Legend wrapperStyle={{ fontSize: '12px' }} />
-            <Line type="monotone" dataKey="totalFees" stroke="#AC1305" strokeWidth={2} name="Total Fees" />
+            <Line type="monotone" dataKey="totalFees" stroke="#0f5257" strokeWidth={2} name="Total Fees" />
             <Line type="monotone" dataKey="royalties" stroke="#2563eb" strokeWidth={2} name="Royalties" />
             <Line type="monotone" dataKey="brandFund" stroke="#16a34a" strokeWidth={2} name="Brand Fund" />
           </LineChart>
@@ -181,7 +181,7 @@ export default function FranchisorRevenue() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Fees per Location</span>
-              <span className="font-semibold text-[#AC1305]">${Math.round(ytdTotalFees / franchiseLocations.length).toLocaleString()}</span>
+              <span className="font-semibold text-auvora-teal">${Math.round(ytdTotalFees / franchiseLocations.length).toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -209,12 +209,12 @@ export default function FranchisorRevenue() {
                 <div className="text-sm text-green-900">YTD Total: <span className="font-bold">${ytdBrandFund.toLocaleString()}</span></div>
               </div>
             </div>
-            <div className="p-4 bg-red-50 rounded-lg">
+            <div className="p-4 bg-teal-50 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-red-900">Total Fees</span>
                 <span className="text-2xl font-bold text-red-900">9%</span>
               </div>
-              <p className="text-xs text-red-700">Combined franchise fees</p>
+              <p className="text-xs text-auvora-teal-dark">Combined franchise fees</p>
               <div className="mt-3 pt-3 border-t border-red-200">
                 <div className="text-sm text-red-900">YTD Total: <span className="font-bold">${ytdTotalFees.toLocaleString()}</span></div>
               </div>

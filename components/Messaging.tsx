@@ -26,7 +26,7 @@ const messageTemplates: MessageTemplate[] = [
   {
     id: 'welcome-member',
     name: 'Welcome New Member',
-    message: 'Welcome to The Lab Tampa, {{name}}! We\'re excited to have you join our fitness family. Your {{membership}} membership is now active. See you soon!',
+    message: 'Welcome to Your Business, {{name}}! We\'re excited to have you join our fitness family. Your {{membership}} membership is now active. See you soon!',
     category: 'welcome'
   },
   {
@@ -50,7 +50,7 @@ const messageTemplates: MessageTemplate[] = [
   {
     id: 'trial-followup',
     name: 'Trial Class Follow-up',
-    message: 'Thanks for trying out The Lab Tampa, {{name}}! How was your experience? We\'d love to have you join us as a member. Reply to learn about our membership options!',
+    message: 'Thanks for trying out Your Business, {{name}}! How was your experience? We\'d love to have you join us as a member. Reply to learn about our membership options!',
     category: 'follow-up'
   },
   {
@@ -83,7 +83,7 @@ export default function Messaging() {
         recipientId: 'member-1',
         recipientName: 'John Smith',
         recipientType: 'member',
-        message: 'Welcome to The Lab Tampa! Your first class is tomorrow at 6:00 PM.',
+        message: 'Welcome to Your Business! Your first class is tomorrow at 6:00 PM.',
         timestamp: new Date(now - 2 * 60 * 60 * 1000).toISOString(),
         status: 'read'
       },
@@ -181,7 +181,7 @@ export default function Messaging() {
               onClick={() => setActiveTab('inbox')}
               className={`px-4 sm:px-6 py-2 sm:py-3 font-medium flex items-center gap-2 text-sm sm:text-base whitespace-nowrap ${
                 activeTab === 'inbox'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -192,7 +192,7 @@ export default function Messaging() {
               onClick={() => setActiveTab('compose')}
               className={`px-4 sm:px-6 py-2 sm:py-3 font-medium flex items-center gap-2 text-sm sm:text-base whitespace-nowrap ${
                 activeTab === 'compose'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -203,7 +203,7 @@ export default function Messaging() {
               onClick={() => setActiveTab('history')}
               className={`px-4 sm:px-6 py-2 sm:py-3 font-medium flex items-center gap-2 text-sm sm:text-base whitespace-nowrap ${
                 activeTab === 'history'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -214,7 +214,7 @@ export default function Messaging() {
               onClick={() => setActiveTab('templates')}
               className={`px-4 sm:px-6 py-2 sm:py-3 font-medium flex items-center gap-2 text-sm sm:text-base whitespace-nowrap ${
                 activeTab === 'templates'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -235,7 +235,7 @@ export default function Messaging() {
                     <input
                       type="text"
                       placeholder="Search contacts..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
                   <div className="overflow-y-auto h-[calc(100%-50px)] sm:h-[calc(100%-60px)]">
@@ -244,7 +244,7 @@ export default function Messaging() {
                         key={contact.id}
                         onClick={() => setSelectedContact(contact.id)}
                         className={`w-full p-2 sm:p-3 text-left border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                          selectedContact === contact.id ? 'bg-red-50 border-l-4 border-l-red-600' : ''
+                          selectedContact === contact.id ? 'bg-teal-50 border-l-4 border-l-auvora-teal' : ''
                         }`}
                       >
                         <div className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export default function Messaging() {
                           </div>
                         </div>
                         <div className="flex justify-end">
-                          <div className="bg-red-600 text-white p-2 sm:p-3 rounded-lg shadow-sm max-w-[80%] sm:max-w-[70%]">
+                          <div className="bg-auvora-teal text-white p-2 sm:p-3 rounded-lg shadow-sm max-w-[80%] sm:max-w-[70%]">
                             <p className="text-xs sm:text-sm">We&apos;re open 6 AM - 9 PM today! See you soon!</p>
                             <p className="text-[10px] sm:text-xs text-red-100 mt-1">10:32 AM • Sent</p>
                           </div>
@@ -308,9 +308,9 @@ export default function Messaging() {
                           <input
                             type="text"
                             placeholder="Type a message..."
-                            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                           />
-                          <button className="px-4 sm:px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm min-h-[44px]">
+                          <button className="px-4 sm:px-6 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark transition-colors flex items-center gap-2 text-sm min-h-[44px]">
                             <Send size={16} className="sm:w-[18px] sm:h-[18px]" />
                             <span className="hidden sm:inline">Send</span>
                           </button>
@@ -346,14 +346,14 @@ export default function Messaging() {
                       placeholder="Search by name or phone..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
                   
                   <select
                     value={recipientType}
                     onChange={(e) => setRecipientType(e.target.value as 'all' | 'members' | 'leads')}
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                   >
                     <option value="all">All</option>
                     <option value="members">Members Only</option>
@@ -375,7 +375,7 @@ export default function Messaging() {
                     Clear Selection
                   </button>
                   {selectedRecipients.length > 0 && (
-                    <span className="px-3 sm:px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium text-sm">
+                    <span className="px-3 sm:px-4 py-2 bg-teal-100 text-auvora-teal-dark rounded-lg font-medium text-sm">
                       {selectedRecipients.length} selected
                     </span>
                   )}
@@ -391,7 +391,7 @@ export default function Messaging() {
                         type="checkbox"
                         checked={selectedRecipients.includes(recipient.id)}
                         onChange={() => toggleRecipient(recipient.id)}
-                        className="w-4 h-4 text-red-600 focus:ring-red-600"
+                        className="w-4 h-4 text-auvora-teal focus:ring-auvora-gold"
                       />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-gray-900 text-sm sm:text-base">{recipient.name}</p>
@@ -409,7 +409,7 @@ export default function Messaging() {
                   onChange={(e) => setMessageText(e.target.value)}
                   placeholder="Type your message here..."
                   rows={6}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600 resize-none"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold resize-none"
                 />
                 <p className="text-xs sm:text-sm text-gray-600 mt-2">
                   {messageText.length} characters • Estimated {Math.ceil(messageText.length / 160)} SMS segment(s)
@@ -419,7 +419,7 @@ export default function Messaging() {
               <button
                 onClick={handleSendMessage}
                 disabled={!messageText.trim() || selectedRecipients.length === 0}
-                className="w-full bg-red-600 text-white px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base min-h-[44px]"
+                className="w-full bg-auvora-teal text-white px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-auvora-teal-dark transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base min-h-[44px]"
               >
                 <Send size={18} />
                 Send Message to {selectedRecipients.length} Recipient{selectedRecipients.length !== 1 ? 's' : ''}
@@ -478,7 +478,7 @@ export default function Messaging() {
                     </div>
                     <button
                       onClick={() => handleTemplateSelect(template)}
-                      className="w-full bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors min-h-[44px]"
+                      className="w-full bg-auvora-teal text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-auvora-teal-dark transition-colors min-h-[44px]"
                     >
                       Use Template
                     </button>

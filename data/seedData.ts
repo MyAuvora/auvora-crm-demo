@@ -837,7 +837,7 @@ export function generateFranchiseLocations(): FranchiseLocation[] {
 
   return cities.map(({ city, state, id }) => ({
     id,
-    name: `The Lab ${city}`,
+    name: `Auvora Fitness ${city}`,
     city,
     state,
     type: 'athletic-club' as const,

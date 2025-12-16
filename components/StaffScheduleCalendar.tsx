@@ -305,7 +305,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
               <select
                 value={selectedStaffId || 'all'}
                 onChange={(e) => setSelectedStaffId(e.target.value === 'all' ? null : e.target.value)}
-                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               >
                 <option value="all">All Staff</option>
                 {allLocationStaff.map(staff => (
@@ -321,7 +321,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
               setEditingShift(null);
               setShowShiftModal(true);
             }}
-            className="px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center justify-center gap-2 text-sm min-h-[44px]"
+            className="px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
           >
             <Plus size={16} />
             Add Shift
@@ -414,7 +414,7 @@ export default function StaffScheduleCalendar({ onShiftClick }: StaffScheduleCal
                                     onClick={(e) => handleDeleteShift(shift.id, e)}
                                     className="p-1 hover:bg-white rounded"
                                   >
-                                    <Trash2 size={12} className="text-red-600" />
+                                    <Trash2 size={12} className="text-auvora-teal" />
                                   </button>
                                 </div>
                               )}
@@ -518,7 +518,7 @@ function ShiftModal({ shift, defaultStaffId, onClose, onSave }: { shift: StaffSh
             <select
               value={formData.templateType}
               onChange={(e) => setFormData({ ...formData, templateType: e.target.value as 'front-desk' | 'event' | 'meeting' | 'other' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
             >
               <option value="front-desk">Front Desk</option>
               <option value="event">Event</option>
@@ -534,7 +534,7 @@ function ShiftModal({ shift, defaultStaffId, onClose, onSave }: { shift: StaffSh
             <select
               value={formData.assignedStaffId}
               onChange={(e) => setFormData({ ...formData, assignedStaffId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
             >
               <option value="">Unassigned</option>
               {locationStaff.map(staff => (
@@ -551,7 +551,7 @@ function ShiftModal({ shift, defaultStaffId, onClose, onSave }: { shift: StaffSh
                 type="checkbox"
                 checked={formData.isRecurring}
                 onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
-                className="rounded border-gray-300 text-[rgb(172,19,5)] focus:ring-[rgb(172,19,5)]"
+                className="rounded border-gray-300 text-auvora-teal focus:ring-auvora-teal"
               />
               <span className="text-sm font-medium text-gray-700">Recurring Weekly</span>
             </label>
@@ -565,7 +565,7 @@ function ShiftModal({ shift, defaultStaffId, onClose, onSave }: { shift: StaffSh
               <select
                 value={formData.dayOfWeek}
                 onChange={(e) => setFormData({ ...formData, dayOfWeek: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               >
                 <option value="1">Monday</option>
                 <option value="2">Tuesday</option>
@@ -585,7 +585,7 @@ function ShiftModal({ shift, defaultStaffId, onClose, onSave }: { shift: StaffSh
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               />
             </div>
           )}
@@ -598,7 +598,7 @@ function ShiftModal({ shift, defaultStaffId, onClose, onSave }: { shift: StaffSh
               <select
                 value={formData.startTime}
                 onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               >
                 {['6:00 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', 
                   '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM'].map(time => (
@@ -613,7 +613,7 @@ function ShiftModal({ shift, defaultStaffId, onClose, onSave }: { shift: StaffSh
               <select
                 value={formData.endTime}
                 onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               >
                 {['6:00 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', 
                   '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM', '10:00 PM'].map(time => (
@@ -631,7 +631,7 @@ function ShiftModal({ shift, defaultStaffId, onClose, onSave }: { shift: StaffSh
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               placeholder="Add any notes about this shift..."
             />
           </div>
@@ -639,7 +639,7 @@ function ShiftModal({ shift, defaultStaffId, onClose, onSave }: { shift: StaffSh
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+              className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
             >
               {shift ? 'Update Shift' : 'Create Shift'}
             </button>

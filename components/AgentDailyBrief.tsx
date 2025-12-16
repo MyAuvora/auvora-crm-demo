@@ -168,7 +168,7 @@ export default function AgentDailyBrief() {
     switch (priority) {
       case 'critical':
       case 'high':
-        return <AlertCircle className="text-red-600" size={20} />;
+        return <AlertCircle className="text-auvora-teal" size={20} />;
       case 'medium':
         return <AlertCircle className="text-yellow-600" size={20} />;
       case 'low':
@@ -180,16 +180,16 @@ export default function AgentDailyBrief() {
 
   const getTrendIcon = (trend?: 'up' | 'down' | 'stable') => {
     if (trend === 'up') return <TrendingUp size={16} className="text-green-600" />;
-    if (trend === 'down') return <TrendingDown size={16} className="text-red-600" />;
+    if (trend === 'down') return <TrendingDown size={16} className="text-auvora-teal" />;
     return null;
   };
 
   return (
-    <div className="mb-4 sm:mb-6 bg-white rounded-lg shadow-lg border-2 border-[#AC1305] p-4 sm:p-6">
+    <div className="mb-4 sm:mb-6 bg-white rounded-lg shadow-lg border-2 border-auvora-teal p-4 sm:p-6">
       <div className="flex items-start justify-between mb-3 sm:mb-4 gap-2">
         <div className="flex-1 min-w-0">
           <h2 className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <span className="text-[#AC1305]">🤖</span> Daily Brief by Auvora
+            <span className="text-auvora-teal">🤖</span> Daily Brief by Auvora
           </h2>
           <p className="text-sm sm:text-base text-gray-600 mt-1">{brief.summary}</p>
         </div>
@@ -254,7 +254,7 @@ export default function AgentDailyBrief() {
                     }}
                     className={`flex-1 px-3 py-2.5 rounded text-sm font-medium min-h-[44px] ${
                       action.type === 'primary'
-                        ? 'bg-[#AC1305] text-white hover:bg-[#8B0F04] active:bg-[#6B0A03]'
+                        ? 'bg-auvora-teal text-white hover:bg-auvora-teal-dark active:bg-[#6B0A03]'
                         : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
                     }`}
                   >

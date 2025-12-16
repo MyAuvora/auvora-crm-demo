@@ -86,7 +86,7 @@ export default function FranchisorMessaging() {
         </div>
         <button
           onClick={() => setShowComposeModal(true)}
-          className="bg-[#AC1305] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#8B0F04] flex items-center justify-center gap-2 text-sm min-h-[44px]"
+          className="bg-auvora-teal text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
         >
           <Mail size={18} className="sm:w-5 sm:h-5" />
           Compose Message
@@ -149,7 +149,7 @@ export default function FranchisorMessaging() {
                   type="text"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
                   placeholder="Message subject..."
                 />
               </div>
@@ -158,7 +158,7 @@ export default function FranchisorMessaging() {
                 <textarea
                   value={formData.body}
                   onChange={(e) => setFormData({ ...formData, body: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
                   rows={8}
                   placeholder="Type your message here..."
                 />
@@ -177,7 +177,7 @@ export default function FranchisorMessaging() {
                           setFormData({ ...formData, targetLocations: [] });
                         }
                       }}
-                      className="rounded text-[#AC1305] focus:ring-[#AC1305]"
+                      className="rounded text-auvora-teal focus:ring-auvora-teal"
                     />
                     <span className="font-semibold">All Locations ({franchiseLocations.length})</span>
                   </label>
@@ -193,7 +193,7 @@ export default function FranchisorMessaging() {
                             setFormData({ ...formData, targetLocations: formData.targetLocations.filter(id => id !== location.id) });
                           }
                         }}
-                        className="rounded text-[#AC1305] focus:ring-[#AC1305]"
+                        className="rounded text-auvora-teal focus:ring-auvora-teal"
                       />
                       <span>{location.name}</span>
                     </label>
@@ -208,7 +208,7 @@ export default function FranchisorMessaging() {
                   type="date"
                   value={formData.scheduleDate}
                   onChange={(e) => setFormData({ ...formData, scheduleDate: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
                   min={new Date().toISOString().split('T')[0]}
                 />
                 <p className="text-xs text-gray-500 mt-1">Leave empty to send immediately</p>
@@ -227,7 +227,7 @@ export default function FranchisorMessaging() {
               <button
                 onClick={handleSendMessage}
                 disabled={!formData.subject || !formData.body || formData.targetLocations.length === 0}
-                className="px-4 py-2 bg-[#AC1305] text-white rounded-lg hover:bg-[#8B0F04] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 <Send size={18} />
                 {formData.scheduleDate ? 'Schedule Message' : 'Send Now'}

@@ -130,7 +130,7 @@ export default function Promotions() {
         </div>
         <button
           onClick={handleCreate}
-          className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-sm min-h-[44px]"
+          className="px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark transition-colors flex items-center justify-center gap-2 text-sm min-h-[44px]"
         >
           <Plus size={18} className="sm:w-5 sm:h-5" />
           Create Promotion
@@ -143,7 +143,7 @@ export default function Promotions() {
             <div className="flex items-start justify-between mb-3 sm:mb-4">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="bg-red-100 p-2 sm:p-3 rounded-full">
-                  <Tag className="text-red-600 w-5 h-5 sm:w-6 sm:h-6" />
+                  <Tag className="text-auvora-teal w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-gray-900">{promo.name}</h3>
@@ -209,7 +209,7 @@ export default function Promotions() {
                 </button>
                 <button
                   onClick={() => handleDelete(promo)}
-                  className="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-sm"
+                  className="flex-1 px-3 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark transition-colors flex items-center justify-center gap-2 text-sm"
                 >
                   <Trash2 size={16} />
                   Delete
@@ -247,7 +247,7 @@ export default function Promotions() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g., Summer Kickstart Challenge"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                   />
                 </div>
 
@@ -258,7 +258,7 @@ export default function Promotions() {
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                   >
                     <option value="">Select type...</option>
                     <option value="New Member">New Member</option>
@@ -277,7 +277,7 @@ export default function Promotions() {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as 'planned' | 'active' | 'ended' })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                   >
                     <option value="planned">Planned</option>
                     <option value="active">Active</option>
@@ -294,7 +294,7 @@ export default function Promotions() {
                       type="date"
                       value={formData.startDate}
                       onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
                   <div>
@@ -305,7 +305,7 @@ export default function Promotions() {
                       type="date"
                       value={formData.endDate}
                       onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
                 </div>
@@ -319,7 +319,7 @@ export default function Promotions() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Enter promotion details, terms, and conditions..."
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                   />
                 </div>
 
@@ -335,7 +335,7 @@ export default function Promotions() {
                         value={formData.promoCode}
                         onChange={(e) => setFormData({ ...formData, promoCode: e.target.value.toUpperCase() })}
                         placeholder="e.g., SUMMER25"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 font-mono"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold font-mono"
                       />
                       <p className="text-xs text-gray-500 mt-1">Will be auto-capitalized</p>
                     </div>
@@ -350,7 +350,7 @@ export default function Promotions() {
                         value={formData.discountPercent}
                         onChange={(e) => setFormData({ ...formData, discountPercent: e.target.value })}
                         placeholder="e.g., 25"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                       />
                       <p className="text-xs text-gray-500 mt-1">1-100%</p>
                     </div>
@@ -383,7 +383,7 @@ export default function Promotions() {
               </button>
               <button
                 onClick={handleSave}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="px-6 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark transition-colors"
               >
                 {editingPromo ? 'Save Changes' : 'Create Promotion'}
               </button>

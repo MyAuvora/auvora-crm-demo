@@ -211,7 +211,7 @@ export default function StaffScheduleView({ staffId, staffName }: StaffScheduleV
               <select
                 value={effectiveStaffId}
                 onChange={(e) => setSelectedStaffId(e.target.value)}
-                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               >
                 {roleStaff.map(s => (
                   <option key={s.id} value={s.id}>{s.name}</option>
@@ -245,7 +245,7 @@ export default function StaffScheduleView({ staffId, staffName }: StaffScheduleV
           </div>
           <button
             onClick={handleRequestTimeOff}
-            className="px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center justify-center gap-2 text-sm min-h-[44px]"
+            className="px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
           >
             <Clock size={16} />
             Request Time Off
@@ -400,7 +400,7 @@ export default function StaffScheduleView({ staffId, staffName }: StaffScheduleV
                                 {viewMode === 'my-schedule' && shift.assignedStaffId === staffId && (
                                   <button
                                     onClick={() => handleRequestSwap(shift)}
-                                    className="text-xs text-[rgb(172,19,5)] hover:underline"
+                                    className="text-xs text-auvora-teal hover:underline"
                                   >
                                     Swap
                                   </button>
@@ -510,7 +510,7 @@ function TimeOffRequestModal({ staffId, staffName, onClose, onSave }: {
               type="date"
               value={formData.startDate}
               onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               required
             />
           </div>
@@ -524,7 +524,7 @@ function TimeOffRequestModal({ staffId, staffName, onClose, onSave }: {
               value={formData.endDate}
               onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
               min={formData.startDate}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               required
             />
           </div>
@@ -537,7 +537,7 @@ function TimeOffRequestModal({ staffId, staffName, onClose, onSave }: {
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               placeholder="Please provide a reason for your time off request..."
               required
             />
@@ -546,7 +546,7 @@ function TimeOffRequestModal({ staffId, staffName, onClose, onSave }: {
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+              className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
             >
               Submit Request
             </button>
@@ -626,7 +626,7 @@ function ShiftSwapRequestModal({ shift, staffId, staffName, onClose, onSave }: {
               type="date"
               value={formData.shiftDate}
               onChange={(e) => setFormData({ ...formData, shiftDate: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               required
             />
           </div>
@@ -638,7 +638,7 @@ function ShiftSwapRequestModal({ shift, staffId, staffName, onClose, onSave }: {
             <select
               value={formData.kind}
               onChange={(e) => setFormData({ ...formData, kind: e.target.value as 'open' | 'direct' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
             >
               <option value="open">Open to Anyone</option>
               <option value="direct">Request Specific Person</option>
@@ -653,7 +653,7 @@ function ShiftSwapRequestModal({ shift, staffId, staffName, onClose, onSave }: {
               <select
                 value={formData.targetStaffId}
                 onChange={(e) => setFormData({ ...formData, targetStaffId: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                 required
               >
                 <option value="">Select staff member...</option>
@@ -674,7 +674,7 @@ function ShiftSwapRequestModal({ shift, staffId, staffName, onClose, onSave }: {
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               placeholder="Please provide a reason for your swap request..."
               required
             />
@@ -683,7 +683,7 @@ function ShiftSwapRequestModal({ shift, staffId, staffName, onClose, onSave }: {
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+              className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
             >
               Submit Request
             </button>

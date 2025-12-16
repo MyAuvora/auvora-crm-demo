@@ -26,7 +26,7 @@ export default function ConfirmDialog({
   if (!isOpen) return null;
 
   const confirmButtonClass = confirmVariant === 'danger'
-    ? 'bg-red-600 hover:bg-red-700 text-white'
+    ? 'bg-auvora-teal hover:bg-auvora-teal-dark text-white'
     : 'bg-blue-600 hover:bg-blue-700 text-white';
 
   return (
@@ -39,7 +39,7 @@ export default function ConfirmDialog({
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         <div className="p-4 sm:p-6">
           <div className="flex items-start gap-3 sm:gap-4">
-            <div className={`flex-shrink-0 ${confirmVariant === 'danger' ? 'text-red-600' : 'text-blue-600'}`}>
+            <div className={`flex-shrink-0 ${confirmVariant === 'danger' ? 'text-auvora-teal' : 'text-blue-600'}`}>
               <AlertTriangle size={20} className="sm:w-6 sm:h-6" />
             </div>
             <div className="flex-1 min-w-0">

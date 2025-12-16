@@ -12,7 +12,7 @@ export default function Settings() {
   const [, setRefreshTrigger] = useState(0);
   
   const [businessInfo, setBusinessInfo] = useState({
-    businessName: 'The Lab Tampa',
+    businessName: 'Your Business',
     email: 'info@thelabtampa.com',
     phone: '(813) 555-0100',
     address: '123 Fitness St, Tampa, FL 33602',
@@ -21,7 +21,7 @@ export default function Settings() {
   });
 
   const [branding, setBranding] = useState({
-    primaryColor: '#AC1305',
+    primaryColor: '#0f5257',
     logoUrl: '',
     accentColor: '#3B82F6',
   });
@@ -97,7 +97,7 @@ export default function Settings() {
                     onClick={() => setActiveSection(section.id)}
                     className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-left transition-colors text-sm sm:text-base ${
                       activeSection === section.id
-                        ? 'bg-red-600 text-white'
+                        ? 'bg-auvora-teal text-white'
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
@@ -125,7 +125,7 @@ export default function Settings() {
                       type="text"
                       value={businessInfo.businessName}
                       onChange={(e) => setBusinessInfo({ ...businessInfo, businessName: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
 
@@ -135,7 +135,7 @@ export default function Settings() {
                       type="email"
                       value={businessInfo.email}
                       onChange={(e) => setBusinessInfo({ ...businessInfo, email: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
 
@@ -145,7 +145,7 @@ export default function Settings() {
                       type="tel"
                       value={businessInfo.phone}
                       onChange={(e) => setBusinessInfo({ ...businessInfo, phone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
 
@@ -154,7 +154,7 @@ export default function Settings() {
                     <select
                       value={businessInfo.timezone}
                       onChange={(e) => setBusinessInfo({ ...businessInfo, timezone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     >
                       <option value="America/New_York">Eastern Time</option>
                       <option value="America/Chicago">Central Time</option>
@@ -169,7 +169,7 @@ export default function Settings() {
                       type="text"
                       value={businessInfo.address}
                       onChange={(e) => setBusinessInfo({ ...businessInfo, address: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
                 </div>
@@ -197,7 +197,7 @@ export default function Settings() {
                         type="text"
                         value={branding.primaryColor}
                         onChange={(e) => setBranding({ ...branding, primaryColor: e.target.value })}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                       />
                     </div>
                   </div>
@@ -215,7 +215,7 @@ export default function Settings() {
                         type="text"
                         value={branding.accentColor}
                         onChange={(e) => setBranding({ ...branding, accentColor: e.target.value })}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                       />
                     </div>
                   </div>
@@ -227,7 +227,7 @@ export default function Settings() {
                       value={branding.logoUrl}
                       onChange={(e) => setBranding({ ...branding, logoUrl: e.target.value })}
                       placeholder="https://example.com/logo.png"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
                 </div>
@@ -249,7 +249,7 @@ export default function Settings() {
                       step="0.1"
                       value={billing.taxRate}
                       onChange={(e) => setBilling({ ...billing, taxRate: parseFloat(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
 
@@ -260,7 +260,7 @@ export default function Settings() {
                       step="1"
                       value={billing.lateFeeAmount}
                       onChange={(e) => setBilling({ ...billing, lateFeeAmount: parseFloat(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
 
@@ -270,7 +270,7 @@ export default function Settings() {
                       type="number"
                       value={billing.gracePeriodDays}
                       onChange={(e) => setBilling({ ...billing, gracePeriodDays: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
 
@@ -280,7 +280,7 @@ export default function Settings() {
                       type="number"
                       value={billing.retryAttempts}
                       onChange={(e) => setBilling({ ...billing, retryAttempts: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
 
@@ -350,7 +350,7 @@ export default function Settings() {
                         type="number"
                         value={staffSettings.commissionRate}
                         onChange={(e) => setStaffSettings({ ...staffSettings, commissionRate: parseInt(e.target.value) })}
-                        className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                        className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                       />
                     </div>
                   )}
@@ -384,7 +384,7 @@ export default function Settings() {
                                   updateStaffSettings(staff.id, { posAccess: e.target.checked });
                                   setRefreshTrigger(prev => prev + 1);
                                 }}
-                                className="rounded border-gray-300 text-red-600 focus:ring-red-600"
+                                className="rounded border-gray-300 text-auvora-teal focus:ring-auvora-gold"
                               />
                             </label>
                           </div>
@@ -532,7 +532,7 @@ export default function Settings() {
                       type="number"
                       value={securitySettings.sessionTimeout}
                       onChange={(e) => setSecuritySettings({ ...securitySettings, sessionTimeout: parseInt(e.target.value) })}
-                      className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
 
@@ -542,7 +542,7 @@ export default function Settings() {
                       type="number"
                       value={securitySettings.passwordExpiry}
                       onChange={(e) => setSecuritySettings({ ...securitySettings, passwordExpiry: parseInt(e.target.value) })}
-                      className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     />
                   </div>
                 </div>
@@ -577,7 +577,7 @@ export default function Settings() {
               </button>
               <button
                 onClick={handleSave}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+                className="px-6 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark font-medium"
               >
                 Save Changes
               </button>

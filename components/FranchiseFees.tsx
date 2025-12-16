@@ -87,7 +87,7 @@ export default function FranchiseFees() {
     switch (status) {
       case 'paid': return <CheckCircle size={18} className="text-green-600" />;
       case 'pending': return <Clock size={18} className="text-yellow-600" />;
-      case 'overdue': return <AlertCircle size={18} className="text-red-600" />;
+      case 'overdue': return <AlertCircle size={18} className="text-auvora-teal" />;
       default: return null;
     }
   };
@@ -134,7 +134,7 @@ export default function FranchiseFees() {
           <select
             value={selectedMonth}
             onChange={(e) => handleMonthChange(e.target.value)}
-            className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+            className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-teal"
           >
             <option value="2024-12">December 2024</option>
             <option value="2024-11">November 2024</option>
@@ -144,7 +144,7 @@ export default function FranchiseFees() {
           </select>
           <button
             onClick={exportToCSV}
-            className="bg-[#AC1305] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#8B0F04] flex items-center justify-center gap-2 text-sm min-h-[44px]"
+            className="bg-auvora-teal text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
           >
             <Download size={18} className="sm:w-5 sm:h-5" />
             Export CSV
@@ -181,10 +181,10 @@ export default function FranchiseFees() {
         <div className="bg-red-50 p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs sm:text-sm font-medium text-red-700">Overdue</span>
-            <AlertCircle className="text-red-600 w-[18px] h-[18px] sm:w-5 sm:h-5" />
+            <AlertCircle className="text-auvora-teal w-[18px] h-[18px] sm:w-5 sm:h-5" />
           </div>
           <div className="text-xl sm:text-2xl font-bold text-red-900">${totalOverdue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-          <p className="text-[10px] sm:text-xs text-red-600 mt-1">{feePayments.filter(p => p.status === 'overdue').length} locations</p>
+          <p className="text-[10px] sm:text-xs text-auvora-teal mt-1">{feePayments.filter(p => p.status === 'overdue').length} locations</p>
         </div>
       </div>
 
@@ -202,7 +202,7 @@ export default function FranchiseFees() {
           </div>
           <div>
             <div className="text-xs sm:text-sm text-gray-600 mb-1">Total Fees (9%)</div>
-            <div className="text-xl sm:text-2xl font-bold text-[#AC1305]">${totalDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <div className="text-xl sm:text-2xl font-bold text-auvora-teal">${totalDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           </div>
         </div>
       </div>
@@ -266,7 +266,7 @@ export default function FranchiseFees() {
                 <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-gray-900 text-xs sm:text-sm">
                   ${totalBrandFund.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
-                <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[#AC1305] text-xs sm:text-sm">
+                <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-auvora-teal text-xs sm:text-sm">
                   ${totalDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
                 <td className="px-3 sm:px-6 py-3 sm:py-4"></td>

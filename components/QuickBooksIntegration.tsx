@@ -113,7 +113,7 @@ export default function QuickBooksIntegration() {
                   onClick={() => setActiveTab('overview')}
                   className={`px-4 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base whitespace-nowrap ${
                     activeTab === 'overview'
-                      ? 'text-red-600 border-b-2 border-red-600'
+                      ? 'text-auvora-teal border-b-2 border-auvora-teal'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -123,7 +123,7 @@ export default function QuickBooksIntegration() {
                   onClick={() => setActiveTab('mappings')}
                   className={`px-4 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base whitespace-nowrap ${
                     activeTab === 'mappings'
-                      ? 'text-red-600 border-b-2 border-red-600'
+                      ? 'text-auvora-teal border-b-2 border-auvora-teal'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -133,7 +133,7 @@ export default function QuickBooksIntegration() {
                   onClick={() => setActiveTab('sync-history')}
                   className={`px-4 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base whitespace-nowrap ${
                     activeTab === 'sync-history'
-                      ? 'text-red-600 border-b-2 border-red-600'
+                      ? 'text-auvora-teal border-b-2 border-auvora-teal'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -151,7 +151,7 @@ export default function QuickBooksIntegration() {
                       <CheckCircle className="text-green-600 w-[18px] h-[18px] sm:w-5 sm:h-5" />
                     </div>
                     <p className="text-xl sm:text-2xl font-bold text-green-900">Connected</p>
-                    <p className="text-[10px] sm:text-xs text-green-700 mt-1">Company: {location === 'athletic-club' ? 'The Lab Tampa - Athletic' : 'The Lab Tampa - Dance'}</p>
+                    <p className="text-[10px] sm:text-xs text-green-700 mt-1">Company: {location === 'athletic-club' ? 'Your Business - Athletic' : 'Your Business - Dance'}</p>
                   </div>
 
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -291,7 +291,7 @@ export default function QuickBooksIntegration() {
                           {sync.status === 'success' ? (
                             <CheckCircle className="text-green-600" size={20} />
                           ) : (
-                            <XCircle className="text-red-600" size={20} />
+                            <XCircle className="text-auvora-teal" size={20} />
                           )}
                         </div>
                         <div>
@@ -302,7 +302,7 @@ export default function QuickBooksIntegration() {
                       <div className="text-right">
                         <p className="text-xs text-gray-600">{sync.time}</p>
                         <span className={`text-xs font-medium ${
-                          sync.status === 'success' ? 'text-green-600' : 'text-red-600'
+                          sync.status === 'success' ? 'text-green-600' : 'text-auvora-teal'
                         }`}>
                           {sync.status}
                         </span>

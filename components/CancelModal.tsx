@@ -36,9 +36,9 @@ export default function CancelModal({ memberId, memberName, onClose, onSuccess }
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-        <div className="bg-red-600 text-white p-3 sm:p-4 flex justify-between items-center rounded-t-lg">
+        <div className="bg-auvora-teal text-white p-3 sm:p-4 flex justify-between items-center rounded-t-lg">
           <h2 className="text-lg sm:text-xl font-bold">Cancel Membership</h2>
-          <button onClick={onClose} className="hover:bg-red-700 p-2 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
+          <button onClick={onClose} className="hover:bg-auvora-teal-dark p-2 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
             <X size={24} />
           </button>
         </div>
@@ -62,7 +62,7 @@ export default function CancelModal({ memberId, memberName, onClose, onSuccess }
                 type="date"
                 value={effectiveDate}
                 onChange={(e) => setEffectiveDate(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
+                className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold text-sm sm:text-base min-h-[44px]"
               />
             </div>
 
@@ -74,7 +74,7 @@ export default function CancelModal({ memberId, memberName, onClose, onSuccess }
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 rows={3}
-                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold text-sm sm:text-base"
                 placeholder="e.g., Moving away, financial reasons, etc."
               />
             </div>
@@ -89,7 +89,7 @@ export default function CancelModal({ memberId, memberName, onClose, onSuccess }
             </button>
             <button
               onClick={handleCancel}
-              className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 min-h-[44px] text-sm sm:text-base"
+              className="flex-1 px-4 py-2.5 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark min-h-[44px] text-sm sm:text-base"
             >
               Cancel Membership
             </button>

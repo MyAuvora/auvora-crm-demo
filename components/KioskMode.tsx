@@ -46,7 +46,7 @@ export default function KioskMode() {
             <span className="text-2xl sm:text-3xl font-semibold text-white">Tampa</span>
           </div>
           <p className="text-lg sm:text-2xl text-gray-300 mb-2">Welcome! Check in to your class</p>
-          <p className="text-2xl sm:text-4xl font-bold text-red-500">{format(currentTime, 'h:mm:ss a')}</p>
+          <p className="text-2xl sm:text-4xl font-bold text-auvora-teal">{format(currentTime, 'h:mm:ss a')}</p>
           <p className="text-base sm:text-xl text-gray-400">{format(currentTime, 'EEEE, MMMM d, yyyy')}</p>
         </div>
 
@@ -70,7 +70,7 @@ export default function KioskMode() {
           <div className={`mb-4 sm:mb-6 p-4 sm:p-6 rounded-lg text-center text-lg sm:text-2xl font-bold ${
             message.type === 'success' 
               ? 'bg-green-600 text-white' 
-              : 'bg-red-600 text-white'
+              : 'bg-auvora-teal text-white'
           }`}>
             {message.text}
           </div>
@@ -95,7 +95,7 @@ export default function KioskMode() {
                   <button
                     key={cls.id}
                     onClick={() => setSelectedClass(cls)}
-                    className="p-4 sm:p-6 rounded-lg text-left transition-all bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 cursor-pointer transform hover:scale-105 min-h-[120px]"
+                    className="p-4 sm:p-6 rounded-lg text-left transition-all bg-gradient-to-br from-auvora-teal to-auvora-teal-dark hover:from-auvora-teal-light hover:to-auvora-teal cursor-pointer transform hover:scale-105 min-h-[120px]"
                   >
                     <div className="flex items-start justify-between mb-3 sm:mb-4">
                       <div>
