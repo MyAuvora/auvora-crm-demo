@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllMembers, getAllLeads, getAllClasses, getAllBookings, getAllTransactions, getAllStaff, getAllWaitlist, getAllProducts, getAllClassPackClients, getAllRefunds, getPendingSubstitutionRequests, getPendingTimeOffRequests } from '@/lib/dataStore';
-import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X, AlertCircle, CreditCard, Zap, Target, MessageSquare, Package, CheckCircle, Sparkles } from 'lucide-react';
+import { Users, TrendingUp, UserPlus, Lightbulb, DollarSign, X, AlertCircle, CreditCard, Zap, Target, MessageSquare, Package, CheckCircle, Sparkles, Settings2 } from 'lucide-react';
 import { Class } from '@/lib/types';
 import { Transaction } from '@/lib/dataStore';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
@@ -12,6 +12,8 @@ import ManagerApprovals from './ManagerApprovals';
 import PersonStatusBadge from './PersonStatusBadge';
 import AgentDailyBrief from './AgentDailyBrief';
 import AskAuvora from './AskAuvora';
+import DashboardCustomizer from './DashboardCustomizer';
+import { loadDashboardLayout, UserDashboardLayout } from '@/lib/dashboardConfig';
 
 export default function Dashboard() {
   const { location, navigateToMember, navigateToLead, userRole } = useApp();
@@ -21,6 +23,20 @@ export default function Dashboard() {
   const [paymentProcessing, setPaymentProcessing] = useState<Record<string, 'processing' | 'complete' | 'incomplete'>>({});
   const [showApprovals, setShowApprovals] = useState(false);
   const [showAskAuvora, setShowAskAuvora] = useState(false);
+  const [showCustomizer, setShowCustomizer] = useState(false);
+  const [dashboardLayout, setDashboardLayout] = useState<UserDashboardLayout | null>(null);
+  
+  const userId = 'demo-user';
+  
+  useEffect(() => {
+    const layout = loadDashboardLayout(userId, userRole);
+    setDashboardLayout(layout);
+  }, [userRole]);
+  
+  const isWidgetVisible = (widgetId: string) => {
+    if (!dashboardLayout) return true;
+    return !dashboardLayout.hiddenWidgets.includes(widgetId);
+  };
   
   const locationMembers = getAllMembers().filter(m => m.location === location);
   const locationLeads = getAllLeads().filter(l => l.location === location);
@@ -254,40 +270,50 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Welcome back! Here&apos;s what&apos;s happening today.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-1">Welcome back! Here&apos;s what&apos;s happening today.</p>
+        </div>
+        <button
+          onClick={() => setShowCustomizer(true)}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <Settings2 size={18} />
+          Customize
+        </button>
       </div>
 
-      {(userRole === 'owner' || userRole === 'manager') && <AgentDailyBrief />}
+      {isWidgetVisible('daily-brief') && (userRole === 'owner' || userRole === 'manager') && <AgentDailyBrief />}
 
-      <DashboardOpsFeed />
+      {isWidgetVisible('ops-feed') && <DashboardOpsFeed />}
 
-      {(userRole === 'owner' || userRole === 'manager' || userRole === 'head-coach') && totalPendingApprovals > 0 && (
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <CheckCircle size={24} className="text-orange-600" />
-              <div>
-                <h3 className="font-semibold text-gray-900">Pending Approvals</h3>
-                <p className="text-sm text-gray-600">
-                  {totalPendingApprovals} request{totalPendingApprovals !== 1 ? 's' : ''} need{totalPendingApprovals === 1 ? 's' : ''} your review
-                </p>
+            {isWidgetVisible('pending-approvals') && (userRole === 'owner' || userRole === 'manager' || userRole === 'head-coach') && totalPendingApprovals > 0 && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle size={24} className="text-orange-600" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Pending Approvals</h3>
+                      <p className="text-sm text-gray-600">
+                        {totalPendingApprovals} request{totalPendingApprovals !== 1 ? 's' : ''} need{totalPendingApprovals === 1 ? 's' : ''} your review
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowApprovals(true)}
+                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+                  >
+                    Review Now
+                  </button>
+                </div>
               </div>
-            </div>
-            <button
-              onClick={() => setShowApprovals(true)}
-              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-            >
-              Review Now
-            </button>
-          </div>
-        </div>
-      )}
+            )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        <button 
-          onClick={() => setSelectedMetric('checkins')}
+            {isWidgetVisible('metric-cards') && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <button 
+                onClick={() => setSelectedMetric('checkins')}
           className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer text-left min-h-[100px] active:scale-95 transition-transform"
         >
           <div className="flex items-center justify-between">
@@ -374,10 +400,11 @@ export default function Dashboard() {
               <AlertCircle className="text-auvora-teal" size={20} />
             </div>
           </div>
-        </button>
-      </div>
+              </button>
+            </div>
+            )}
       
-      {selectedMetric && (
+            {selectedMetric && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden">
             <div className="p-4 sm:p-6 border-b border-gray-200 flex justify-between items-center">
@@ -912,6 +939,14 @@ export default function Dashboard() {
       )}
 
       <AskAuvora isOpen={showAskAuvora} onClose={() => setShowAskAuvora(false)} />
+
+      <DashboardCustomizer
+        isOpen={showCustomizer}
+        onClose={() => setShowCustomizer(false)}
+        userRole={userRole}
+        userId={userId}
+        onLayoutChange={(newLayout) => setDashboardLayout(newLayout)}
+      />
     </div>
   );
 }
