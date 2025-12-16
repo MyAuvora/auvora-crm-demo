@@ -176,6 +176,53 @@ export interface Database {
           updated_at?: string
         }
       }
+      staff: {
+        Row: {
+          id: string
+          tenant_id: string
+          user_id: string | null
+          name: string
+          email: string
+          phone: string | null
+          role: 'manager' | 'head-coach' | 'coach' | 'instructor' | 'front-desk'
+          specialties: string[]
+          hourly_rate: number | null
+          status: 'active' | 'inactive'
+          hire_date: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          user_id?: string | null
+          name: string
+          email: string
+          phone?: string | null
+          role: 'manager' | 'head-coach' | 'coach' | 'instructor' | 'front-desk'
+          specialties?: string[]
+          hourly_rate?: number | null
+          status?: 'active' | 'inactive'
+          hire_date: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          user_id?: string | null
+          name?: string
+          email?: string
+          phone?: string | null
+          role?: 'manager' | 'head-coach' | 'coach' | 'instructor' | 'front-desk'
+          specialties?: string[]
+          hourly_rate?: number | null
+          status?: 'active' | 'inactive'
+          hire_date?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
       classes: {
         Row: {
           id: string
