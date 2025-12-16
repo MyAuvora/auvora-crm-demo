@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { seedTenantData, checkTenantHasData } from '@/lib/services/seedTenantData';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -57,7 +58,24 @@ export default function SignupPage() {
       }
 
       if (data.user) {
-        router.push('/signup/verify-email');
+        // Get the user's tenant_id from the users table
+        const { data: userData } = await supabase
+          .from('users')
+          .select('tenant_id')
+          .eq('id', data.user.id)
+          .single();
+
+        if (userData?.tenant_id) {
+          // Check if tenant already has data (in case of re-signup)
+          const hasData = await checkTenantHasData(userData.tenant_id);
+          if (!hasData) {
+            // Seed initial demo data for the new tenant
+            await seedTenantData(userData.tenant_id);
+          }
+        }
+
+        // Redirect to dashboard (email confirmation is disabled)
+        router.push('/');
       }
     } catch (err) {
       setError('An unexpected error occurred');
