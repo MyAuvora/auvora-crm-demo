@@ -26,7 +26,7 @@ const getSamplePosts = (): SocialPost[] => {
     {
       id: 'post-1',
       platform: ['facebook', 'instagram'],
-      content: '💪 New class alert! Join us for High-Intensity Interval Training every Monday and Wednesday at 6 PM. First class is FREE for new members! #FitnessGoals #TheLab Tampa',
+      content: '💪 New class alert! Join us for High-Intensity Interval Training every Monday and Wednesday at 6 PM. First class is FREE for new members! #FitnessGoals #YourBusiness Tampa',
       mediaType: 'image',
       status: 'published',
       publishedAt: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -186,7 +186,7 @@ export default function SocialMedia() {
                 <textarea
                   value={postContent}
                   onChange={(e) => setPostContent(e.target.value)}
-                  placeholder="What's happening at The Lab Tampa?"
+                  placeholder="What's happening at Your Business?"
                   rows={6}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-auvora-gold resize-none"
                 />

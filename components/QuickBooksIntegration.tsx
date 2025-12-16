@@ -151,7 +151,7 @@ export default function QuickBooksIntegration() {
                       <CheckCircle className="text-green-600 w-[18px] h-[18px] sm:w-5 sm:h-5" />
                     </div>
                     <p className="text-xl sm:text-2xl font-bold text-green-900">Connected</p>
-                    <p className="text-[10px] sm:text-xs text-green-700 mt-1">Company: {location === 'athletic-club' ? 'The Lab Tampa - Athletic' : 'The Lab Tampa - Dance'}</p>
+                    <p className="text-[10px] sm:text-xs text-green-700 mt-1">Company: {location === 'athletic-club' ? 'Your Business - Athletic' : 'Your Business - Dance'}</p>
                   </div>
 
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

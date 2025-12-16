@@ -12,7 +12,7 @@ export default function Settings() {
   const [, setRefreshTrigger] = useState(0);
   
   const [businessInfo, setBusinessInfo] = useState({
-    businessName: 'The Lab Tampa',
+    businessName: 'Your Business',
     email: 'info@thelabtampa.com',
     phone: '(813) 555-0100',
     address: '123 Fitness St, Tampa, FL 33602',

@@ -66,7 +66,7 @@ export default function CRMApp() {
     setActiveSection(section as Section);
   };
 
-  const locationName = location === 'all' ? 'All Locations' : location === 'athletic-club' ? 'The Lab Tampa' : 'Dance Studio';
+  const locationName = location === 'all' ? 'All Locations' : location === 'athletic-club' ? 'Athletic Club' : 'Dance Studio';
   
   const getRoleName = (role: string) => {
     switch(role) {
@@ -138,7 +138,7 @@ export default function CRMApp() {
               {userRole === 'franchisor' ? (
                 <>
                   <option value="all">All Locations</option>
-                  <option value="athletic-club">The Lab Tampa</option>
+                  <option value="athletic-club">Athletic Club</option>
                 </>
               ) : (
                 <>

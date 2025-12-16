@@ -26,7 +26,7 @@ const messageTemplates: MessageTemplate[] = [
   {
     id: 'welcome-member',
     name: 'Welcome New Member',
-    message: 'Welcome to The Lab Tampa, {{name}}! We\'re excited to have you join our fitness family. Your {{membership}} membership is now active. See you soon!',
+    message: 'Welcome to Your Business, {{name}}! We\'re excited to have you join our fitness family. Your {{membership}} membership is now active. See you soon!',
     category: 'welcome'
   },
   {
@@ -50,7 +50,7 @@ const messageTemplates: MessageTemplate[] = [
   {
     id: 'trial-followup',
     name: 'Trial Class Follow-up',
-    message: 'Thanks for trying out The Lab Tampa, {{name}}! How was your experience? We\'d love to have you join us as a member. Reply to learn about our membership options!',
+    message: 'Thanks for trying out Your Business, {{name}}! How was your experience? We\'d love to have you join us as a member. Reply to learn about our membership options!',
     category: 'follow-up'
   },
   {
@@ -83,7 +83,7 @@ export default function Messaging() {
         recipientId: 'member-1',
         recipientName: 'John Smith',
         recipientType: 'member',
-        message: 'Welcome to The Lab Tampa! Your first class is tomorrow at 6:00 PM.',
+        message: 'Welcome to Your Business! Your first class is tomorrow at 6:00 PM.',
         timestamp: new Date(now - 2 * 60 * 60 * 1000).toISOString(),
         status: 'read'
       },
