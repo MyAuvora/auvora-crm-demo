@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Auvora Brand Colors */
+  --auvora-teal: #0f5257;
+  --auvora-teal-dark: #0a3d41;
+  --auvora-teal-light: #1a7a82;
+  --auvora-gold: #d4af37;
+  --auvora-gold-dark: #b8962f;
 }
 
 @theme inline {
@@ -10,6 +17,13 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Auvora Brand Colors for Tailwind */
+  --color-auvora-teal: var(--auvora-teal);
+  --color-auvora-teal-dark: var(--auvora-teal-dark);
+  --color-auvora-teal-light: var(--auvora-teal-light);
+  --color-auvora-gold: var(--auvora-gold);
+  --color-auvora-gold-dark: var(--auvora-gold-dark);
 }
 
 @media (prefers-color-scheme: dark) {

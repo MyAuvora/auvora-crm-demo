@@ -374,7 +374,7 @@ function ShiftModal({
             <select
               value={formData.assignedStaffId}
               onChange={(e) => setFormData({ ...formData, assignedStaffId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               required
             >
               <option value="">Select staff member</option>
@@ -392,7 +392,7 @@ function ShiftModal({
                 type="checkbox"
                 checked={formData.isRecurring}
                 onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
-                className="rounded border-gray-300 text-[rgb(172,19,5)] focus:ring-[rgb(172,19,5)]"
+                className="rounded border-gray-300 text-auvora-teal focus:ring-auvora-teal"
               />
               <span className="text-sm font-medium text-gray-700">Recurring Weekly</span>
             </label>
@@ -406,7 +406,7 @@ function ShiftModal({
               <select
                 value={formData.dayOfWeek}
                 onChange={(e) => setFormData({ ...formData, dayOfWeek: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               >
                 <option value="1">Monday</option>
                 <option value="2">Tuesday</option>
@@ -426,7 +426,7 @@ function ShiftModal({
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                 required
               />
             </div>
@@ -440,7 +440,7 @@ function ShiftModal({
               <select
                 value={formData.startTime}
                 onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               >
                 {['6:00 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', 
                   '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM'].map(time => (
@@ -455,7 +455,7 @@ function ShiftModal({
               <select
                 value={formData.endTime}
                 onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               >
                 {['6:00 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', 
                   '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM', '10:00 PM'].map(time => (
@@ -473,7 +473,7 @@ function ShiftModal({
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               placeholder="Add any notes about this shift..."
             />
           </div>
@@ -481,7 +481,7 @@ function ShiftModal({
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+              className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
             >
               {shift?.id ? 'Update Shift' : 'Create Shift'}
             </button>

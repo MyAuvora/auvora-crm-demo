@@ -80,7 +80,7 @@ export default function ManagerApprovals() {
       <div className="bg-white rounded-lg shadow">
         <div className="p-4 sm:p-6 border-b border-gray-200">
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-            <Calendar size={20} className="text-red-600 sm:w-6 sm:h-6" />
+            <Calendar size={20} className="text-auvora-teal sm:w-6 sm:h-6" />
             <h2 className="text-lg sm:text-xl font-bold text-gray-900">Substitution Requests</h2>
             <span className="ml-auto bg-red-100 text-red-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
               {substitutionRequests.length} pending
@@ -132,7 +132,7 @@ export default function ManagerApprovals() {
                       </button>
                       <button
                         onClick={() => handleDenySubstitution(request.id)}
-                        className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
+                        className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
                       >
                         <XCircle size={14} className="sm:w-4 sm:h-4" />
                         Deny
@@ -149,7 +149,7 @@ export default function ManagerApprovals() {
       <div className="bg-white rounded-lg shadow">
         <div className="p-4 sm:p-6 border-b border-gray-200">
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-            <UserX size={20} className="text-red-600 sm:w-6 sm:h-6" />
+            <UserX size={20} className="text-auvora-teal sm:w-6 sm:h-6" />
             <h2 className="text-lg sm:text-xl font-bold text-gray-900">Time Off Requests</h2>
             <span className="ml-auto bg-red-100 text-red-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
               {timeOffRequests.length} pending
@@ -189,7 +189,7 @@ export default function ManagerApprovals() {
                       </button>
                       <button
                         onClick={() => handleDenyTimeOff(request.id)}
-                        className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
+                        className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
                       >
                         <XCircle size={14} className="sm:w-4 sm:h-4" />
                         Deny

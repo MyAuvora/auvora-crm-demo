@@ -266,7 +266,7 @@ export default function POS() {
               onClick={() => setActiveTab('pos')}
               className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'pos'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -277,7 +277,7 @@ export default function POS() {
               onClick={() => setActiveTab('inventory')}
               className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'inventory'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -287,7 +287,7 @@ export default function POS() {
               onClick={() => setActiveTab('transactions')}
               className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'transactions'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -297,7 +297,7 @@ export default function POS() {
               onClick={() => setActiveTab('invoices')}
               className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'invoices'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -324,7 +324,7 @@ export default function POS() {
                     <select
                       value={selectedMember}
                       onChange={(e) => setSelectedMember(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     >
                       <option value="">Guest / Walk-in</option>
                       {allMembers.map(member => (
@@ -339,7 +339,7 @@ export default function POS() {
                     <select
                       value={selectedSeller}
                       onChange={(e) => setSelectedSeller(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     >
                       <option value="">Select Seller</option>
                       {staff.filter(s => s.location === location).map(s => (
@@ -356,11 +356,11 @@ export default function POS() {
                       <button
                         key={product.id}
                         onClick={() => addToCart(product)}
-                        className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                        className="p-4 border border-gray-300 rounded-lg hover:border-auvora-teal hover:bg-red-50 transition-colors text-left"
                       >
                         <p className="font-medium text-gray-900">{product.name}</p>
                         <p className="text-sm text-gray-600">{product.category}</p>
-                        <p className="text-lg font-bold text-red-600 mt-2">${product.price}</p>
+                        <p className="text-lg font-bold text-auvora-teal mt-2">${product.price}</p>
                         <p className="text-xs text-gray-500">Stock: {product.stock}</p>
                       </button>
                     ))}
@@ -381,10 +381,10 @@ export default function POS() {
                               addToCart({ id: 'membership-1x-temp', name: '1x/week Membership', category: 'Membership', price: 99, stock: 999, location });
                             }
                           }}
-                          className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                          className="p-4 border border-gray-300 rounded-lg hover:border-auvora-teal hover:bg-red-50 transition-colors text-left"
                         >
                           <p className="font-medium text-gray-900">1x/week</p>
-                          <p className="text-lg font-bold text-red-600 mt-2">$99/mo</p>
+                          <p className="text-lg font-bold text-auvora-teal mt-2">$99/mo</p>
                         </button>
                         <button 
                           onClick={() => {
@@ -395,10 +395,10 @@ export default function POS() {
                               addToCart({ id: 'membership-2x-temp', name: '2x/week Membership', category: 'Membership', price: 149, stock: 999, location });
                             }
                           }}
-                          className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                          className="p-4 border border-gray-300 rounded-lg hover:border-auvora-teal hover:bg-red-50 transition-colors text-left"
                         >
                           <p className="font-medium text-gray-900">2x/week</p>
-                          <p className="text-lg font-bold text-red-600 mt-2">$149/mo</p>
+                          <p className="text-lg font-bold text-auvora-teal mt-2">$149/mo</p>
                         </button>
                         <button 
                           onClick={() => {
@@ -409,10 +409,10 @@ export default function POS() {
                               addToCart({ id: 'membership-unlimited-temp', name: 'Unlimited Membership', category: 'Membership', price: 199, stock: 999, location });
                             }
                           }}
-                          className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                          className="p-4 border border-gray-300 rounded-lg hover:border-auvora-teal hover:bg-red-50 transition-colors text-left"
                         >
                           <p className="font-medium text-gray-900">Unlimited</p>
-                          <p className="text-lg font-bold text-red-600 mt-2">$199/mo</p>
+                          <p className="text-lg font-bold text-auvora-teal mt-2">$199/mo</p>
                         </button>
                       </>
                     )}
@@ -435,10 +435,10 @@ export default function POS() {
                           addToCart({ id: '5-pack-temp', name: '5-pack', category: 'Class Pack', price: 75, stock: 999, location });
                         }
                       }}
-                      className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                      className="p-4 border border-gray-300 rounded-lg hover:border-auvora-teal hover:bg-red-50 transition-colors text-left"
                     >
                       <p className="font-medium text-gray-900">5-pack</p>
-                      <p className="text-lg font-bold text-red-600 mt-2">$75</p>
+                      <p className="text-lg font-bold text-auvora-teal mt-2">$75</p>
                     </button>
                     <button 
                       onClick={() => {
@@ -449,10 +449,10 @@ export default function POS() {
                           addToCart({ id: '10-pack-temp', name: '10-pack', category: 'Class Pack', price: 140, stock: 999, location });
                         }
                       }}
-                      className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                      className="p-4 border border-gray-300 rounded-lg hover:border-auvora-teal hover:bg-red-50 transition-colors text-left"
                     >
                       <p className="font-medium text-gray-900">10-pack</p>
-                      <p className="text-lg font-bold text-red-600 mt-2">$140</p>
+                      <p className="text-lg font-bold text-auvora-teal mt-2">$140</p>
                     </button>
                     <button 
                       onClick={() => {
@@ -463,10 +463,10 @@ export default function POS() {
                           addToCart({ id: '20-pack-temp', name: '20-pack', category: 'Class Pack', price: 260, stock: 999, location });
                         }
                       }}
-                      className="p-4 border border-gray-300 rounded-lg hover:border-red-600 hover:bg-red-50 transition-colors text-left"
+                      className="p-4 border border-gray-300 rounded-lg hover:border-auvora-teal hover:bg-red-50 transition-colors text-left"
                     >
                       <p className="font-medium text-gray-900">20-pack</p>
-                      <p className="text-lg font-bold text-red-600 mt-2">$260</p>
+                      <p className="text-lg font-bold text-auvora-teal mt-2">$260</p>
                     </button>
                   </div>
                 </div>
@@ -474,7 +474,7 @@ export default function POS() {
 
               <div className="bg-gray-50 p-6 rounded-lg h-fit">
                 <div className="flex items-center gap-2 mb-4">
-                  <ShoppingCart className="text-red-600" size={24} />
+                  <ShoppingCart className="text-auvora-teal" size={24} />
                   <h3 className="text-lg font-bold text-gray-900">Cart</h3>
                 </div>
 
@@ -525,7 +525,7 @@ export default function POS() {
                       </div>
                       <div className="flex justify-between items-center pt-2 border-t border-gray-300">
                         <span className="text-lg font-bold text-gray-900">Total</span>
-                        <span className="text-2xl font-bold text-red-600">${getTotal().toFixed(2)}</span>
+                        <span className="text-2xl font-bold text-auvora-teal">${getTotal().toFixed(2)}</span>
                       </div>
                     </div>
 
@@ -539,7 +539,7 @@ export default function POS() {
                           value={promoCode}
                           onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                           placeholder="Enter code"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                         />
                         <button
                           onClick={applyPromoCode}
@@ -554,7 +554,7 @@ export default function POS() {
 
                     <button
                       onClick={completeSale}
-                      className="w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition-colors"
+                      className="w-full bg-auvora-teal text-white py-3 rounded-lg font-medium hover:bg-auvora-teal-dark transition-colors"
                     >
                       Complete Sale
                     </button>
@@ -585,7 +585,7 @@ export default function POS() {
                       <td className="px-4 py-3 text-sm text-gray-900">{product.stock}</td>
                       <td className="px-4 py-3 text-sm">
                         {product.stock < 10 ? (
-                          <span className="flex items-center gap-1 text-red-600">
+                          <span className="flex items-center gap-1 text-auvora-teal">
                             <AlertTriangle size={16} />
                             Low Stock
                           </span>
@@ -650,7 +650,7 @@ export default function POS() {
                               setLastTransaction(txn);
                               setShowReceipt(true);
                             }}
-                            className="text-red-600 hover:text-red-700 flex items-center gap-1"
+                            className="text-auvora-teal hover:text-red-700 flex items-center gap-1"
                           >
                             <Receipt size={16} />
                             View
@@ -731,7 +731,7 @@ export default function POS() {
                               setSelectedInvoice(inv);
                               setShowRefundModal(true);
                             }}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-auvora-teal hover:text-red-700"
                           >
                             <DollarSign size={16} className="inline" /> Refund
                           </button>
@@ -749,9 +749,9 @@ export default function POS() {
       {showRefundModal && selectedInvoice && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div className="bg-red-600 text-white p-4 flex justify-between items-center rounded-t-lg">
+            <div className="bg-auvora-teal text-white p-4 flex justify-between items-center rounded-t-lg">
               <h2 className="text-xl font-bold">Process Refund</h2>
-              <button onClick={() => setShowRefundModal(false)} className="hover:bg-red-700 p-1 rounded">
+              <button onClick={() => setShowRefundModal(false)} className="hover:bg-auvora-teal-dark p-1 rounded">
                 <X size={20} />
               </button>
             </div>
@@ -775,7 +775,7 @@ export default function POS() {
                     step="0.01"
                     value={refundAmount}
                     onChange={(e) => setRefundAmount(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     placeholder="0.00"
                   />
                 </div>
@@ -785,7 +785,7 @@ export default function POS() {
                   <textarea
                     value={refundReason}
                     onChange={(e) => setRefundReason(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     rows={3}
                     placeholder="Enter refund reason..."
                   />
@@ -801,7 +801,7 @@ export default function POS() {
                 </button>
                 <button
                   onClick={handleRefund}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
                 >
                   Process Refund
                 </button>
@@ -814,9 +814,9 @@ export default function POS() {
       {showReceipt && (selectedInvoice || lastTransaction) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div className="bg-red-600 text-white p-4 flex justify-between items-center rounded-t-lg">
+            <div className="bg-auvora-teal text-white p-4 flex justify-between items-center rounded-t-lg">
               <h2 className="text-xl font-bold">{selectedInvoice ? 'Invoice' : 'Receipt'}</h2>
-              <button onClick={() => { setShowReceipt(false); setSelectedInvoice(null); }} className="hover:bg-red-700 p-1 rounded">
+              <button onClick={() => { setShowReceipt(false); setSelectedInvoice(null); }} className="hover:bg-auvora-teal-dark p-1 rounded">
                 <X size={20} />
               </button>
             </div>
@@ -871,7 +871,7 @@ export default function POS() {
                       </div>
                       <div className="flex justify-between pt-2 border-t border-gray-300">
                         <span className="font-bold text-gray-900">Total</span>
-                        <span className="font-bold text-red-600">${data.total.toFixed(2)}</span>
+                        <span className="font-bold text-auvora-teal">${data.total.toFixed(2)}</span>
                       </div>
                       
                       {selectedInvoice && refunds.length > 0 && (
@@ -879,7 +879,7 @@ export default function POS() {
                           <div className="pt-2 border-t border-gray-300 mt-2">
                             <p className="text-sm font-medium text-gray-700 mb-2">Refunds:</p>
                             {refunds.map((refund: Refund) => (
-                              <div key={refund.id} className="flex justify-between text-sm text-red-600 mb-1">
+                              <div key={refund.id} className="flex justify-between text-sm text-auvora-teal mb-1">
                                 <span>{new Date(refund.refundedAt).toLocaleDateString()} - {refund.reason}</span>
                                 <span>-${refund.amount.toFixed(2)}</span>
                               </div>

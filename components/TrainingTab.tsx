@@ -125,7 +125,7 @@ export default function TrainingTab({ memberId, currentStaffId, currentStaffName
           onClick={() => setActiveTab('goals')}
           className={`px-3 sm:px-4 py-2 font-medium border-b-2 transition-colors text-sm sm:text-base whitespace-nowrap ${
             activeTab === 'goals'
-              ? 'border-[rgb(172,19,5)] text-[rgb(172,19,5)]'
+              ? 'border-auvora-teal text-auvora-teal'
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
@@ -138,7 +138,7 @@ export default function TrainingTab({ memberId, currentStaffId, currentStaffName
           onClick={() => setActiveTab('notes')}
           className={`px-3 sm:px-4 py-2 font-medium border-b-2 transition-colors text-sm sm:text-base whitespace-nowrap ${
             activeTab === 'notes'
-              ? 'border-[rgb(172,19,5)] text-[rgb(172,19,5)]'
+              ? 'border-auvora-teal text-auvora-teal'
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
@@ -159,7 +159,7 @@ export default function TrainingTab({ memberId, currentStaffId, currentStaffName
                 setEditingGoal(null);
                 setShowGoalModal(true);
               }}
-              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] text-sm min-h-[44px]"
+              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark text-sm min-h-[44px]"
             >
               <Plus size={16} className="sm:w-[18px] sm:h-[18px]" />
               Add Goal
@@ -213,7 +213,7 @@ export default function TrainingTab({ memberId, currentStaffId, currentStaffName
                   setEditingGoal(null);
                   setShowGoalModal(true);
                 }}
-                className="px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+                className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
               >
                 Create First Goal
               </button>
@@ -232,7 +232,7 @@ export default function TrainingTab({ memberId, currentStaffId, currentStaffName
                 setEditingNote(null);
                 setShowNoteModal(true);
               }}
-              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] text-sm min-h-[44px]"
+              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark text-sm min-h-[44px]"
             >
               <Plus size={16} className="sm:w-[18px] sm:h-[18px]" />
               Add Note
@@ -262,7 +262,7 @@ export default function TrainingTab({ memberId, currentStaffId, currentStaffName
                   setEditingNote(null);
                   setShowNoteModal(true);
                 }}
-                className="px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+                className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
               >
                 Add First Note
               </button>
@@ -440,7 +440,7 @@ function GoalCard({ goal, onEdit, onDelete, onUpdateStatus }: {
           </button>
           <button
             onClick={onDelete}
-            className="p-2 text-red-600 hover:bg-red-50 rounded"
+            className="p-2 text-auvora-teal hover:bg-red-50 rounded"
             title="Delete"
           >
             <Trash2 size={18} />
@@ -455,7 +455,7 @@ function GoalCard({ goal, onEdit, onDelete, onUpdateStatus }: {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-[rgb(172,19,5)] h-2 rounded-full transition-all"
+              className="bg-auvora-teal h-2 rounded-full transition-all"
               style={{ width: `${goal.progress}%` }}
             />
           </div>
@@ -512,7 +512,7 @@ function NoteCard({ note, onEdit, onDelete }: {
           </button>
           <button
             onClick={onDelete}
-            className="p-2 text-red-600 hover:bg-red-50 rounded"
+            className="p-2 text-auvora-teal hover:bg-red-50 rounded"
             title="Delete"
           >
             <Trash2 size={18} />
@@ -584,7 +584,7 @@ function GoalModal({ goal, onSave, onClose }: {
                   <button
                     key={idx}
                     onClick={() => handleTemplateSelect(template)}
-                    className="text-left p-3 border border-gray-200 rounded-lg hover:border-[rgb(172,19,5)] hover:bg-gray-50 transition-colors"
+                    className="text-left p-3 border border-gray-200 rounded-lg hover:border-auvora-teal hover:bg-gray-50 transition-colors"
                   >
                     <p className="font-medium text-sm text-gray-900">{template.title}</p>
                     <p className="text-xs text-gray-500">{template.category}</p>
@@ -593,7 +593,7 @@ function GoalModal({ goal, onSave, onClose }: {
               </div>
               <button
                 onClick={() => setShowTemplates(false)}
-                className="text-sm text-[rgb(172,19,5)] hover:underline"
+                className="text-sm text-auvora-teal hover:underline"
               >
                 Skip templates
               </button>
@@ -607,7 +607,7 @@ function GoalModal({ goal, onSave, onClose }: {
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                 required
               />
             </div>
@@ -617,7 +617,7 @@ function GoalModal({ goal, onSave, onClose }: {
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                 rows={3}
               />
             </div>
@@ -628,7 +628,7 @@ function GoalModal({ goal, onSave, onClose }: {
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value as GoalCategory })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                 >
                   <option value="weight-loss">Weight Loss</option>
                   <option value="strength">Strength</option>
@@ -645,7 +645,7 @@ function GoalModal({ goal, onSave, onClose }: {
                   type="date"
                   value={formData.targetDate}
                   onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                   required
                 />
               </div>
@@ -658,7 +658,7 @@ function GoalModal({ goal, onSave, onClose }: {
                   type="text"
                   value={formData.startValue}
                   onChange={(e) => setFormData({ ...formData, startValue: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                   placeholder="e.g., 200"
                 />
               </div>
@@ -669,7 +669,7 @@ function GoalModal({ goal, onSave, onClose }: {
                   type="text"
                   value={formData.targetValue}
                   onChange={(e) => setFormData({ ...formData, targetValue: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                   placeholder="e.g., 180"
                 />
               </div>
@@ -680,7 +680,7 @@ function GoalModal({ goal, onSave, onClose }: {
                   type="text"
                   value={formData.currentValue}
                   onChange={(e) => setFormData({ ...formData, currentValue: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                   placeholder="e.g., 190"
                 />
               </div>
@@ -691,7 +691,7 @@ function GoalModal({ goal, onSave, onClose }: {
                   type="text"
                   value={formData.units}
                   onChange={(e) => setFormData({ ...formData, units: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                   placeholder="lbs"
                 />
               </div>
@@ -704,7 +704,7 @@ function GoalModal({ goal, onSave, onClose }: {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as GoalStatus })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                   >
                     <option value="active">Active</option>
                     <option value="completed">Completed</option>
@@ -721,7 +721,7 @@ function GoalModal({ goal, onSave, onClose }: {
                     max="100"
                     value={formData.progress}
                     onChange={(e) => setFormData({ ...formData, progress: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                   />
                 </div>
               </div>
@@ -732,7 +732,7 @@ function GoalModal({ goal, onSave, onClose }: {
               <textarea
                 value={formData.privateNotes}
                 onChange={(e) => setFormData({ ...formData, privateNotes: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                 rows={2}
                 placeholder="Internal notes not visible to member"
               />
@@ -744,7 +744,7 @@ function GoalModal({ goal, onSave, onClose }: {
                 id="memberVisible"
                 checked={formData.memberVisible}
                 onChange={(e) => setFormData({ ...formData, memberVisible: e.target.checked })}
-                className="rounded border-gray-300 text-[rgb(172,19,5)] focus:ring-[rgb(172,19,5)]"
+                className="rounded border-gray-300 text-auvora-teal focus:ring-auvora-teal"
               />
               <label htmlFor="memberVisible" className="text-sm text-gray-700">
                 Visible to member (future member portal)
@@ -765,7 +765,7 @@ function GoalModal({ goal, onSave, onClose }: {
                   onSave(formData);
                 }
               }}
-              className="flex-1 px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+              className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
             >
               {goal ? 'Update Goal' : 'Create Goal'}
             </button>
@@ -824,7 +824,7 @@ function NoteModal({ note, onSave, onClose }: {
                   <button
                     key={idx}
                     onClick={() => handleTemplateSelect(template)}
-                    className="text-left p-3 border border-gray-200 rounded-lg hover:border-[rgb(172,19,5)] hover:bg-gray-50 transition-colors"
+                    className="text-left p-3 border border-gray-200 rounded-lg hover:border-auvora-teal hover:bg-gray-50 transition-colors"
                   >
                     <p className="font-medium text-sm text-gray-900">{template.title}</p>
                     <p className="text-xs text-gray-500">{template.type}</p>
@@ -833,7 +833,7 @@ function NoteModal({ note, onSave, onClose }: {
               </div>
               <button
                 onClick={() => setShowTemplates(false)}
-                className="text-sm text-[rgb(172,19,5)] hover:underline"
+                className="text-sm text-auvora-teal hover:underline"
               >
                 Skip templates
               </button>
@@ -847,7 +847,7 @@ function NoteModal({ note, onSave, onClose }: {
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as NoteType })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                 >
                   <option value="session">Training Session</option>
                   <option value="assessment">Assessment</option>
@@ -862,7 +862,7 @@ function NoteModal({ note, onSave, onClose }: {
                 <select
                   value={formData.visibility}
                   onChange={(e) => setFormData({ ...formData, visibility: e.target.value as NoteVisibility })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                 >
                   <option value="private">🔒 Private (Only Me)</option>
                   <option value="team">👥 Team (Coaches & Managers)</option>
@@ -877,7 +877,7 @@ function NoteModal({ note, onSave, onClose }: {
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                 required
               />
             </div>
@@ -887,7 +887,7 @@ function NoteModal({ note, onSave, onClose }: {
               <textarea
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
                 rows={8}
                 required
               />
@@ -907,7 +907,7 @@ function NoteModal({ note, onSave, onClose }: {
                   onSave(formData);
                 }
               }}
-              className="flex-1 px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+              className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
             >
               {note ? 'Update Note' : 'Add Note'}
             </button>

@@ -101,11 +101,11 @@ export default function BookingModal({ classData, onClose, onSuccess, mode = 'fr
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
       <div className={`bg-white rounded-lg shadow-xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden ${mode === 'kiosk' ? 'max-w-4xl' : 'max-w-2xl'}`}>
-        <div className="bg-red-600 text-white p-3 sm:p-4 flex justify-between items-center">
+        <div className="bg-auvora-teal text-white p-3 sm:p-4 flex justify-between items-center">
           <h2 className={`font-bold ${mode === 'kiosk' ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'}`}>
             {mode === 'kiosk' ? 'Class Check-In' : 'Book Class'}
           </h2>
-          <button onClick={onClose} className="hover:bg-red-700 p-2 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
+          <button onClick={onClose} className="hover:bg-auvora-teal-dark p-2 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
             <X size={mode === 'kiosk' ? 32 : 24} />
           </button>
         </div>
@@ -115,13 +115,13 @@ export default function BookingModal({ classData, onClose, onSuccess, mode = 'fr
             <h3 className={`font-bold text-gray-900 ${mode === 'kiosk' ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'}`}>{classData.name}</h3>
             <p className={`text-gray-600 ${mode === 'kiosk' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'}`}>{classData.dayOfWeek} at {classData.time}</p>
             <p className={`text-gray-600 ${mode === 'kiosk' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'}`}>Duration: {classData.duration} minutes</p>
-            <p className={`font-medium mt-2 ${availableSpots > 0 ? 'text-green-600' : 'text-red-600'} ${mode === 'kiosk' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'}`}>
+            <p className={`font-medium mt-2 ${availableSpots > 0 ? 'text-green-600' : 'text-auvora-teal'} ${mode === 'kiosk' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'}`}>
               {availableSpots > 0 ? `${availableSpots} spots available` : 'Class is full - will add to waitlist'}
             </p>
           </div>
 
           {message && (
-            <div className={`mb-4 p-3 rounded ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} ${mode === 'kiosk' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'}`}>
+            <div className={`mb-4 p-3 rounded ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-teal-100 text-auvora-teal-dark'} ${mode === 'kiosk' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'}`}>
               {message.text}
             </div>
           )}
@@ -137,7 +137,7 @@ export default function BookingModal({ classData, onClose, onSuccess, mode = 'fr
                   <div key={booking.id} className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 ${mode === 'kiosk' ? 'p-3 sm:p-4' : 'p-2 sm:p-3'} hover:bg-gray-50`}>
                     <button
                       onClick={() => handleNameClick(booking.memberId)}
-                      className="flex items-center gap-2 sm:gap-3 flex-1 text-left hover:text-red-600 transition-colors min-h-[44px]"
+                      className="flex items-center gap-2 sm:gap-3 flex-1 text-left hover:text-auvora-teal transition-colors min-h-[44px]"
                     >
                       <PersonStatusBadge personId={booking.memberId} />
                       <div>
@@ -182,7 +182,7 @@ export default function BookingModal({ classData, onClose, onSuccess, mode = 'fr
                 placeholder="Search by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold text-sm sm:text-base min-h-[44px]"
               />
             </div>
           </div>
@@ -196,7 +196,7 @@ export default function BookingModal({ classData, onClose, onSuccess, mode = 'fr
                   key={member.id}
                   onClick={() => setSelectedMember(member)}
                   className={`p-3 cursor-pointer hover:bg-gray-50 border-b border-gray-100 min-h-[44px] active:bg-gray-100 ${
-                    selectedMember?.id === member.id ? 'bg-red-50 border-l-4 border-l-red-600' : ''
+                    selectedMember?.id === member.id ? 'bg-teal-50 border-l-4 border-l-auvora-teal' : ''
                   }`}
                 >
                   <div className="font-medium text-gray-900 text-sm sm:text-base">{member.name}</div>
@@ -216,7 +216,7 @@ export default function BookingModal({ classData, onClose, onSuccess, mode = 'fr
                 <button
                   onClick={handleBook}
                   disabled={!selectedMember}
-                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed min-h-[44px] text-sm sm:text-base"
+                  className="flex-1 px-4 py-2.5 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark disabled:bg-gray-300 disabled:cursor-not-allowed min-h-[44px] text-sm sm:text-base"
                 >
                   {availableSpots > 0 ? 'Book Class' : 'Add to Waitlist'}
                 </button>

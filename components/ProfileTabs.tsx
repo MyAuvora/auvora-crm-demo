@@ -83,7 +83,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
               onClick={() => setActiveTab('account')}
               className={`px-3 sm:px-4 py-2 sm:py-3 font-medium text-sm sm:text-base whitespace-nowrap ${
                 activeTab === 'account'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -93,7 +93,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
               onClick={() => setActiveTab('billing')}
               className={`px-4 py-3 font-medium ${
                 activeTab === 'billing'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -103,7 +103,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
               onClick={() => setActiveTab('attendance')}
               className={`px-4 py-3 font-medium ${
                 activeTab === 'attendance'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -113,7 +113,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
               onClick={() => setActiveTab('messages')}
               className={`px-4 py-3 font-medium ${
                 activeTab === 'messages'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -123,7 +123,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
               onClick={() => setActiveTab('documents')}
               className={`px-4 py-3 font-medium ${
                 activeTab === 'documents'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -133,7 +133,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
               onClick={() => setActiveTab('training')}
               className={`px-4 py-3 font-medium ${
                 activeTab === 'training'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -143,7 +143,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
               onClick={() => setActiveTab('timeline')}
               className={`px-4 py-3 font-medium ${
                 activeTab === 'timeline'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -451,7 +451,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                   <h3 className="text-lg font-semibold">Transaction History</h3>
                   <button
                     onClick={() => alert('Charge feature coming soon')}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                    className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center gap-2"
                   >
                     <CreditCard size={16} />
                     Charge
@@ -589,7 +589,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                       </div>
                       <div className="text-sm text-gray-900">{c.message}</div>
                       <div className={`text-xs mt-2 ${
-                        c.status === 'sent' ? 'text-green-600' : 'text-red-600'
+                        c.status === 'sent' ? 'text-green-600' : 'text-auvora-teal'
                       }`}>
                         {c.status === 'sent' ? '✓ Sent' : '✗ Failed'}
                       </div>
@@ -604,7 +604,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Documents & Contracts</h3>
-                <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
+                <button className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark transition-colors flex items-center gap-2">
                   <Upload size={18} />
                   Upload Document
                 </button>
@@ -617,7 +617,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3 flex-1">
                         <div className="bg-red-100 p-2 rounded">
-                          <FileText className="text-red-600" size={24} />
+                          <FileText className="text-auvora-teal" size={24} />
                         </div>
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-900">Membership Agreement</h4>
@@ -635,7 +635,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                           <Download size={18} className="text-gray-600" />
                         </button>
                         <button className="p-2 hover:bg-red-100 rounded transition-colors" title="Delete">
-                          <Trash2 size={18} className="text-red-600" />
+                          <Trash2 size={18} className="text-auvora-teal" />
                         </button>
                       </div>
                     </div>
@@ -665,7 +665,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                         <Download size={18} className="text-gray-600" />
                       </button>
                       <button className="p-2 hover:bg-red-100 rounded transition-colors" title="Delete">
-                        <Trash2 size={18} className="text-red-600" />
+                        <Trash2 size={18} className="text-auvora-teal" />
                       </button>
                     </div>
                   </div>
@@ -694,7 +694,7 @@ export default function ProfileTabs({ personId, onClose, onSendText }: ProfileTa
                         <Download size={18} className="text-gray-600" />
                       </button>
                       <button className="p-2 hover:bg-red-100 rounded transition-colors" title="Delete">
-                        <Trash2 size={18} className="text-red-600" />
+                        <Trash2 size={18} className="text-auvora-teal" />
                       </button>
                     </div>
                   </div>

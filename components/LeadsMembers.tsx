@@ -157,7 +157,7 @@ export default function LeadsMembers() {
               onClick={() => { setActiveTab('leads'); setSelectedItem(null); }}
               className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'leads'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -167,7 +167,7 @@ export default function LeadsMembers() {
               onClick={() => { setActiveTab('members'); setSelectedItem(null); }}
               className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'members'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -177,7 +177,7 @@ export default function LeadsMembers() {
               onClick={() => { setActiveTab('class-packs'); setSelectedItem(null); }}
               className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base min-h-[48px] ${
                 activeTab === 'class-packs'
-                  ? 'text-red-600 border-b-2 border-red-600'
+                  ? 'text-auvora-teal border-b-2 border-auvora-teal'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -195,7 +195,7 @@ export default function LeadsMembers() {
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-base min-h-[44px]"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold text-base min-h-[44px]"
               />
             </div>
             
@@ -204,7 +204,7 @@ export default function LeadsMembers() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
+                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold text-sm sm:text-base min-h-[44px]"
                 >
                   <option value="all">All Statuses</option>
                   <option value="new-lead">New Lead</option>
@@ -217,7 +217,7 @@ export default function LeadsMembers() {
                 <select
                   value={sourceFilter}
                   onChange={(e) => setSourceFilter(e.target.value)}
-                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
+                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold text-sm sm:text-base min-h-[44px]"
                 >
                   <option value="all">All Sources</option>
                   <option value="website">Website</option>
@@ -233,7 +233,7 @@ export default function LeadsMembers() {
                 <select
                   value={membershipFilter}
                   onChange={(e) => setMembershipFilter(e.target.value)}
-                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
+                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold text-sm sm:text-base min-h-[44px]"
                 >
                   <option value="all">All Types</option>
                   {location === 'athletic-club' && (
@@ -253,7 +253,7 @@ export default function LeadsMembers() {
                     <span className="text-xs sm:text-sm text-gray-600">{selectedRows.size} selected</span>
                     <button
                       onClick={() => setShowBulkActions(!showBulkActions)}
-                      className="px-3 sm:px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 text-sm min-h-[44px]"
+                      className="px-3 sm:px-4 py-2.5 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center gap-2 text-sm min-h-[44px]"
                     >
                       <MoreVertical size={16} />
                       <span className="hidden sm:inline">Bulk Actions</span>
@@ -269,7 +269,7 @@ export default function LeadsMembers() {
                 <select
                   value={packTypeFilter}
                   onChange={(e) => setPackTypeFilter(e.target.value)}
-                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
+                  className="px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold text-sm sm:text-base min-h-[44px]"
                 >
                   <option value="all">All Pack Types</option>
                   <option value="5-pack">5-Pack</option>
@@ -283,7 +283,7 @@ export default function LeadsMembers() {
                     <span className="text-xs sm:text-sm text-gray-600">{selectedRows.size} selected</span>
                     <button
                       onClick={() => setShowBulkActions(!showBulkActions)}
-                      className="px-3 sm:px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 text-sm min-h-[44px]"
+                      className="px-3 sm:px-4 py-2.5 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center gap-2 text-sm min-h-[44px]"
                     >
                       <MoreVertical size={16} />
                       <span className="hidden sm:inline">Bulk Actions</span>
@@ -676,7 +676,7 @@ export default function LeadsMembers() {
                                 className="p-1.5 hover:bg-gray-200 rounded bg-red-50"
                                 title="Refill Pack"
                               >
-                                <Plus size={16} className="text-red-600" />
+                                <Plus size={16} className="text-auvora-teal" />
                               </button>
                             )}
                           </div>
@@ -691,7 +691,7 @@ export default function LeadsMembers() {
             <div>
               <button
                 onClick={() => setSelectedItem(null)}
-                className="flex items-center gap-2 text-red-600 hover:text-red-700 mb-4"
+                className="flex items-center gap-2 text-auvora-teal hover:text-red-700 mb-4"
               >
                 <X size={20} />
                 <span>Back to list</span>
@@ -709,7 +709,7 @@ export default function LeadsMembers() {
                         setSelectedItem(null);
                         setTimeout(() => setSelectedItem(getAllLeads().find(l => l.id === selectedItem.id) || null), 100);
                       }}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                     >
                       <option value="new-lead">New Lead</option>
                       <option value="trial-booked">Trial Booked</option>
@@ -765,7 +765,7 @@ export default function LeadsMembers() {
                     {hasPermission(userRole, 'member:cancel') && (
                       <button
                         onClick={() => setShowCancelModal(true)}
-                        className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                        className="px-3 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center gap-2"
                       >
                         <XCircle size={16} />
                         Cancel Membership

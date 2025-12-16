@@ -134,7 +134,7 @@ export default function StaffScheduleApprovals() {
                     </button>
                     <button
                       onClick={() => handleRejectTimeOff(request.id)}
-                      className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
+                      className="px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
                     >
                       <XCircle size={16} />
                       Deny
@@ -201,7 +201,7 @@ export default function StaffScheduleApprovals() {
                     </button>
                     <button
                       onClick={() => handleRejectSwap(request.id)}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                      className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center gap-2"
                     >
                       <XCircle size={16} />
                       Reject

@@ -84,7 +84,7 @@ export default function FranchisorDashboard() {
         <div className="mb-4 sm:mb-6">
           <button
             onClick={() => setSelectedLocation(null)}
-            className="text-[#AC1305] hover:underline mb-2 text-sm sm:text-base"
+            className="text-auvora-teal hover:underline mb-2 text-sm sm:text-base"
           >
             ← Back to All Locations
           </button>
@@ -99,7 +99,7 @@ export default function FranchisorDashboard() {
               <DollarSign className="text-green-600" size={18} />
             </div>
             <div className="text-xl sm:text-2xl font-bold text-gray-900">{formatCurrency(locationData.revenue.mtd)}</div>
-            <div className={`text-xs sm:text-sm mt-1 ${locationData.revenue.momGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`text-xs sm:text-sm mt-1 ${locationData.revenue.momGrowth >= 0 ? 'text-green-600' : 'text-auvora-teal'}`}>
               {formatPercent(locationData.revenue.momGrowth)} MoM
             </div>
           </div>
@@ -110,7 +110,7 @@ export default function FranchisorDashboard() {
               <Users className="text-blue-600" size={18} />
             </div>
             <div className="text-xl sm:text-2xl font-bold text-gray-900">{locationData.members.active}</div>
-            <div className={`text-xs sm:text-sm mt-1 ${locationData.members.netGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`text-xs sm:text-sm mt-1 ${locationData.members.netGrowth >= 0 ? 'text-green-600' : 'text-auvora-teal'}`}>
               {locationData.members.netGrowth >= 0 ? '+' : ''}{locationData.members.netGrowth} net growth
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function FranchisorDashboard() {
             </div>
             <div>
               <div className="text-xs sm:text-sm text-gray-600">YoY Growth</div>
-              <div className={`text-base sm:text-lg font-semibold ${locationData.revenue.yoyGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <div className={`text-base sm:text-lg font-semibold ${locationData.revenue.yoyGrowth >= 0 ? 'text-green-600' : 'text-auvora-teal'}`}>
                 {formatPercent(locationData.revenue.yoyGrowth)}
               </div>
             </div>
@@ -157,7 +157,7 @@ export default function FranchisorDashboard() {
             </div>
             <div>
               <div className="text-xs sm:text-sm text-gray-600">Churn Rate</div>
-              <div className="text-base sm:text-lg font-semibold text-red-600">{locationData.members.churn.toFixed(1)}%</div>
+              <div className="text-base sm:text-lg font-semibold text-auvora-teal">{locationData.members.churn.toFixed(1)}%</div>
             </div>
             <div>
               <div className="text-xs sm:text-sm text-gray-600">New Members MTD</div>
@@ -165,7 +165,7 @@ export default function FranchisorDashboard() {
             </div>
             <div>
               <div className="text-xs sm:text-sm text-gray-600">Cancelled MTD</div>
-              <div className="text-base sm:text-lg font-semibold text-red-600">-{locationData.members.cancelled}</div>
+              <div className="text-base sm:text-lg font-semibold text-auvora-teal">-{locationData.members.cancelled}</div>
             </div>
             <div>
               <div className="text-xs sm:text-sm text-gray-600">Total Staff</div>
@@ -246,7 +246,7 @@ export default function FranchisorDashboard() {
           <div className="text-xs sm:text-sm mt-2 opacity-90">Across all locations</div>
         </div>
 
-        <div className="bg-gradient-to-br from-red-500 to-red-600 p-4 sm:p-6 rounded-lg shadow-lg text-white">
+        <div className="bg-gradient-to-br from-auvora-teal to-auvora-teal-dark p-4 sm:p-6 rounded-lg shadow-lg text-white">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs sm:text-sm opacity-90">Churn Rate</span>
             <TrendingDown size={20} className="sm:w-6 sm:h-6" />
@@ -296,25 +296,25 @@ export default function FranchisorDashboard() {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedMetric('revenue')}
-              className={`px-3 py-1.5 rounded text-xs sm:text-sm min-h-[36px] ${selectedMetric === 'revenue' ? 'bg-[#AC1305] text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`px-3 py-1.5 rounded text-xs sm:text-sm min-h-[36px] ${selectedMetric === 'revenue' ? 'bg-auvora-teal text-white' : 'bg-gray-200 text-gray-700'}`}
             >
               Revenue
             </button>
             <button
               onClick={() => setSelectedMetric('members')}
-              className={`px-3 py-1.5 rounded text-xs sm:text-sm min-h-[36px] ${selectedMetric === 'members' ? 'bg-[#AC1305] text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`px-3 py-1.5 rounded text-xs sm:text-sm min-h-[36px] ${selectedMetric === 'members' ? 'bg-auvora-teal text-white' : 'bg-gray-200 text-gray-700'}`}
             >
               Members
             </button>
             <button
               onClick={() => setSelectedMetric('conversion')}
-              className={`px-3 py-1.5 rounded text-xs sm:text-sm min-h-[36px] ${selectedMetric === 'conversion' ? 'bg-[#AC1305] text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`px-3 py-1.5 rounded text-xs sm:text-sm min-h-[36px] ${selectedMetric === 'conversion' ? 'bg-auvora-teal text-white' : 'bg-gray-200 text-gray-700'}`}
             >
               Conversion
             </button>
             <button
               onClick={() => setSelectedMetric('fillRate')}
-              className={`px-3 py-1.5 rounded text-xs sm:text-sm min-h-[36px] ${selectedMetric === 'fillRate' ? 'bg-[#AC1305] text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`px-3 py-1.5 rounded text-xs sm:text-sm min-h-[36px] ${selectedMetric === 'fillRate' ? 'bg-auvora-teal text-white' : 'bg-gray-200 text-gray-700'}`}
             >
               Fill Rate
             </button>
@@ -357,7 +357,7 @@ export default function FranchisorDashboard() {
                     {formatCurrency(loc.revenue.mtd)}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-right text-sm">
-                    <span className={loc.revenue.yoyGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
+                    <span className={loc.revenue.yoyGrowth >= 0 ? 'text-green-600' : 'text-auvora-teal'}>
                       {formatPercent(loc.revenue.yoyGrowth)}
                     </span>
                   </td>
@@ -374,7 +374,7 @@ export default function FranchisorDashboard() {
                     {franchiseLocations.find(fl => fl.id === loc.location)?.clickable ? (
                       <button
                         onClick={() => handleLocationClick(loc.location)}
-                        className="text-[#AC1305] hover:underline"
+                        className="text-auvora-teal hover:underline"
                       >
                         View Details
                       </button>
@@ -434,7 +434,7 @@ export default function FranchisorDashboard() {
           </table>
         </div>
         <div className="mt-3 sm:mt-4">
-          <button className="bg-[#AC1305] text-white px-4 py-2 rounded hover:bg-[#8B0F04] text-sm min-h-[44px]">
+          <button className="bg-auvora-teal text-white px-4 py-2 rounded hover:bg-auvora-teal-dark text-sm min-h-[44px]">
             Export to CSV
           </button>
         </div>

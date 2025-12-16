@@ -271,7 +271,7 @@ export default function FrontDeskDashboard() {
             <select
               value={selectedFrontDeskId}
               onChange={(e) => setSelectedStaffId(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent text-sm min-h-[44px]"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent text-sm min-h-[44px]"
             >
               {locationFrontDesk.map(fd => (
                 <option key={fd.id} value={fd.id}>{fd.name}</option>
@@ -428,7 +428,7 @@ export default function FrontDeskDashboard() {
           className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow text-left"
         >
           <div className="flex items-center justify-between mb-2">
-            <AlertCircle className="text-red-600" size={20} />
+            <AlertCircle className="text-auvora-teal" size={20} />
             <span className="text-xl sm:text-2xl font-bold text-gray-900">{missedPayments.length}</span>
           </div>
           <p className="text-xs sm:text-sm font-semibold text-gray-700">Missed Payments</p>

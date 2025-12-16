@@ -710,7 +710,7 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-2xl w-full max-w-3xl h-[600px] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-[#AC1305] to-[#8B0F04] text-white rounded-t-lg">
+        <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-auvora-teal to-auvora-teal-dark text-white rounded-t-lg">
           <div className="flex items-center gap-2">
             <Sparkles size={24} />
             <h2 className="text-xl font-bold">Ask Auvora</h2>
@@ -733,7 +733,7 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
               <div
                 className={`max-w-[80%] rounded-lg p-3 ${
                   message.role === 'user'
-                    ? 'bg-[#AC1305] text-white'
+                    ? 'bg-auvora-teal text-white'
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
@@ -750,7 +750,7 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
             <div className="flex justify-start">
               <div className="bg-gray-100 rounded-lg p-3">
                 <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#AC1305] border-t-transparent"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-auvora-teal border-t-transparent"></div>
                   <span className="text-gray-600">Analyzing...</span>
                 </div>
               </div>
@@ -785,13 +785,13 @@ export default function AskAuvora({ isOpen, onClose }: AskAuvoraProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me anything about your business..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
               disabled={isProcessing}
             />
             <button
               type="submit"
               disabled={!input.trim() || isProcessing}
-              className="px-4 py-2 bg-[#AC1305] text-white rounded-lg hover:bg-[#8B0F04] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send size={20} />
             </button>

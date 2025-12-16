@@ -104,9 +104,9 @@ export default function LeadPipeline() {
       {selectedLead && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="bg-red-600 text-white p-3 sm:p-4 flex justify-between items-center">
+            <div className="bg-auvora-teal text-white p-3 sm:p-4 flex justify-between items-center">
               <h2 className="text-lg sm:text-xl font-bold">Lead Details</h2>
-              <button onClick={() => setSelectedLead(null)} className="hover:bg-red-700 p-1 rounded text-2xl sm:text-3xl leading-none">
+              <button onClick={() => setSelectedLead(null)} className="hover:bg-auvora-teal-dark p-1 rounded text-2xl sm:text-3xl leading-none">
                 ×
               </button>
             </div>
@@ -141,7 +141,7 @@ export default function LeadPipeline() {
                     const newStatus = e.target.value as Lead['status'];
                     setSelectedLead({ ...selectedLead, status: newStatus });
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-gold"
                 >
                   <option value="new-lead">New Lead</option>
                   <option value="trial-booked">Trial Booked</option>

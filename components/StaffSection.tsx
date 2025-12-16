@@ -157,7 +157,7 @@ export default function StaffSection() {
         </div>
         <button
           onClick={() => setShowAddStaffModal(true)}
-          className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
+          className="px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
         >
           <Plus size={18} className="sm:w-5 sm:h-5" />
           Add Staff
@@ -173,7 +173,7 @@ export default function StaffSection() {
               <div className="flex items-start justify-between mb-3 sm:mb-4">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="bg-red-100 p-2 sm:p-3 rounded-full">
-                    <UserCog className="text-red-600 w-5 h-5 sm:w-6 sm:h-6" />
+                    <UserCog className="text-auvora-teal w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-bold text-gray-900">{member.name}</h3>
@@ -314,7 +314,7 @@ export default function StaffSection() {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={handleSaveNewStaff}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
                 >
                   Add Staff Member
                 </button>
@@ -388,13 +388,13 @@ export default function StaffSection() {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={handleSaveEditStaff}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
                 >
                   Save Changes
                 </button>
                 <button
                   onClick={() => handleDeleteStaff(editingStaff.id)}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
                 >
                   Delete
                 </button>

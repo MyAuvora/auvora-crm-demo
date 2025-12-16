@@ -31,7 +31,7 @@ export default function DashboardOpsFeed() {
         type: 'missed-payment',
         title: `${overdueMembers.length} Missed Payments`,
         description: `${overdueMembers.length} member${overdueMembers.length > 1 ? 's have' : ' has'} overdue payments`,
-        icon: <AlertCircle className="text-red-600" size={20} />,
+        icon: <AlertCircle className="text-auvora-teal" size={20} />,
         action: 'Process All',
         onAction: () => {
           alert(`Processing ${overdueMembers.length} overdue payments...`);
@@ -136,7 +136,7 @@ export default function DashboardOpsFeed() {
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6">
       <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 flex-wrap">
-        <AlertCircle className="text-red-600" size={20} />
+        <AlertCircle className="text-auvora-teal" size={20} />
         <h2 className="text-lg sm:text-xl font-bold text-gray-900">Operations Feed</h2>
         <span className="ml-auto px-2 sm:px-3 py-1 bg-red-100 text-red-700 text-xs sm:text-sm font-medium rounded-full">
           {alerts.length} Alert{alerts.length > 1 ? 's' : ''}
@@ -158,7 +158,7 @@ export default function DashboardOpsFeed() {
             </div>
             <button
               onClick={alert.onAction}
-              className="w-full sm:w-auto sm:ml-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium whitespace-nowrap min-h-[44px]"
+              className="w-full sm:w-auto sm:ml-4 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark text-sm font-medium whitespace-nowrap min-h-[44px]"
             >
               {alert.action}
             </button>

@@ -57,7 +57,7 @@ export default function ShiftTemplatesManager() {
             setEditingTemplate(null);
             setShowModal(true);
           }}
-          className="px-3 sm:px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)] flex items-center justify-center gap-2 text-sm min-h-[44px]"
+          className="px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
         >
           <Plus size={16} />
           Add Template
@@ -83,13 +83,13 @@ export default function ShiftTemplatesManager() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(template)}
-                    className="p-1 text-gray-600 hover:text-[rgb(172,19,5)]"
+                    className="p-1 text-gray-600 hover:text-auvora-teal"
                   >
                     <Edit2 size={16} />
                   </button>
                   <button
                     onClick={() => handleDelete(template.id)}
-                    className="p-1 text-gray-600 hover:text-red-600"
+                    className="p-1 text-gray-600 hover:text-auvora-teal"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -166,7 +166,7 @@ function TemplateModal({ template, onClose, onSave }: {
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               placeholder="e.g., Morning Front Desk"
               required
             />
@@ -179,7 +179,7 @@ function TemplateModal({ template, onClose, onSave }: {
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value as 'front-desk' | 'event' | 'meeting' | 'other' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
             >
               <option value="front-desk">Front Desk</option>
               <option value="event">Event</option>
@@ -198,7 +198,7 @@ function TemplateModal({ template, onClose, onSave }: {
               onChange={(e) => setFormData({ ...formData, defaultDuration: parseInt(e.target.value) })}
               min="15"
               step="15"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
               required
             />
           </div>
@@ -211,14 +211,14 @@ function TemplateModal({ template, onClose, onSave }: {
               type="color"
               value={formData.color}
               onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-              className="w-full h-10 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(172,19,5)] focus:border-transparent"
+              className="w-full h-10 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-auvora-teal focus:border-transparent"
             />
           </div>
 
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-[rgb(172,19,5)] text-white rounded-lg hover:bg-[rgb(152,17,4)]"
+              className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
             >
               {template ? 'Update' : 'Create'} Template
             </button>

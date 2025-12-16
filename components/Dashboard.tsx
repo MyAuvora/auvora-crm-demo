@@ -213,7 +213,7 @@ export default function Dashboard() {
     });
     
     return [
-      { name: 'Memberships', value: categories['Memberships'], color: '#AC1305' },
+      { name: 'Memberships', value: categories['Memberships'], color: '#0f5257' },
       { name: 'Class Packs', value: categories['Class Packs'], color: '#EAB308' },
       { name: 'Drop-In', value: categories['Drop-In'], color: '#3B82F6' },
       { name: 'Retail', value: categories['Retail'], color: '#10B981' }
@@ -295,8 +295,8 @@ export default function Dashboard() {
               <p className="text-sm text-gray-600 font-medium">Check-ins Today</p>
               <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{totalCheckIns}</p>
             </div>
-            <div className="bg-red-100 p-2 sm:p-3 rounded-full">
-              <Users className="text-red-600" size={20} />
+            <div className="bg-teal-100 p-2 sm:p-3 rounded-full">
+              <Users className="text-auvora-teal" size={20} />
             </div>
           </div>
         </button>
@@ -368,10 +368,10 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 font-medium">Missed Payments</p>
-              <p className="text-2xl sm:text-3xl font-bold text-red-600 mt-2">{missedPayments.length}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-auvora-teal mt-2">{missedPayments.length}</p>
             </div>
-            <div className="bg-red-100 p-2 sm:p-3 rounded-full">
-              <AlertCircle className="text-red-600" size={20} />
+            <div className="bg-teal-100 p-2 sm:p-3 rounded-full">
+              <AlertCircle className="text-auvora-teal" size={20} />
             </div>
           </div>
         </button>
@@ -438,7 +438,7 @@ export default function Dashboard() {
                                     setSelectedMetric(null);
                                     navigateToMember(clickableItem.id);
                                   }}
-                                  className="flex-1 text-left text-gray-900 hover:text-red-600 transition-colors font-medium"
+                                  className="flex-1 text-left text-gray-900 hover:text-auvora-teal transition-colors font-medium"
                                 >
                                   {clickableItem.text}
                                 </button>
@@ -449,7 +449,7 @@ export default function Dashboard() {
                                     processingStatus === 'complete' 
                                       ? 'bg-green-600 text-white cursor-default' 
                                       : processingStatus === 'incomplete'
-                                      ? 'bg-red-600 text-white hover:bg-red-700'
+                                      ? 'bg-auvora-teal text-white hover:bg-auvora-teal-dark'
                                       : processingStatus === 'processing'
                                       ? 'bg-gray-400 text-white cursor-wait'
                                       : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -545,7 +545,7 @@ export default function Dashboard() {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className={`h-2 rounded-full ${fillPercentage >= 90 ? 'bg-red-600' : fillPercentage >= 70 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                      className={`h-2 rounded-full ${fillPercentage >= 90 ? 'bg-auvora-teal' : fillPercentage >= 70 ? 'bg-yellow-500' : 'bg-green-500'}`}
                       style={{ width: `${Math.min(fillPercentage, 100)}%` }}
                     />
                   </div>
@@ -732,7 +732,7 @@ export default function Dashboard() {
               className="w-full flex justify-between items-center py-3 hover:bg-gray-50 transition-colors rounded px-2"
             >
               <span className="text-gray-600">Cancellations</span>
-              <span className="text-2xl font-bold text-red-600">{cancellations}</span>
+              <span className="text-2xl font-bold text-auvora-teal">{cancellations}</span>
             </button>
           </div>
         </div>
@@ -745,7 +745,7 @@ export default function Dashboard() {
           <ul className="space-y-3">
             {insights.map((insight, i) => (
               <li key={i} className="flex items-start gap-2 text-gray-700">
-                <span className="text-red-600 mt-1">•</span>
+                <span className="text-auvora-teal mt-1">•</span>
                 <span>{insight}</span>
               </li>
             ))}
@@ -755,7 +755,7 @@ export default function Dashboard() {
 
       <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg shadow-md border border-red-200 p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Zap className="text-red-600" size={24} />
+          <Zap className="text-auvora-teal" size={24} />
           <h2 className="text-xl font-bold text-gray-900">Action Playbooks</h2>
         </div>
         <p className="text-sm text-gray-600 mb-6">Quick actions to improve your business metrics</p>
@@ -763,8 +763,8 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-3 mb-3">
-              <div className="bg-red-100 p-2 rounded-lg">
-                <CreditCard className="text-red-600" size={20} />
+              <div className="bg-teal-100 p-2 rounded-lg">
+                <CreditCard className="text-auvora-teal" size={20} />
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 text-sm">Recover Payments</h3>
@@ -773,7 +773,7 @@ export default function Dashboard() {
             </div>
             <button
               onClick={() => setSelectedMetric('missedPayments')}
-              className="w-full px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+              className="w-full px-3 py-2 bg-auvora-teal text-white text-sm rounded-lg hover:bg-auvora-teal-dark transition-colors"
             >
               Process All
             </button>
@@ -873,15 +873,15 @@ export default function Dashboard() {
               </div>
             )}
             {missedPayments.length > 15 && (
-              <div className="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-200">
-                <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={16} />
+              <div className="flex items-start gap-3 p-3 bg-teal-50 rounded-lg border border-red-200">
+                <AlertCircle className="text-auvora-teal flex-shrink-0 mt-0.5" size={16} />
                 <div className="flex-1">
                   <p className="text-sm text-gray-900">
                     <span className="font-semibold">{missedPayments.length} members</span> have overdue payments totaling ${(missedPayments.length * 150).toFixed(0)}.
                   </p>
                   <button
                     onClick={() => setSelectedMetric('missedPayments')}
-                    className="text-sm text-red-600 hover:text-red-700 font-medium mt-1"
+                    className="text-sm text-auvora-teal hover:text-auvora-teal-dark font-medium mt-1"
                   >
                     Process all payments →
                   </button>

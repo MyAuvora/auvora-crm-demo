@@ -96,7 +96,7 @@ export default function Reports() {
               onClick={() => setActiveTab('analytics')}
               className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-semibold transition-colors min-h-[44px] text-sm sm:text-base ${
                 activeTab === 'analytics'
-                  ? 'bg-red-600 text-white'
+                  ? 'bg-auvora-teal text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -106,7 +106,7 @@ export default function Reports() {
               onClick={() => setActiveTab('commissions')}
               className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-semibold transition-colors min-h-[44px] text-sm sm:text-base ${
                 activeTab === 'commissions'
-                  ? 'bg-red-600 text-white'
+                  ? 'bg-auvora-teal text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -234,7 +234,7 @@ export default function Reports() {
             </div>
             <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
               <p className="text-xs sm:text-sm text-gray-600">Cancellations (Last 30 Days)</p>
-              <p className="text-2xl sm:text-3xl font-bold text-red-600">{cancellations}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-auvora-teal">{cancellations}</p>
             </div>
             <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
               <p className="text-xs sm:text-sm text-gray-600">New Leads (This Month)</p>

@@ -347,7 +347,7 @@ export default function AuvoraChat() {
     return (
       <button
         onClick={() => setChatOpen(true)}
-        className="fixed bottom-6 right-6 bg-red-600 text-white p-4 rounded-full shadow-lg hover:bg-red-700 transition-colors z-50"
+        className="fixed bottom-6 right-6 bg-auvora-teal text-white p-4 rounded-full shadow-lg hover:bg-auvora-teal-dark transition-colors z-50"
       >
         <MessageCircle size={24} />
       </button>
@@ -356,14 +356,14 @@ export default function AuvoraChat() {
 
   return (
     <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100vw-2rem)] sm:w-96 h-[calc(100vh-2rem)] sm:h-[600px] max-h-[600px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col z-50">
-      <div className="bg-red-600 text-white p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
+      <div className="bg-auvora-teal text-white p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MessageCircle size={18} className="sm:w-5 sm:h-5" />
           <h3 className="font-bold text-sm sm:text-base">Ask Auvora</h3>
         </div>
         <button
           onClick={() => setChatOpen(false)}
-          className="hover:bg-red-700 p-1 rounded"
+          className="hover:bg-auvora-teal-dark p-1 rounded"
         >
           <X size={18} className="sm:w-5 sm:h-5" />
         </button>
@@ -378,7 +378,7 @@ export default function AuvoraChat() {
             <div
               className={`max-w-[85%] sm:max-w-[80%] p-2.5 sm:p-3 rounded-lg ${
                 message.sender === 'user'
-                  ? 'bg-red-600 text-white'
+                  ? 'bg-auvora-teal text-white'
                   : 'bg-gray-100 text-gray-900'
               }`}
             >
@@ -411,11 +411,11 @@ export default function AuvoraChat() {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Ask me anything..."
-            className="flex-1 px-2.5 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 text-xs sm:text-sm"
+            className="flex-1 px-2.5 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-gold text-xs sm:text-sm"
           />
           <button
             onClick={() => handleSend()}
-            className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-700 transition-colors flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="bg-auvora-teal text-white p-2 rounded-lg hover:bg-auvora-teal-dark transition-colors flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <Send size={18} className="sm:w-5 sm:h-5" />
           </button>

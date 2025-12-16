@@ -197,7 +197,7 @@ export default function Schedule() {
               {hasPermission(userRole, 'class:add') && (
                 <button
                   onClick={() => setShowAddClassModal(true)}
-                  className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 text-sm min-h-[44px]"
+                  className="px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
                 >
                   <Plus size={20} />
                   <span className="hidden sm:inline">Add Class</span>
@@ -289,7 +289,7 @@ export default function Schedule() {
                                     )}
                                   </div>
                                   <div className={`text-xs font-medium mt-1 ${
-                                    getClassBookingCount(cls.id) >= cls.capacity * 0.9 ? 'text-red-600' :
+                                    getClassBookingCount(cls.id) >= cls.capacity * 0.9 ? 'text-auvora-teal' :
                                     getClassBookingCount(cls.id) >= cls.capacity * 0.7 ? 'text-yellow-600' :
                                     'text-green-600'
                                   }`}>
@@ -340,7 +340,7 @@ export default function Schedule() {
                           <td className="px-4 py-3 text-sm">
                             <div className="flex items-center gap-2">
                               <span className={`font-medium ${
-                                getClassBookingCount(cls.id) >= cls.capacity * 0.9 ? 'text-red-600' :
+                                getClassBookingCount(cls.id) >= cls.capacity * 0.9 ? 'text-auvora-teal' :
                                 getClassBookingCount(cls.id) >= cls.capacity * 0.7 ? 'text-yellow-600' :
                                 'text-green-600'
                               }`}>
@@ -384,7 +384,7 @@ export default function Schedule() {
         <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
           <button
             onClick={() => setSelectedClass(null)}
-            className="flex items-center gap-2 text-red-600 hover:text-red-700 mb-4"
+            className="flex items-center gap-2 text-auvora-teal hover:text-red-700 mb-4"
           >
             <X size={20} />
             <span>Back to schedule</span>
@@ -417,7 +417,7 @@ export default function Schedule() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowBookingModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="flex items-center gap-2 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
               >
                 <UserPlus size={20} />
                 Book Member
@@ -579,7 +579,7 @@ export default function Schedule() {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={handleSaveNewClass}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
                 >
                   Create Class
                 </button>
@@ -675,13 +675,13 @@ export default function Schedule() {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={handleSaveEditClass}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="flex-1 px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
                 >
                   Save Changes
                 </button>
                 <button
                   onClick={() => handleDeleteClass(editingClass.id)}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
                 >
                   Delete
                 </button>

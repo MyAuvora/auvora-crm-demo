@@ -38,9 +38,9 @@ export default function CheckInModal({ classData, onClose, onSuccess }: CheckInM
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
-        <div className="bg-red-600 text-white p-3 sm:p-4 flex justify-between items-center">
+        <div className="bg-auvora-teal text-white p-3 sm:p-4 flex justify-between items-center">
           <h2 className="text-lg sm:text-xl font-bold">Class Roster & Check-In</h2>
-          <button onClick={onClose} className="hover:bg-red-700 p-2 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
+          <button onClick={onClose} className="hover:bg-auvora-teal-dark p-2 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
             <X size={24} />
           </button>
         </div>

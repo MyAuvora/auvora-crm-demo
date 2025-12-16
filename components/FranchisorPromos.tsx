@@ -132,7 +132,7 @@ export default function FranchisorPromos() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-[#AC1305] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#8B0F04] flex items-center justify-center gap-2 text-sm min-h-[44px]"
+          className="bg-auvora-teal text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
         >
           <Plus size={18} className="sm:w-5 sm:h-5" />
           Create Promotion
@@ -184,13 +184,13 @@ export default function FranchisorPromos() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => openEditModal(promo)}
-                      className="text-[#AC1305] hover:text-[#8B0F04] mr-3"
+                      className="text-auvora-teal hover:text-auvora-teal-dark mr-3"
                     >
                       <Edit2 size={18} />
                     </button>
                     <button
                       onClick={() => handleDeletePromo(promo.id)}
-                      className="text-red-600 hover:text-red-800"
+                      className="text-auvora-teal hover:text-red-800"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -218,7 +218,7 @@ export default function FranchisorPromos() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
                   placeholder="e.g., Spring Sale 2025"
                 />
               </div>
@@ -227,7 +227,7 @@ export default function FranchisorPromos() {
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
                   rows={3}
                   placeholder="Describe the promotion..."
                 />
@@ -238,7 +238,7 @@ export default function FranchisorPromos() {
                   <select
                     value={formData.discountType}
                     onChange={(e) => setFormData({ ...formData, discountType: e.target.value as 'percentage' | 'fixed' })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-teal"
                   >
                     <option value="percentage">Percentage</option>
                     <option value="fixed">Fixed Amount</option>
@@ -250,7 +250,7 @@ export default function FranchisorPromos() {
                     type="number"
                     value={formData.discountValue}
                     onChange={(e) => setFormData({ ...formData, discountValue: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-auvora-teal"
                     placeholder={formData.discountType === 'percentage' ? '50' : '100'}
                   />
                 </div>
@@ -262,7 +262,7 @@ export default function FranchisorPromos() {
                     type="date"
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
                   />
                 </div>
                 <div>
@@ -271,7 +271,7 @@ export default function FranchisorPromos() {
                     type="date"
                     value={formData.endDate}
                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC1305]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
                   />
                 </div>
               </div>
@@ -289,7 +289,7 @@ export default function FranchisorPromos() {
                           setFormData({ ...formData, targetLocations: [] });
                         }
                       }}
-                      className="rounded text-[#AC1305] focus:ring-[#AC1305]"
+                      className="rounded text-auvora-teal focus:ring-auvora-teal"
                     />
                     <span className="font-semibold">All Locations</span>
                   </label>
@@ -305,7 +305,7 @@ export default function FranchisorPromos() {
                             setFormData({ ...formData, targetLocations: formData.targetLocations.filter(id => id !== location.id) });
                           }
                         }}
-                        className="rounded text-[#AC1305] focus:ring-[#AC1305]"
+                        className="rounded text-auvora-teal focus:ring-auvora-teal"
                       />
                       <span>{location.name}</span>
                     </label>
@@ -326,7 +326,7 @@ export default function FranchisorPromos() {
               </button>
               <button
                 onClick={editingPromo ? handleUpdatePromo : handleCreatePromo}
-                className="px-4 py-2 bg-[#AC1305] text-white rounded-lg hover:bg-[#8B0F04]"
+                className="px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark"
               >
                 {editingPromo ? 'Update Promotion' : 'Create Promotion'}
               </button>

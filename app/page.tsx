@@ -104,7 +104,7 @@ export default function CRMApp() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-black text-white shadow-lg sticky top-0 z-40">
+      <header className="bg-auvora-teal-dark text-white shadow-lg sticky top-0 z-40">
         <div className="px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-4">
             <button
@@ -113,9 +113,10 @@ export default function CRMApp() {
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <div className="flex flex-col leading-tight">
-              <span className="text-xl sm:text-2xl font-bold text-white">The Lab</span>
-            </div>
+                        <div className="flex items-center gap-3">
+                          <img src="/auvora-logo.png" alt="Auvora" className="h-10 w-10 object-contain" />
+                          <span className="text-xl sm:text-2xl font-bold text-white">Auvora</span>
+                        </div>
           </div>
           
           <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
@@ -132,7 +133,7 @@ export default function CRMApp() {
             <select
               value={location}
               onChange={(e) => setLocation(e.target.value as 'athletic-club' | 'dance-studio' | 'all')}
-              className="bg-gray-800 text-white px-2 sm:px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px]"
+              className="bg-auvora-teal text-white px-2 sm:px-4 py-2 rounded-lg border border-auvora-teal-light focus:outline-none focus:ring-2 focus:ring-auvora-gold text-sm sm:text-base min-h-[44px]"
             >
               {userRole === 'franchisor' ? (
                 <>
@@ -156,7 +157,7 @@ export default function CRMApp() {
                   setLocation('all');
                 }
               }}
-              className="bg-gray-800 text-white px-2 sm:px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600 text-sm sm:text-base min-h-[44px] hidden sm:block"
+              className="bg-auvora-teal text-white px-2 sm:px-4 py-2 rounded-lg border border-auvora-teal-light focus:outline-none focus:ring-2 focus:ring-auvora-gold text-sm sm:text-base min-h-[44px] hidden sm:block"
             >
               <option value="owner">Owner/Admin</option>
               <option value="manager">Manager</option>
@@ -192,16 +193,16 @@ export default function CRMApp() {
                         setActiveSection(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center gap-3 px-3 sm:px-4 py-3 sm:py-3.5 rounded-lg transition-colors relative min-h-[48px] ${
-                        isActive
-                          ? 'bg-red-600 text-white'
-                          : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
-                      }`}
+                                            className={`w-full flex items-center gap-3 px-3 sm:px-4 py-3 sm:py-3.5 rounded-lg transition-colors relative min-h-[48px] ${
+                                              isActive
+                                                ? 'bg-auvora-teal text-white'
+                                                : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
+                                            }`}
                     >
                       <Icon size={20} />
                       <span className="font-medium text-sm sm:text-base">{item.label}</span>
                       {item.badge && item.badge > 0 && (
-                        <span className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-red-600 text-white text-xs font-bold rounded-full min-w-[24px] h-6 flex items-center justify-center px-1">
+                        <span className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-auvora-gold text-white text-xs font-bold rounded-full min-w-[24px] h-6 flex items-center justify-center px-1">
                           {item.badge}
                         </span>
                       )}
@@ -243,7 +244,7 @@ export default function CRMApp() {
       {activeSection !== 'kiosk' && (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-6 right-6 bg-gradient-to-r from-[#AC1305] to-[#8B0F04] text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow z-50"
+          className="fixed bottom-6 right-6 bg-gradient-to-r from-auvora-teal to-auvora-teal-dark text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow z-50"
           title="Ask Auvora"
         >
           <Sparkles size={24} />
