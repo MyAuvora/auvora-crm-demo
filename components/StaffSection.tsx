@@ -3,20 +3,32 @@
 import { useState } from 'react';
 import { useApp } from '@/lib/context';
 import { getAllStaff, getAllClasses, addStaff, updateStaff, deleteStaff } from '@/lib/dataStore';
-import { UserCog, Award, Plus, Edit2, X } from 'lucide-react';
+import { UserCog, Award, Plus, Edit2, X, Mail, Loader2 } from 'lucide-react';
 import { Staff } from '@/lib/types';
 
 export default function StaffSection() {
   const { location } = useApp();
   const [showAddStaffModal, setShowAddStaffModal] = useState(false);
+  const [showInviteStaffModal, setShowInviteStaffModal] = useState(false);
   const [showEditStaffModal, setShowEditStaffModal] = useState(false);
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
   const [, setRefreshTrigger] = useState(0);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteSuccess, setInviteSuccess] = useState(false);
   
   const [newStaff, setNewStaff] = useState({
     name: '',
     email: '',
     role: 'coach' as 'head-coach' | 'coach' | 'instructor' | 'front-desk' | 'manager',
+    specialties: '',
+  });
+  
+  const [inviteStaff, setInviteStaff] = useState({
+    name: '',
+    email: '',
+    role: 'coach' as 'head-coach' | 'coach' | 'instructor' | 'front-desk' | 'manager',
+    password: '',
     specialties: '',
   });
   
@@ -133,20 +145,85 @@ export default function StaffSection() {
     handleRefresh();
   };
   
-  const handleDeleteStaff = (staffId: string) => {
-    const staffClasses = locationClasses.filter(c => c.coachId === staffId);
-    if (staffClasses.length > 0) {
-      alert(`Cannot delete staff member who is assigned to ${staffClasses.length} class(es). Please reassign or delete those classes first.`);
-      return;
-    }
+    const handleDeleteStaff = (staffId: string) => {
+      const staffClasses = locationClasses.filter(c => c.coachId === staffId);
+      if (staffClasses.length > 0) {
+        alert(`Cannot delete staff member who is assigned to ${staffClasses.length} class(es). Please reassign or delete those classes first.`);
+        return;
+      }
     
-    if (confirm('Are you sure you want to delete this staff member?')) {
-      deleteStaff(staffId);
-      setShowEditStaffModal(false);
-      setEditingStaff(null);
-      handleRefresh();
-    }
-  };
+      if (confirm('Are you sure you want to delete this staff member?')) {
+        deleteStaff(staffId);
+        setShowEditStaffModal(false);
+        setEditingStaff(null);
+        handleRefresh();
+      }
+    };
+  
+    const handleInviteStaff = async () => {
+      if (!inviteStaff.name || !inviteStaff.email || !inviteStaff.password) {
+        setInviteError('Please fill in name, email, and password');
+        return;
+      }
+    
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(inviteStaff.email)) {
+        setInviteError('Please enter a valid email address');
+        return;
+      }
+    
+      if (inviteStaff.password.length < 8) {
+        setInviteError('Password must be at least 8 characters');
+        return;
+      }
+    
+      setInviteLoading(true);
+      setInviteError(null);
+    
+      try {
+        const specialtiesArray = inviteStaff.specialties
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s.length > 0);
+      
+        const response = await fetch('/api/staff/invite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: inviteStaff.name,
+            email: inviteStaff.email,
+            password: inviteStaff.password,
+            role: inviteStaff.role,
+            specialties: specialtiesArray,
+          }),
+        });
+      
+        const data = await response.json();
+      
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to invite staff member');
+        }
+      
+        setInviteSuccess(true);
+        setInviteStaff({
+          name: '',
+          email: '',
+          role: 'coach',
+          password: '',
+          specialties: '',
+        });
+      
+        setTimeout(() => {
+          setShowInviteStaffModal(false);
+          setInviteSuccess(false);
+          handleRefresh();
+        }, 2000);
+      } catch (err) {
+        setInviteError(err instanceof Error ? err.message : 'Failed to invite staff member');
+      } finally {
+        setInviteLoading(false);
+      }
+    };
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -155,14 +232,23 @@ export default function StaffSection() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Coaches & Staff</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your team and view performance</p>
         </div>
-        <button
-          onClick={() => setShowAddStaffModal(true)}
-          className="px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
-        >
-          <Plus size={18} className="sm:w-5 sm:h-5" />
-          Add Staff
-        </button>
-      </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowInviteStaffModal(true)}
+                  className="px-3 sm:px-4 py-2 bg-auvora-gold text-white rounded-lg hover:bg-yellow-600 flex items-center justify-center gap-2 text-sm min-h-[44px]"
+                >
+                  <Mail size={18} className="sm:w-5 sm:h-5" />
+                  Invite with Login
+                </button>
+                <button
+                  onClick={() => setShowAddStaffModal(true)}
+                  className="px-3 sm:px-4 py-2 bg-auvora-teal text-white rounded-lg hover:bg-auvora-teal-dark flex items-center justify-center gap-2 text-sm min-h-[44px]"
+                >
+                  <Plus size={18} className="sm:w-5 sm:h-5" />
+                  Add Staff
+                </button>
+              </div>
+            </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {locationStaff.map(member => {
@@ -405,6 +491,135 @@ export default function StaffSection() {
                   Cancel
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showInviteStaffModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[95vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Invite Staff Member</h2>
+                <p className="text-sm text-gray-600 mt-1">Create a login account for this staff member</p>
+              </div>
+              <button 
+                onClick={() => { 
+                  setShowInviteStaffModal(false); 
+                  setInviteError(null); 
+                  setInviteSuccess(false);
+                }} 
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X size={18} className="sm:w-5 sm:h-5" />
+              </button>
+            </div>
+            <div className="p-4 sm:p-6">
+              {inviteSuccess ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Mail className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Staff Member Invited!</h3>
+                  <p className="text-gray-600">They can now log in with their email and password.</p>
+                </div>
+              ) : (
+                <>
+                  {inviteError && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                      {inviteError}
+                    </div>
+                  )}
+                  <div className="space-y-3 sm:space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                      <input
+                        type="text"
+                        value={inviteStaff.name}
+                        onChange={(e) => setInviteStaff({ ...inviteStaff, name: e.target.value })}
+                        placeholder="John Doe"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                      <input
+                        type="email"
+                        value={inviteStaff.email}
+                        onChange={(e) => setInviteStaff({ ...inviteStaff, email: e.target.value })}
+                        placeholder="john@example.com"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                      <input
+                        type="password"
+                        value={inviteStaff.password}
+                        onChange={(e) => setInviteStaff({ ...inviteStaff, password: e.target.value })}
+                        placeholder="Minimum 8 characters"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Share this password with the staff member</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+                      <select 
+                        value={inviteStaff.role}
+                        onChange={(e) => setInviteStaff({ ...inviteStaff, role: e.target.value as 'head-coach' | 'coach' | 'instructor' | 'front-desk' | 'manager' })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      >
+                        <option value="head-coach">Head Coach</option>
+                        <option value="coach">Coach</option>
+                        <option value="instructor">Instructor</option>
+                        <option value="front-desk">Front Desk</option>
+                        <option value="manager">Manager</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {location === 'athletic-club' ? 'Specialties' : 'Dance Styles'} (comma-separated)
+                      </label>
+                      <input
+                        type="text"
+                        value={inviteStaff.specialties}
+                        onChange={(e) => setInviteStaff({ ...inviteStaff, specialties: e.target.value })}
+                        placeholder={location === 'athletic-club' ? 'strength, conditioning, beginners' : 'ballet, hip-hop, contemporary'}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mt-6">
+                    <button
+                      onClick={handleInviteStaff}
+                      disabled={inviteLoading}
+                      className="flex-1 px-4 py-2 bg-auvora-gold text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {inviteLoading ? (
+                        <>
+                          <Loader2 size={18} className="animate-spin" />
+                          Inviting...
+                        </>
+                      ) : (
+                        <>
+                          <Mail size={18} />
+                          Send Invite
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => { 
+                        setShowInviteStaffModal(false); 
+                        setInviteError(null);
+                      }}
+                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
