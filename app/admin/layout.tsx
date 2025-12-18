@@ -1,15 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Building2, Users, Upload, Settings, LogOut, Loader2 } from 'lucide-react';
+import { Building2, Users, Upload, Settings, LogOut, Loader2, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [adminName, setAdminName] = useState<string>('');
+  const [adminEmail, setAdminEmail] = useState<string>('');
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     async function checkAdmin() {
@@ -34,6 +38,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       setIsAdmin(true);
       setAdminName(admin.full_name);
+      setAdminEmail(admin.email);
     }
 
     checkAdmin();
@@ -45,10 +50,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push('/login');
   };
 
+  const isActive = (path: string) => {
+    if (path === '/admin') {
+      return pathname === '/admin' || pathname?.startsWith('/admin/tenants');
+    }
+    return pathname?.startsWith(path);
+  };
+
   if (isAdmin === null) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-auvora-teal" />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <Image src="/auvora-logo.png" alt="Auvora" width={64} height={64} className="mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0f5257] mx-auto" />
+        </div>
       </div>
     );
   }
@@ -58,63 +73,117 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-auvora-teal text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <nav className="bg-gradient-to-r from-[#0f5257] to-[#0a3d41] text-white shadow-xl">
+        <div className="px-6">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link href="/admin" className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                  <span className="text-auvora-teal font-bold text-lg">A</span>
+              <Link href="/admin" className="flex items-center gap-3">
+                <Image src="/auvora-logo.png" alt="Auvora" width={40} height={40} className="rounded-lg" />
+                <div>
+                  <span className="font-bold text-xl tracking-tight">Auvora</span>
+                  <span className="ml-2 text-xs bg-white/20 px-2 py-0.5 rounded-full">Admin</span>
                 </div>
-                <span className="font-bold text-xl">Auvora Admin</span>
               </Link>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm opacity-80">{adminName}</span>
-              <button
-                onClick={handleLogout}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-              >
-                <LogOut size={20} />
-              </button>
+            <div className="flex items-center">
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <div className="w-8 h-8 bg-[#d4af37] rounded-full flex items-center justify-center font-bold text-sm">
+                    {adminName.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="text-left hidden sm:block">
+                    <div className="text-sm font-medium">{adminName}</div>
+                    <div className="text-xs opacity-70">{adminEmail}</div>
+                  </div>
+                  <ChevronDown size={16} className="opacity-70" />
+                </button>
+                
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-1 z-50">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      <LogOut size={16} />
+                      <span>Sign out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </nav>
 
       <div className="flex">
-        <aside className="w-64 bg-white shadow-md min-h-[calc(100vh-4rem)]">
-          <nav className="p-4 space-y-2">
-            <Link
-              href="/admin"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <Building2 size={20} />
-              <span>Tenants</span>
-            </Link>
-            <Link
-              href="/admin/users"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <Users size={20} />
-              <span>Users</span>
-            </Link>
-            <Link
-              href="/admin/import"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <Upload size={20} />
-              <span>Data Import</span>
-            </Link>
-            <Link
-              href="/admin/settings"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <Settings size={20} />
-              <span>Settings</span>
-            </Link>
-          </nav>
+        <aside className="w-64 bg-white shadow-lg min-h-[calc(100vh-4rem)] border-r border-gray-200">
+          <div className="p-4">
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-4">
+              Management
+            </div>
+            <nav className="space-y-1">
+              <Link
+                href="/admin"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  isActive('/admin') && !isActive('/admin/users') && !isActive('/admin/import') && !isActive('/admin/settings')
+                    ? 'bg-[#0f5257] text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <Building2 size={20} />
+                <span className="font-medium">Tenants</span>
+              </Link>
+              <Link
+                href="/admin/users"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  isActive('/admin/users')
+                    ? 'bg-[#0f5257] text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <Users size={20} />
+                <span className="font-medium">Users</span>
+              </Link>
+              <Link
+                href="/admin/import"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  isActive('/admin/import')
+                    ? 'bg-[#0f5257] text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <Upload size={20} />
+                <span className="font-medium">Data Import</span>
+              </Link>
+            </nav>
+            
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-4 mt-8">
+              System
+            </div>
+            <nav className="space-y-1">
+              <Link
+                href="/admin/settings"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  isActive('/admin/settings')
+                    ? 'bg-[#0f5257] text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <Settings size={20} />
+                <span className="font-medium">Settings</span>
+              </Link>
+            </nav>
+          </div>
+          
+          <div className="absolute bottom-0 left-0 w-64 p-4 border-t border-gray-200 bg-gray-50">
+            <div className="text-xs text-gray-500 text-center">
+              Auvora Admin Portal v1.0
+            </div>
+          </div>
         </aside>
 
         <main className="flex-1 p-8">
