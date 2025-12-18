@@ -157,17 +157,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         Management
                       </div>
                       <nav className="space-y-1">
-                        <Link
-                          href="/admin"
-                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                            isActive('/admin/tenants')
-                              ? 'bg-[#0f5257] text-white shadow-md'
-                              : 'text-gray-700 hover:bg-gray-100'
-                          }`}
-                        >
-                          <Building2 size={20} />
-                          <span className="font-medium">Tenants</span>
-                        </Link>
+                                                <Link
+                                                  href="/admin"
+                                                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                                                    isActive('/admin/tenants')
+                                                      ? 'bg-[#0f5257] text-white shadow-md'
+                                                      : 'text-gray-700 hover:bg-gray-100'
+                                                  }`}
+                                                >
+                                                  <Building2 size={20} />
+                                                  <span className="font-medium">Clients</span>
+                                                </Link>
                         <Link
                           href="/admin/users"
                           className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${

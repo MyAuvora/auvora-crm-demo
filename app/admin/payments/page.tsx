@@ -20,8 +20,8 @@ import {
 
 interface Payment {
   id: string;
-  tenantName: string;
-  tenantId: string;
+  clientName: string;
+  clientId: string;
   amount: number;
   status: 'paid' | 'pending' | 'failed' | 'refunded';
   date: string;
@@ -32,8 +32,8 @@ interface Payment {
 
 interface Subscription {
   id: string;
-  tenantName: string;
-  tenantId: string;
+  clientName: string;
+  clientId: string;
   plan: string;
   amount: number;
   status: 'active' | 'past_due' | 'canceled' | 'trialing';
@@ -42,25 +42,25 @@ interface Subscription {
 }
 
 const mockPayments: Payment[] = [
-  { id: 'pay_1', tenantName: 'Iron Fitness Tampa', tenantId: 't1', amount: 299, status: 'paid', date: '2024-12-15', method: 'card', plan: 'Professional', invoiceId: 'INV-001' },
-  { id: 'pay_2', tenantName: 'CrossFit Downtown', tenantId: 't2', amount: 499, status: 'paid', date: '2024-12-14', method: 'card', plan: 'Enterprise', invoiceId: 'INV-002' },
-  { id: 'pay_3', tenantName: 'Yoga Studio Miami', tenantId: 't3', amount: 199, status: 'paid', date: '2024-12-13', method: 'bank', plan: 'Starter', invoiceId: 'INV-003' },
-  { id: 'pay_4', tenantName: 'FitLife Gym', tenantId: 't4', amount: 299, status: 'pending', date: '2024-12-12', method: 'invoice', plan: 'Professional', invoiceId: 'INV-004' },
-  { id: 'pay_5', tenantName: 'Peak Performance', tenantId: 't5', amount: 299, status: 'failed', date: '2024-12-11', method: 'card', plan: 'Professional', invoiceId: 'INV-005' },
-  { id: 'pay_6', tenantName: 'Strength Lab', tenantId: 't6', amount: 499, status: 'paid', date: '2024-12-10', method: 'card', plan: 'Enterprise', invoiceId: 'INV-006' },
-  { id: 'pay_7', tenantName: 'Zen Fitness', tenantId: 't7', amount: 199, status: 'paid', date: '2024-12-09', method: 'card', plan: 'Starter', invoiceId: 'INV-007' },
-  { id: 'pay_8', tenantName: 'Elite Training', tenantId: 't8', amount: 299, status: 'refunded', date: '2024-12-08', method: 'card', plan: 'Professional', invoiceId: 'INV-008' },
+  { id: 'pay_1', clientName: 'Iron Fitness Tampa', clientId: 't1', amount: 299, status: 'paid', date: '2024-12-15', method: 'card', plan: 'Professional', invoiceId: 'INV-001' },
+  { id: 'pay_2', clientName: 'CrossFit Downtown', clientId: 't2', amount: 499, status: 'paid', date: '2024-12-14', method: 'card', plan: 'Enterprise', invoiceId: 'INV-002' },
+  { id: 'pay_3', clientName: 'Yoga Studio Miami', clientId: 't3', amount: 199, status: 'paid', date: '2024-12-13', method: 'bank', plan: 'Starter', invoiceId: 'INV-003' },
+  { id: 'pay_4', clientName: 'FitLife Gym', clientId: 't4', amount: 299, status: 'pending', date: '2024-12-12', method: 'invoice', plan: 'Professional', invoiceId: 'INV-004' },
+  { id: 'pay_5', clientName: 'Peak Performance', clientId: 't5', amount: 299, status: 'failed', date: '2024-12-11', method: 'card', plan: 'Professional', invoiceId: 'INV-005' },
+  { id: 'pay_6', clientName: 'Strength Lab', clientId: 't6', amount: 499, status: 'paid', date: '2024-12-10', method: 'card', plan: 'Enterprise', invoiceId: 'INV-006' },
+  { id: 'pay_7', clientName: 'Zen Fitness', clientId: 't7', amount: 199, status: 'paid', date: '2024-12-09', method: 'card', plan: 'Starter', invoiceId: 'INV-007' },
+  { id: 'pay_8', clientName: 'Elite Training', clientId: 't8', amount: 299, status: 'refunded', date: '2024-12-08', method: 'card', plan: 'Professional', invoiceId: 'INV-008' },
 ];
 
 const mockSubscriptions: Subscription[] = [
-  { id: 'sub_1', tenantName: 'Iron Fitness Tampa', tenantId: 't1', plan: 'Professional', amount: 299, status: 'active', nextBillingDate: '2025-01-15', startDate: '2024-06-15' },
-  { id: 'sub_2', tenantName: 'CrossFit Downtown', tenantId: 't2', plan: 'Enterprise', amount: 499, status: 'active', nextBillingDate: '2025-01-14', startDate: '2024-03-14' },
-  { id: 'sub_3', tenantName: 'Yoga Studio Miami', tenantId: 't3', plan: 'Starter', amount: 199, status: 'active', nextBillingDate: '2025-01-13', startDate: '2024-08-13' },
-  { id: 'sub_4', tenantName: 'FitLife Gym', tenantId: 't4', plan: 'Professional', amount: 299, status: 'past_due', nextBillingDate: '2024-12-12', startDate: '2024-05-12' },
-  { id: 'sub_5', tenantName: 'Peak Performance', tenantId: 't5', plan: 'Professional', amount: 299, status: 'past_due', nextBillingDate: '2024-12-11', startDate: '2024-07-11' },
-  { id: 'sub_6', tenantName: 'Strength Lab', tenantId: 't6', plan: 'Enterprise', amount: 499, status: 'active', nextBillingDate: '2025-01-10', startDate: '2024-04-10' },
-  { id: 'sub_7', tenantName: 'Zen Fitness', tenantId: 't7', plan: 'Starter', amount: 199, status: 'trialing', nextBillingDate: '2025-01-09', startDate: '2024-12-09' },
-  { id: 'sub_8', tenantName: 'Elite Training', tenantId: 't8', plan: 'Professional', amount: 299, status: 'canceled', nextBillingDate: '-', startDate: '2024-02-08' },
+  { id: 'sub_1', clientName: 'Iron Fitness Tampa', clientId: 't1', plan: 'Professional', amount: 299, status: 'active', nextBillingDate: '2025-01-15', startDate: '2024-06-15' },
+  { id: 'sub_2', clientName: 'CrossFit Downtown', clientId: 't2', plan: 'Enterprise', amount: 499, status: 'active', nextBillingDate: '2025-01-14', startDate: '2024-03-14' },
+  { id: 'sub_3', clientName: 'Yoga Studio Miami', clientId: 't3', plan: 'Starter', amount: 199, status: 'active', nextBillingDate: '2025-01-13', startDate: '2024-08-13' },
+  { id: 'sub_4', clientName: 'FitLife Gym', clientId: 't4', plan: 'Professional', amount: 299, status: 'past_due', nextBillingDate: '2024-12-12', startDate: '2024-05-12' },
+  { id: 'sub_5', clientName: 'Peak Performance', clientId: 't5', plan: 'Professional', amount: 299, status: 'past_due', nextBillingDate: '2024-12-11', startDate: '2024-07-11' },
+  { id: 'sub_6', clientName: 'Strength Lab', clientId: 't6', plan: 'Enterprise', amount: 499, status: 'active', nextBillingDate: '2025-01-10', startDate: '2024-04-10' },
+  { id: 'sub_7', clientName: 'Zen Fitness', clientId: 't7', plan: 'Starter', amount: 199, status: 'trialing', nextBillingDate: '2025-01-09', startDate: '2024-12-09' },
+  { id: 'sub_8', clientName: 'Elite Training', clientId: 't8', plan: 'Professional', amount: 299, status: 'canceled', nextBillingDate: '-', startDate: '2024-02-08' },
 ];
 
 const statusColors = {
@@ -79,18 +79,18 @@ export default function PaymentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const filteredPayments = mockPayments.filter(payment => {
-    const matchesSearch = payment.tenantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         payment.invoiceId.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+    const filteredPayments = mockPayments.filter(payment => {
+      const matchesSearch = payment.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           payment.invoiceId.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
 
-  const filteredSubscriptions = mockSubscriptions.filter(sub => {
-    const matchesSearch = sub.tenantName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || sub.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+    const filteredSubscriptions = mockSubscriptions.filter(sub => {
+      const matchesSearch = sub.clientName.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || sub.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
 
   const totalRevenue = mockPayments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
   const pendingAmount = mockPayments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0);
@@ -261,7 +261,7 @@ export default function PaymentsPage() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenant</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
@@ -276,9 +276,9 @@ export default function PaymentsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-[#0f5257] rounded-lg flex items-center justify-center text-white text-sm font-medium">
-                          {payment.tenantName.charAt(0)}
+                          {payment.clientName.charAt(0)}
                         </div>
-                        <span className="font-medium text-gray-900">{payment.tenantName}</span>
+                        <span className="font-medium text-gray-900">{payment.clientName}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 font-mono">{payment.invoiceId}</td>
@@ -307,7 +307,7 @@ export default function PaymentsPage() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenant</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -321,9 +321,9 @@ export default function PaymentsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-[#0f5257] rounded-lg flex items-center justify-center text-white text-sm font-medium">
-                          {sub.tenantName.charAt(0)}
+                          {sub.clientName.charAt(0)}
                         </div>
-                        <span className="font-medium text-gray-900">{sub.tenantName}</span>
+                        <span className="font-medium text-gray-900">{sub.clientName}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">

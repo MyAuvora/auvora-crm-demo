@@ -32,21 +32,21 @@ const revenueByPlan = [
   { name: 'Starter', value: 15, amount: 7275, color: '#d4af37' },
 ];
 
-const tenantGrowth = [
-  { month: 'Jul', tenants: 18 },
-  { month: 'Aug', tenants: 20 },
-  { month: 'Sep', tenants: 22 },
-  { month: 'Oct', tenants: 25 },
-  { month: 'Nov', tenants: 28 },
-  { month: 'Dec', tenants: 30 },
+const clientGrowth = [
+  { month: 'Jul', clients: 18 },
+  { month: 'Aug', clients: 20 },
+  { month: 'Sep', clients: 22 },
+  { month: 'Oct', clients: 25 },
+  { month: 'Nov', clients: 28 },
+  { month: 'Dec', clients: 30 },
 ];
 
-const topTenants = [
-  { name: 'CrossFit Downtown', revenue: 5988, members: 450, growth: 15.2 },
-  { name: 'Iron Fitness Tampa', revenue: 3588, members: 320, growth: 12.8 },
-  { name: 'Strength Lab', revenue: 5988, members: 380, growth: 10.5 },
-  { name: 'Yoga Studio Miami', revenue: 2388, members: 180, growth: 8.3 },
-  { name: 'FitLife Gym', revenue: 3588, members: 290, growth: 6.1 },
+const clientsByIndustry = [
+  { industry: 'Fitness', count: 18, color: '#3b82f6', percentage: 60 },
+  { industry: 'Education', count: 6, color: '#8b5cf6', percentage: 20 },
+  { industry: 'Wellness', count: 4, color: '#22c55e', percentage: 13 },
+  { industry: 'Beauty', count: 1, color: '#ec4899', percentage: 4 },
+  { industry: 'Auxiliary', count: 1, color: '#f97316', percentage: 3 },
 ];
 
 const engagementMetrics = [
@@ -68,14 +68,14 @@ export default function AnalyticsPage() {
       icon: <DollarSign size={24} />,
       color: 'green',
     },
-    {
-      title: 'Active Tenants',
-      value: '30',
-      change: 66.7,
-      changeLabel: 'vs last year',
-      icon: <Building2 size={24} />,
-      color: 'blue',
-    },
+        {
+          title: 'Active Clients',
+          value: '30',
+          change: 66.7,
+          changeLabel: 'vs last year',
+          icon: <Building2 size={24} />,
+          color: 'blue',
+        },
     {
       title: 'Total End Users',
       value: '4,850',
@@ -84,14 +84,14 @@ export default function AnalyticsPage() {
       icon: <Users size={24} />,
       color: 'purple',
     },
-    {
-      title: 'Avg Revenue/Tenant',
-      value: '$1,617',
-      change: 8.2,
-      changeLabel: 'vs last month',
-      icon: <Target size={24} />,
-      color: 'teal',
-    },
+        {
+          title: 'Avg Revenue/Client',
+          value: '$1,617',
+          change: 8.2,
+          changeLabel: 'vs last month',
+          icon: <Target size={24} />,
+          color: 'teal',
+        },
   ];
 
   const getColorClasses = (color: string) => {
@@ -104,7 +104,7 @@ export default function AnalyticsPage() {
     }
   };
 
-  const maxTenants = Math.max(...tenantGrowth.map(d => d.tenants));
+  const maxClients = Math.max(...clientGrowth.map(d => d.clients));
 
   return (
     <div className="space-y-6">
@@ -169,35 +169,35 @@ export default function AnalyticsPage() {
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Tenant Growth Chart */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Tenant Growth</h2>
-              <p className="text-sm text-gray-500">New tenants over time</p>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <div className="w-3 h-3 bg-[#0f5257] rounded-full"></div>
-              <span className="text-gray-600">Active Tenants</span>
-            </div>
-          </div>
+                {/* Client Growth Chart */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-900">Client Growth</h2>
+                      <p className="text-sm text-gray-500">New clients over time</p>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-3 h-3 bg-[#0f5257] rounded-full"></div>
+                      <span className="text-gray-600">Active Clients</span>
+                    </div>
+                  </div>
           
-          <div className="h-48 flex items-end gap-4">
-            {tenantGrowth.map((data) => (
-              <div key={data.month} className="flex-1 flex flex-col items-center gap-2">
-                <div 
-                  className="w-full bg-gradient-to-t from-[#0f5257] to-[#0f5257]/70 rounded-t-lg transition-all hover:from-[#0a3d41] cursor-pointer group relative"
-                  style={{ height: `${(data.tenants / maxTenants) * 100}%` }}
-                >
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                    {data.tenants}
+                  <div className="h-48 flex items-end gap-4">
+                    {clientGrowth.map((data) => (
+                      <div key={data.month} className="flex-1 flex flex-col items-center gap-2">
+                        <div 
+                          className="w-full bg-gradient-to-t from-[#0f5257] to-[#0f5257]/70 rounded-t-lg transition-all hover:from-[#0a3d41] cursor-pointer group relative"
+                          style={{ height: `${(data.clients / maxClients) * 100}%` }}
+                        >
+                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                            {data.clients}
+                          </div>
+                        </div>
+                        <span className="text-xs text-gray-500">{data.month}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <span className="text-xs text-gray-500">{data.month}</span>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Revenue by Plan */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -261,38 +261,40 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Top Tenants & Engagement */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Tenants */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Top Performing Tenants</h2>
-            <span className="text-sm text-gray-500">By revenue</span>
-          </div>
-          
-          <div className="space-y-4">
-            {topTenants.map((tenant, index) => (
-              <div key={tenant.name} className="flex items-center gap-4">
-                <div className="w-8 h-8 bg-[#0f5257] rounded-lg flex items-center justify-center text-white text-sm font-bold">
-                  {index + 1}
+            {/* Clients by Industry & Engagement */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Clients by Industry */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Clients by Industry</h2>
+                  <span className="text-sm text-gray-500">Distribution</span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900 truncate">{tenant.name}</span>
-                    <span className="font-semibold text-gray-900">${tenant.revenue.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs text-gray-500">{tenant.members} members</span>
-                    <span className="text-xs text-green-600 flex items-center gap-1">
-                      <ArrowUpRight size={12} />
-                      {tenant.growth}%
-                    </span>
-                  </div>
+          
+                <div className="space-y-4">
+                  {clientsByIndustry.map((item) => (
+                    <div key={item.industry} className="flex items-center gap-4">
+                      <div 
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold"
+                        style={{ backgroundColor: item.color }}
+                      >
+                        {item.count}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-medium text-gray-900">{item.industry}</span>
+                          <span className="text-sm text-gray-600">{item.percentage}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="h-2 rounded-full transition-all"
+                            style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
 
         {/* Platform Engagement */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
