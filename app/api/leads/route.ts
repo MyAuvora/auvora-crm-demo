@@ -4,6 +4,16 @@ import { NextRequest, NextResponse } from 'next/server';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -13,7 +23,7 @@ export async function POST(request: NextRequest) {
     if (!name || !email) {
       return NextResponse.json(
         { error: 'Name and email are required' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -39,16 +49,16 @@ export async function POST(request: NextRequest) {
       console.error('Failed to create lead:', error);
       return NextResponse.json(
         { error: 'Failed to create lead' },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       );
     }
 
-    return NextResponse.json({ success: true, lead: data });
+    return NextResponse.json({ success: true, lead: data }, { headers: corsHeaders });
   } catch (error) {
     console.error('Lead API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

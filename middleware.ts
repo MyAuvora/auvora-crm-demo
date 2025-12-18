@@ -41,8 +41,9 @@ export async function middleware(request: NextRequest) {
                      request.nextUrl.pathname.startsWith('/signup') ||
                      request.nextUrl.pathname.startsWith('/auth');
 
-  // Allow public access to the leads API for demo form submissions
-  const isPublicApi = request.nextUrl.pathname === '/api/leads' && request.method === 'POST';
+  // Allow public access to the leads API for demo form submissions (POST and OPTIONS for CORS preflight)
+  const isPublicApi = request.nextUrl.pathname === '/api/leads' && 
+    (request.method === 'POST' || request.method === 'OPTIONS');
 
   if (!user && !isAuthPage && !isPublicApi) {
     const url = request.nextUrl.clone();
