@@ -48,8 +48,15 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && isAuthPage) {
+    // Check if user is an Auvora admin
+    const { data: adminData } = await supabase
+      .from('auvora_admins')
+      .select('id')
+      .eq('id', user.id)
+      .single();
+
     const url = request.nextUrl.clone();
-    url.pathname = '/';
+    url.pathname = adminData ? '/admin' : '/';
     return NextResponse.redirect(url);
   }
 
