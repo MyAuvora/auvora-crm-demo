@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -58,6 +59,55 @@ const engagementMetrics = [
 
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
+
+  const handleExport = () => {
+    const reportData = {
+      generatedAt: new Date().toISOString(),
+      timeRange,
+      metrics: {
+        totalRevenue: '$366,400',
+        activeClients: 30,
+        totalEndUsers: 4850,
+        avgRevenuePerClient: '$1,617'
+      },
+      revenueByPlan,
+      clientGrowth,
+      clientsByIndustry,
+      engagementMetrics
+    };
+    
+    const csv = [
+      'Auvora Analytics Report',
+      `Generated: ${new Date().toLocaleDateString()}`,
+      `Time Range: ${timeRange}`,
+      '',
+      'Key Metrics',
+      'Total Revenue,$366,400',
+      'Active Clients,30',
+      'Total End Users,4850',
+      'Avg Revenue/Client,$1617',
+      '',
+      'Revenue by Plan',
+      'Plan,Amount,Percentage',
+      ...revenueByPlan.map(p => `${p.name},$${p.amount},${p.value}%`),
+      '',
+      'Clients by Industry',
+      'Industry,Count,Percentage',
+      ...clientsByIndustry.map(i => `${i.industry},${i.count},${i.percentage}%`),
+      '',
+      'Client Growth',
+      'Month,Clients',
+      ...clientGrowth.map(c => `${c.month},${c.clients}`)
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `auvora-analytics-${timeRange}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const metrics: MetricCard[] = [
     {
@@ -129,10 +179,13 @@ export default function AnalyticsPage() {
               </button>
             ))}
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            <Download size={18} />
-            Export
-          </button>
+                    <button 
+                      onClick={handleExport}
+                      className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <Download size={18} />
+                      Export Report
+                    </button>
         </div>
       </div>
 
@@ -270,30 +323,37 @@ export default function AnalyticsPage() {
                   <span className="text-sm text-gray-500">Distribution</span>
                 </div>
           
-                <div className="space-y-4">
-                  {clientsByIndustry.map((item) => (
-                    <div key={item.industry} className="flex items-center gap-4">
-                      <div 
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold"
-                        style={{ backgroundColor: item.color }}
-                      >
-                        {item.count}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium text-gray-900">{item.industry}</span>
-                          <span className="text-sm text-gray-600">{item.percentage}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="h-2 rounded-full transition-all"
-                            style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                                <div className="space-y-4">
+                                  {clientsByIndustry.map((item) => {
+                                    const industryKey = item.industry.toLowerCase();
+                                    return (
+                                      <Link 
+                                        key={item.industry} 
+                                        href={`/admin?industry=${industryKey}`}
+                                        className="flex items-center gap-4 p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                                      >
+                                        <div 
+                                          className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold"
+                                          style={{ backgroundColor: item.color }}
+                                        >
+                                          {item.count}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center justify-between mb-1">
+                                            <span className="font-medium text-gray-900">{item.industry}</span>
+                                            <span className="text-sm text-gray-600">{item.percentage}%</span>
+                                          </div>
+                                          <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div 
+                                              className="h-2 rounded-full transition-all"
+                                              style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
+                                            />
+                                          </div>
+                                        </div>
+                                      </Link>
+                                    );
+                                  })}
+                                </div>
               </div>
 
         {/* Platform Engagement */}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { 
   DollarSign, 
   CreditCard, 
@@ -15,7 +16,13 @@ import {
   Building2,
   Calendar,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Eye,
+  Settings,
+  X,
+  FileText,
+  RefreshCw,
+  Mail
 } from 'lucide-react';
 
 interface Payment {
@@ -78,19 +85,47 @@ export default function PaymentsPage() {
   const [activeTab, setActiveTab] = useState<'payments' | 'subscriptions'>('payments');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
 
-    const filteredPayments = mockPayments.filter(payment => {
-      const matchesSearch = payment.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           payment.invoiceId.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
-      return matchesSearch && matchesStatus;
+  const filteredPayments = mockPayments.filter(payment => {
+    const matchesSearch = payment.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         payment.invoiceId.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const filteredSubscriptions = mockSubscriptions.filter(sub => {
+    const matchesSearch = sub.clientName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || sub.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleExport = () => {
+    const data = activeTab === 'payments' ? filteredPayments : filteredSubscriptions;
+    const headers = activeTab === 'payments' 
+      ? ['Client', 'Invoice', 'Amount', 'Plan', 'Status', 'Date', 'Method']
+      : ['Client', 'Plan', 'Amount', 'Status', 'Start Date', 'Next Billing'];
+    
+    const rows = data.map(item => {
+      if (activeTab === 'payments') {
+        const p = item as Payment;
+        return [p.clientName, p.invoiceId, `$${p.amount}`, p.plan, p.status, p.date, p.method];
+      } else {
+        const s = item as Subscription;
+        return [s.clientName, s.plan, `$${s.amount}/mo`, s.status, s.startDate, s.nextBillingDate];
+      }
     });
 
-    const filteredSubscriptions = mockSubscriptions.filter(sub => {
-      const matchesSearch = sub.clientName.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || sub.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `auvora-${activeTab}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const totalRevenue = mockPayments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
   const pendingAmount = mockPayments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0);
@@ -120,10 +155,13 @@ export default function PaymentsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
           <p className="text-gray-600 mt-1">Track subscriptions and payment history</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-          <Download size={18} />
-          Export
-        </button>
+                <button 
+                  onClick={handleExport}
+                  className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Download size={18} />
+                  Export CSV
+                </button>
       </div>
 
       {/* Stats Cards */}
@@ -261,44 +299,65 @@ export default function PaymentsPage() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredPayments.map((payment) => (
-                  <tr key={payment.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-[#0f5257] rounded-lg flex items-center justify-center text-white text-sm font-medium">
-                          {payment.clientName.charAt(0)}
-                        </div>
-                        <span className="font-medium text-gray-900">{payment.clientName}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 font-mono">{payment.invoiceId}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">${payment.amount}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{payment.plan}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusColors[payment.status]}`}>
-                        {getStatusIcon(payment.status)}
-                        {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{payment.date}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <CreditCard size={14} className="text-gray-400" />
-                        <span className="text-sm text-gray-600 capitalize">{payment.method}</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {filteredPayments.map((payment) => (
+                                <tr key={payment.id} className="hover:bg-gray-50">
+                                  <td className="px-6 py-4">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-8 h-8 bg-[#0f5257] rounded-lg flex items-center justify-center text-white text-sm font-medium">
+                                        {payment.clientName.charAt(0)}
+                                      </div>
+                                      <span className="font-medium text-gray-900">{payment.clientName}</span>
+                                    </div>
+                                  </td>
+                                  <td className="px-6 py-4 text-sm text-gray-600 font-mono">{payment.invoiceId}</td>
+                                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">${payment.amount}</td>
+                                  <td className="px-6 py-4 text-sm text-gray-600">{payment.plan}</td>
+                                  <td className="px-6 py-4">
+                                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusColors[payment.status]}`}>
+                                      {getStatusIcon(payment.status)}
+                                      {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 text-sm text-gray-600">{payment.date}</td>
+                                  <td className="px-6 py-4">
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={() => setSelectedPayment(payment)}
+                                        className="p-1.5 text-gray-500 hover:text-[#0f5257] hover:bg-gray-100 rounded transition-colors"
+                                        title="View Invoice"
+                                      >
+                                        <Eye size={16} />
+                                      </button>
+                                      {payment.status === 'failed' && (
+                                        <button
+                                          onClick={() => alert('Retry payment functionality coming soon')}
+                                          className="p-1.5 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+                                          title="Retry Payment"
+                                        >
+                                          <RefreshCw size={16} />
+                                        </button>
+                                      )}
+                                      <button
+                                        onClick={() => alert('Send receipt functionality coming soon')}
+                                        className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                        title="Send Receipt"
+                                      >
+                                        <Mail size={16} />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
               </tbody>
             </table>
           </div>
@@ -307,50 +366,199 @@ export default function PaymentsPage() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Billing</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredSubscriptions.map((sub) => (
-                  <tr key={sub.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-[#0f5257] rounded-lg flex items-center justify-center text-white text-sm font-medium">
-                          {sub.clientName.charAt(0)}
-                        </div>
-                        <span className="font-medium text-gray-900">{sub.clientName}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        sub.plan === 'Enterprise' ? 'bg-purple-100 text-purple-700' :
-                        sub.plan === 'Professional' ? 'bg-blue-100 text-blue-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {sub.plan}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">${sub.amount}/mo</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusColors[sub.status]}`}>
-                        {getStatusIcon(sub.status)}
-                        {sub.status === 'past_due' ? 'Past Due' : sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{sub.startDate}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{sub.nextBillingDate}</td>
-                  </tr>
-                ))}
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Billing</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {filteredSubscriptions.map((sub) => (
+                                <tr key={sub.id} className="hover:bg-gray-50">
+                                  <td className="px-6 py-4">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-8 h-8 bg-[#0f5257] rounded-lg flex items-center justify-center text-white text-sm font-medium">
+                                        {sub.clientName.charAt(0)}
+                                      </div>
+                                      <span className="font-medium text-gray-900">{sub.clientName}</span>
+                                    </div>
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                      sub.plan === 'Enterprise' ? 'bg-purple-100 text-purple-700' :
+                                      sub.plan === 'Professional' ? 'bg-blue-100 text-blue-700' :
+                                      'bg-gray-100 text-gray-700'
+                                    }`}>
+                                      {sub.plan}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">${sub.amount}/mo</td>
+                                  <td className="px-6 py-4">
+                                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusColors[sub.status]}`}>
+                                      {getStatusIcon(sub.status)}
+                                      {sub.status === 'past_due' ? 'Past Due' : sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 text-sm text-gray-600">{sub.startDate}</td>
+                                  <td className="px-6 py-4 text-sm text-gray-600">{sub.nextBillingDate}</td>
+                                  <td className="px-6 py-4">
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={() => setSelectedSubscription(sub)}
+                                        className="p-1.5 text-gray-500 hover:text-[#0f5257] hover:bg-gray-100 rounded transition-colors"
+                                        title="View Details"
+                                      >
+                                        <Eye size={16} />
+                                      </button>
+                                      <button
+                                        onClick={() => alert('Manage subscription functionality coming soon')}
+                                        className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                        title="Manage Subscription"
+                                      >
+                                        <Settings size={16} />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
               </tbody>
             </table>
           </div>
         )}
       </div>
+
+      {/* Payment Detail Modal */}
+      {selectedPayment && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">Invoice Details</h2>
+              <button onClick={() => setSelectedPayment(null)} className="text-gray-400 hover:text-gray-600">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#0f5257] rounded-lg flex items-center justify-center text-white font-bold">
+                  {selectedPayment.clientName.charAt(0)}
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">{selectedPayment.clientName}</div>
+                  <div className="text-sm text-gray-500">{selectedPayment.invoiceId}</div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                <div>
+                  <div className="text-xs text-gray-500 uppercase">Amount</div>
+                  <div className="text-lg font-bold text-gray-900">${selectedPayment.amount}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 uppercase">Status</div>
+                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusColors[selectedPayment.status]}`}>
+                    {selectedPayment.status.charAt(0).toUpperCase() + selectedPayment.status.slice(1)}
+                  </span>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 uppercase">Plan</div>
+                  <div className="text-sm text-gray-900">{selectedPayment.plan}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 uppercase">Date</div>
+                  <div className="text-sm text-gray-900">{selectedPayment.date}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 uppercase">Payment Method</div>
+                  <div className="text-sm text-gray-900 capitalize">{selectedPayment.method}</div>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-200 flex gap-3">
+              <button 
+                onClick={() => alert('Download invoice functionality coming soon')}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#0f5257] text-white rounded-lg hover:bg-[#0a3d41] transition-colors"
+              >
+                <FileText size={16} />
+                Download Invoice
+              </button>
+              <button 
+                onClick={() => setSelectedPayment(null)}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Subscription Detail Modal */}
+      {selectedSubscription && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">Subscription Details</h2>
+              <button onClick={() => setSelectedSubscription(null)} className="text-gray-400 hover:text-gray-600">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#0f5257] rounded-lg flex items-center justify-center text-white font-bold">
+                  {selectedSubscription.clientName.charAt(0)}
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">{selectedSubscription.clientName}</div>
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    selectedSubscription.plan === 'Enterprise' ? 'bg-purple-100 text-purple-700' :
+                    selectedSubscription.plan === 'Professional' ? 'bg-blue-100 text-blue-700' :
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    {selectedSubscription.plan}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                <div>
+                  <div className="text-xs text-gray-500 uppercase">Monthly Amount</div>
+                  <div className="text-lg font-bold text-gray-900">${selectedSubscription.amount}/mo</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 uppercase">Status</div>
+                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusColors[selectedSubscription.status]}`}>
+                    {selectedSubscription.status === 'past_due' ? 'Past Due' : selectedSubscription.status.charAt(0).toUpperCase() + selectedSubscription.status.slice(1)}
+                  </span>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 uppercase">Start Date</div>
+                  <div className="text-sm text-gray-900">{selectedSubscription.startDate}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 uppercase">Next Billing</div>
+                  <div className="text-sm text-gray-900">{selectedSubscription.nextBillingDate}</div>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-200 flex gap-3">
+              <button 
+                onClick={() => alert('Upgrade plan functionality coming soon')}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#0f5257] text-white rounded-lg hover:bg-[#0a3d41] transition-colors"
+              >
+                <ArrowUpRight size={16} />
+                Upgrade Plan
+              </button>
+              <button 
+                onClick={() => setSelectedSubscription(null)}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

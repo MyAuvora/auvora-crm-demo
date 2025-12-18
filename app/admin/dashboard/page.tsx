@@ -259,33 +259,37 @@ export default function AdminDashboardPage() {
             </Link>
           </div>
           
-          <div className="space-y-4">
-            {industries.map((industry) => {
-              const count = stats.clientsByIndustry[industry.key] || 0;
-              const percentage = stats.totalClients > 0 ? (count / stats.totalClients) * 100 : 0;
-              const Icon = industry.icon;
+                    <div className="space-y-4">
+                      {industries.map((industry) => {
+                        const count = stats.clientsByIndustry[industry.key] || 0;
+                        const percentage = stats.totalClients > 0 ? (count / stats.totalClients) * 100 : 0;
+                        const Icon = industry.icon;
               
-              return (
-                <div key={industry.key} className="flex items-center gap-4">
-                  <div className={`w-10 h-10 ${industry.color} rounded-lg flex items-center justify-center`}>
-                    <Icon size={20} className="text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-900">{industry.label}</span>
-                      <span className="text-sm text-gray-600">{count} clients</span>
+                        return (
+                          <Link 
+                            key={industry.key} 
+                            href={`/admin?industry=${industry.key}`}
+                            className="flex items-center gap-4 p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                          >
+                            <div className={`w-10 h-10 ${industry.color} rounded-lg flex items-center justify-center`}>
+                              <Icon size={20} className="text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-medium text-gray-900">{industry.label}</span>
+                                <span className="text-sm text-gray-600">{count} clients</span>
+                              </div>
+                              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full ${industry.color} rounded-full transition-all`}
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })}
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full ${industry.color} rounded-full transition-all`}
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
 
           {stats.totalClients === 0 && (
             <div className="text-center py-8 text-gray-500">
@@ -298,27 +302,40 @@ export default function AdminDashboardPage() {
           )}
         </div>
 
-        {/* Activity Feed */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
-          </div>
+                {/* Activity Feed */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+                    <Link href="/admin/analytics" className="text-sm text-[#0f5257] hover:underline">
+                      View all
+                    </Link>
+                  </div>
           
-          <div className="space-y-4">
-            {mockActivity.map((activity) => (
-              <div key={activity.id} className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                  {getActivityIcon(activity.icon)}
+                  <div className="space-y-4">
+                    {mockActivity.map((activity) => {
+                      const activityLink = activity.type === 'client_added' ? '/admin' :
+                                           activity.type === 'subscription_paid' ? '/admin/payments' :
+                                           activity.type === 'onboarding_complete' ? '/admin' :
+                                           activity.type === 'support_request' ? '/admin/settings' : '/admin';
+                      return (
+                        <Link 
+                          key={activity.id} 
+                          href={activityLink}
+                          className="flex items-start gap-3 p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                        >
+                          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                            {getActivityIcon(activity.icon)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                            <p className="text-xs text-gray-500 truncate">{activity.description}</p>
+                            <p className="text-xs text-gray-400 mt-1">{activity.timestamp}</p>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-                  <p className="text-xs text-gray-500 truncate">{activity.description}</p>
-                  <p className="text-xs text-gray-400 mt-1">{activity.timestamp}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Onboarding Pipeline */}
@@ -330,26 +347,30 @@ export default function AdminDashboardPage() {
           </div>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-          {[
-            { status: 'pending', label: 'Pending', color: 'bg-gray-100 text-gray-700' },
-            { status: 'provisioned', label: 'Provisioned', color: 'bg-blue-100 text-blue-700' },
-            { status: 'branded', label: 'Branded', color: 'bg-purple-100 text-purple-700' },
-            { status: 'imported', label: 'Data Imported', color: 'bg-yellow-100 text-yellow-700' },
-            { status: 'testing', label: 'Testing', color: 'bg-orange-100 text-orange-700' },
-            { status: 'ready', label: 'Ready', color: 'bg-green-100 text-green-700' },
-            { status: 'live', label: 'Live', color: 'bg-[#0f5257] text-white' },
-          ].map((stage) => (
-            <div key={stage.status} className={`rounded-lg p-4 text-center ${stage.color}`}>
-              <div className="text-2xl font-bold">
-                {stage.status === 'live' ? stats.activeClients : 
-                 stage.status === 'pending' ? stats.pendingClients : 
-                 Math.floor(stats.onboardingClients / 5)}
-              </div>
-              <div className="text-xs font-medium mt-1">{stage.label}</div>
-            </div>
-          ))}
-        </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                  {[
+                    { status: 'pending', label: 'Pending', color: 'bg-gray-100 text-gray-700', hoverColor: 'hover:bg-gray-200' },
+                    { status: 'provisioned', label: 'Provisioned', color: 'bg-blue-100 text-blue-700', hoverColor: 'hover:bg-blue-200' },
+                    { status: 'branded', label: 'Branded', color: 'bg-purple-100 text-purple-700', hoverColor: 'hover:bg-purple-200' },
+                    { status: 'imported', label: 'Data Imported', color: 'bg-yellow-100 text-yellow-700', hoverColor: 'hover:bg-yellow-200' },
+                    { status: 'testing', label: 'Testing', color: 'bg-orange-100 text-orange-700', hoverColor: 'hover:bg-orange-200' },
+                    { status: 'ready', label: 'Ready', color: 'bg-green-100 text-green-700', hoverColor: 'hover:bg-green-200' },
+                    { status: 'live', label: 'Live', color: 'bg-[#0f5257] text-white', hoverColor: 'hover:bg-[#0a3d41]' },
+                  ].map((stage) => (
+                    <Link 
+                      key={stage.status} 
+                      href={`/admin?status=${stage.status}`}
+                      className={`rounded-lg p-4 text-center ${stage.color} ${stage.hoverColor} transition-colors cursor-pointer block`}
+                    >
+                      <div className="text-2xl font-bold">
+                        {stage.status === 'live' ? stats.activeClients : 
+                         stage.status === 'pending' ? stats.pendingClients : 
+                         Math.floor(stats.onboardingClients / 5)}
+                      </div>
+                      <div className="text-xs font-medium mt-1">{stage.label}</div>
+                    </Link>
+                  ))}
+                </div>
       </div>
 
       {/* Quick Actions */}

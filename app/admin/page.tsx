@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Plus, Search, Building2, Users, Calendar, ChevronRight, Loader2, Briefcase, GraduationCap, Heart, Scissors, Wrench, Filter } from 'lucide-react';
 import Link from 'next/link';
@@ -40,15 +41,25 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AdminDashboard() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [industryFilter, setIndustryFilter] = useState<string>('all');
+  const [industryFilter, setIndustryFilter] = useState<string>(searchParams.get('industry') || 'all');
+  const [statusFilter, setStatusFilter] = useState<string>(searchParams.get('status') || 'all');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     fetchClients();
   }, []);
+
+  useEffect(() => {
+    const industry = searchParams.get('industry');
+    const status = searchParams.get('status');
+    if (industry) setIndustryFilter(industry);
+    if (status) setStatusFilter(status);
+  }, [searchParams]);
 
   async function fetchClients() {
     try {
@@ -64,13 +75,21 @@ export default function AdminDashboard() {
     }
   }
 
-  const filteredClients = clients.filter(client => {
-    const matchesSearch = client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.owner_email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.subdomain.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesIndustry = industryFilter === 'all' || (client.industry || 'fitness') === industryFilter;
-    return matchesSearch && matchesIndustry;
-  });
+    const filteredClients = clients.filter(client => {
+      const matchesSearch = client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        client.owner_email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        client.subdomain.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesIndustry = industryFilter === 'all' || (client.industry || 'fitness') === industryFilter;
+      const matchesStatus = statusFilter === 'all' || client.onboarding_status === statusFilter;
+      return matchesSearch && matchesIndustry && matchesStatus;
+    });
+
+    const clearFilters = () => {
+      setIndustryFilter('all');
+      setStatusFilter('all');
+      setSearchQuery('');
+      router.push('/admin');
+    };
 
   const stats = {
     total: clients.length,
@@ -114,31 +133,53 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-4 border-b border-gray-200 flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search clients..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
-              />
-            </div>
-            <select
-              value={industryFilter}
-              onChange={(e) => setIndustryFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
-            >
-              <option value="all">All Industries</option>
-              <option value="fitness">Fitness</option>
-              <option value="education">Education</option>
-              <option value="wellness">Wellness</option>
-              <option value="beauty">Beauty</option>
-              <option value="auxiliary">Auxiliary</option>
-            </select>
-          </div>
+                <div className="bg-white rounded-lg shadow-sm">
+                  <div className="p-4 border-b border-gray-200 flex flex-wrap gap-4">
+                    <div className="relative flex-1 min-w-[200px]">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                      <input
+                        type="text"
+                        placeholder="Search clients..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
+                      />
+                    </div>
+                    <select
+                      value={industryFilter}
+                      onChange={(e) => setIndustryFilter(e.target.value)}
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
+                    >
+                      <option value="all">All Industries</option>
+                      <option value="fitness">Fitness</option>
+                      <option value="education">Education</option>
+                      <option value="wellness">Wellness</option>
+                      <option value="beauty">Beauty</option>
+                      <option value="auxiliary">Auxiliary</option>
+                    </select>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
+                    >
+                      <option value="all">All Status</option>
+                      <option value="pending">Pending</option>
+                      <option value="provisioned">Provisioned</option>
+                      <option value="branded">Branded</option>
+                      <option value="imported">Data Imported</option>
+                      <option value="testing">Testing</option>
+                      <option value="ready">Ready</option>
+                      <option value="live">Live</option>
+                    </select>
+                    {(industryFilter !== 'all' || statusFilter !== 'all' || searchQuery) && (
+                      <button
+                        onClick={clearFilters}
+                        className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        Clear Filters
+                      </button>
+                    )}
+                  </div>
 
           {loading ? (
             <div className="p-8 text-center">
