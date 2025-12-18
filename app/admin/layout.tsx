@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Building2, Users, Upload, Settings, LogOut, Loader2, ChevronDown, Monitor, LayoutDashboard, CreditCard, BarChart3 } from 'lucide-react';
+import { Building2, Users, Upload, Settings, LogOut, Loader2, ChevronDown, Monitor, LayoutDashboard, CreditCard, BarChart3, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -179,19 +179,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                           <Users size={20} />
                           <span className="font-medium">Users</span>
                         </Link>
-                        <Link
-                          href="/admin/payments"
-                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                            isActive('/admin/payments')
-                              ? 'bg-[#0f5257] text-white shadow-md'
-                              : 'text-gray-700 hover:bg-gray-100'
-                          }`}
-                        >
-                          <CreditCard size={20} />
-                          <span className="font-medium">Payments</span>
-                        </Link>
-                        <Link
-                          href="/admin/import"
+                                                <Link
+                                                  href="/admin/leads"
+                                                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                                                    isActive('/admin/leads')
+                                                      ? 'bg-[#0f5257] text-white shadow-md'
+                                                      : 'text-gray-700 hover:bg-gray-100'
+                                                  }`}
+                                                >
+                                                  <UserPlus size={20} />
+                                                  <span className="font-medium">Leads</span>
+                                                </Link>
+                                                <Link
+                                                  href="/admin/payments"
+                                                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                                                    isActive('/admin/payments')
+                                                      ? 'bg-[#0f5257] text-white shadow-md'
+                                                      : 'text-gray-700 hover:bg-gray-100'
+                                                  }`}
+                                                >
+                                                  <CreditCard size={20} />
+                                                  <span className="font-medium">Payments</span>
+                                                </Link>
+                                                <Link
+                                                  href="/admin/import"
                           className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                             isActive('/admin/import')
                               ? 'bg-[#0f5257] text-white shadow-md'
