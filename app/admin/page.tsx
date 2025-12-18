@@ -40,6 +40,35 @@ const statusColors: Record<string, string> = {
   live: 'bg-auvora-teal text-white',
 };
 
+const industrySubCategories: Record<string, { value: string; label: string }[]> = {
+  wellness: [
+    { value: 'chiropractic', label: 'Chiropractic Office' },
+    { value: 'physical_therapy', label: 'Physical Therapy' },
+    { value: 'massage', label: 'Massage Therapy' },
+    { value: 'acupuncture', label: 'Acupuncture' },
+    { value: 'mental_health', label: 'Mental Health / Counseling' },
+    { value: 'other_wellness', label: 'Other Wellness' },
+  ],
+  beauty: [
+    { value: 'hair_salon', label: 'Hair Salon' },
+    { value: 'nail_salon', label: 'Nail Salon' },
+    { value: 'spa', label: 'Spa' },
+    { value: 'barbershop', label: 'Barbershop' },
+    { value: 'med_spa', label: 'Med Spa' },
+    { value: 'esthetics', label: 'Esthetics / Skincare' },
+    { value: 'other_beauty', label: 'Other Beauty' },
+  ],
+  auxiliary: [
+    { value: 'consulting', label: 'Consulting' },
+    { value: 'coaching', label: 'Life / Business Coaching' },
+    { value: 'photography', label: 'Photography Studio' },
+    { value: 'music_lessons', label: 'Music Lessons' },
+    { value: 'art_studio', label: 'Art Studio' },
+    { value: 'pet_services', label: 'Pet Services' },
+    { value: 'other_auxiliary', label: 'Other' },
+  ],
+};
+
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -252,19 +281,31 @@ export default function AdminDashboard() {
 function CreateClientModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    subdomain: '',
-    custom_domain: '',
-    industry: 'fitness',
-    owner_name: '',
-    owner_email: '',
-    business_phone: '',
-    business_address: '',
-    timezone: 'America/New_York',
-    primary_color: '#0f5257',
-    secondary_color: '#d4af37',
-  });
+    const [formData, setFormData] = useState({
+      name: '',
+      subdomain: '',
+      custom_domain: '',
+      industry: 'fitness',
+      sub_category: '',
+      owner_name: '',
+      owner_email: '',
+      business_phone: '',
+      business_address: '',
+      timezone: 'America/New_York',
+      primary_color: '#0f5257',
+      secondary_color: '#d4af37',
+    });
+
+    const handleIndustryChange = (industry: string) => {
+      const needsSubCategory = ['wellness', 'beauty', 'auxiliary'].includes(industry);
+      setFormData({ 
+        ...formData, 
+        industry, 
+        sub_category: needsSubCategory ? '' : '' 
+      });
+    };
+
+    const hasSubCategories = ['wellness', 'beauty', 'auxiliary'].includes(formData.industry);
   const [createdOwner, setCreatedOwner] = useState<{ email: string; temp_password: string } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -360,24 +401,43 @@ function CreateClientModal({ onClose, onCreated }: { onClose: () => void; onCrea
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Industry *</label>
-                <select
-                  required
-                  value={formData.industry}
-                  onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
-                >
-                  <option value="fitness">Fitness</option>
-                  <option value="education">Education</option>
-                  <option value="wellness">Wellness</option>
-                  <option value="beauty">Beauty</option>
-                  <option value="auxiliary">Auxiliary</option>
-                </select>
-              </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Industry *</label>
+                              <select
+                                required
+                                value={formData.industry}
+                                onChange={(e) => handleIndustryChange(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
+                              >
+                                <option value="fitness">Fitness</option>
+                                <option value="education">Education</option>
+                                <option value="wellness">Wellness</option>
+                                <option value="beauty">Beauty</option>
+                                <option value="auxiliary">Auxiliary</option>
+                              </select>
+                            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subdomain *</label>
+                            {hasSubCategories && (
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Business Type *</label>
+                                <select
+                                  required
+                                  value={formData.sub_category}
+                                  onChange={(e) => setFormData({ ...formData, sub_category: e.target.value })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-auvora-teal"
+                                >
+                                  <option value="">Select business type...</option>
+                                  {industrySubCategories[formData.industry]?.map((subCat) => (
+                                    <option key={subCat.value} value={subCat.value}>
+                                      {subCat.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Subdomain *</label>
                 <div className="flex">
                   <input
                     type="text"
