@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { Search, Loader2, Mail, Phone, Building2, Calendar, Filter, Download, Plus, X, Eye, Trash2, CheckCircle, Clock, XCircle } from 'lucide-react';
 
 interface Lead {
@@ -59,69 +58,15 @@ export default function LeadsPage() {
 
   async function fetchLeads() {
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('auvora_leads')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setLeads(data || []);
+      const response = await fetch('/api/leads');
+      if (!response.ok) {
+        throw new Error('Failed to fetch leads');
+      }
+      const data = await response.json();
+      setLeads(data.leads || []);
     } catch (error) {
       console.error('Failed to fetch leads:', error);
-      // Use mock data if table doesn't exist yet
-      setLeads([
-        {
-          id: '1',
-          name: 'John Smith',
-          email: 'john@ironfitness.com',
-          phone: '(555) 123-4567',
-          business_name: 'Iron Fitness',
-          industry: 'fitness',
-          source: 'demo_form',
-          status: 'new',
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          name: 'Sarah Johnson',
-          email: 'sarah@zenspawellness.com',
-          phone: '(555) 234-5678',
-          business_name: 'Zen Spa Wellness',
-          industry: 'wellness',
-          sub_category: 'massage',
-          source: 'demo_form',
-          status: 'contacted',
-          notes: 'Interested in the massage therapy CRM features',
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-        },
-        {
-          id: '3',
-          name: 'Mike Davis',
-          email: 'mike@elitechiro.com',
-          phone: '(555) 345-6789',
-          business_name: 'Elite Chiropractic',
-          industry: 'wellness',
-          sub_category: 'chiropractic',
-          source: 'demo_form',
-          status: 'qualified',
-          notes: 'Ready for demo call next week',
-          created_at: new Date(Date.now() - 172800000).toISOString(),
-        },
-        {
-          id: '4',
-          name: 'Lisa Chen',
-          email: 'lisa@glamourhair.com',
-          phone: '(555) 456-7890',
-          business_name: 'Glamour Hair Studio',
-          industry: 'beauty',
-          sub_category: 'hair_salon',
-          source: 'referral',
-          status: 'converted',
-          notes: 'Signed up for monthly plan',
-          created_at: new Date(Date.now() - 604800000).toISOString(),
-        },
-      ]);
+      setLeads([]);
     } finally {
       setLoading(false);
     }
@@ -133,21 +78,24 @@ export default function LeadsPage() {
     setAddError(null);
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('auvora_leads')
-        .insert({
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: addForm.name,
           email: addForm.email,
           phone: addForm.phone || null,
           business_name: addForm.business_name || null,
           industry: addForm.industry,
           source: 'manual',
-          status: 'new',
           notes: addForm.notes || null,
-        });
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to add lead');
+      }
 
       setShowAddModal(false);
       setAddForm({ name: '', email: '', phone: '', business_name: '', industry: 'fitness', notes: '' });
@@ -161,16 +109,15 @@ export default function LeadsPage() {
 
   const handleUpdateStatus = async (leadId: string, newStatus: string) => {
     try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('auvora_leads')
-        .update({ status: newStatus })
-        .eq('id', leadId);
+      const response = await fetch(`/api/leads/${leadId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error('Failed to update status');
       fetchLeads();
     } catch (err) {
-      // Update locally if DB fails
       setLeads(leads.map(l => l.id === leadId ? { ...l, status: newStatus as Lead['status'] } : l));
     }
   };
@@ -179,16 +126,13 @@ export default function LeadsPage() {
     if (!confirm('Are you sure you want to delete this lead?')) return;
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('auvora_leads')
-        .delete()
-        .eq('id', leadId);
+      const response = await fetch(`/api/leads/${leadId}`, {
+        method: 'DELETE',
+      });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error('Failed to delete lead');
       fetchLeads();
     } catch (err) {
-      // Remove locally if DB fails
       setLeads(leads.filter(l => l.id !== leadId));
     }
   };
