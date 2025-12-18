@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Building2, Users, Upload, Settings, LogOut, Loader2, ChevronDown, Monitor } from 'lucide-react';
+import { Building2, Users, Upload, Settings, LogOut, Loader2, ChevronDown, Monitor, LayoutDashboard, CreditCard, BarChart3, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -50,12 +50,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push('/login');
   };
 
-  const isActive = (path: string) => {
-    if (path === '/admin') {
-      return pathname === '/admin' || pathname?.startsWith('/admin/tenants');
-    }
-    return pathname?.startsWith(path);
-  };
+    const isActive = (path: string) => {
+      if (path === '/admin/tenants') {
+        return pathname === '/admin' || pathname?.startsWith('/admin/tenants');
+      }
+      if (path === '/admin/dashboard') {
+        return pathname === '/admin/dashboard';
+      }
+      return pathname?.startsWith(path);
+    };
 
   if (isAdmin === null) {
     return (
@@ -121,74 +124,124 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <div className="flex">
         <aside className="w-64 bg-white shadow-lg min-h-[calc(100vh-4rem)] border-r border-gray-200">
-          <div className="p-4">
-            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-4">
-              Management
-            </div>
-            <nav className="space-y-1">
-              <Link
-                href="/admin"
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  isActive('/admin') && !isActive('/admin/users') && !isActive('/admin/import') && !isActive('/admin/settings')
-                    ? 'bg-[#0f5257] text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Building2 size={20} />
-                <span className="font-medium">Tenants</span>
-              </Link>
-              <Link
-                href="/admin/users"
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  isActive('/admin/users')
-                    ? 'bg-[#0f5257] text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Users size={20} />
-                <span className="font-medium">Users</span>
-              </Link>
-                          <Link
-                            href="/admin/import"
-                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                              isActive('/admin/import')
-                                ? 'bg-[#0f5257] text-white shadow-md'
-                                : 'text-gray-700 hover:bg-gray-100'
-                            }`}
-                          >
-                            <Upload size={20} />
-                            <span className="font-medium">Data Import</span>
-                          </Link>
-                          <Link
-                            href="/admin/demos"
-                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                              isActive('/admin/demos')
-                                ? 'bg-[#0f5257] text-white shadow-md'
-                                : 'text-gray-700 hover:bg-gray-100'
-                            }`}
-                          >
-                            <Monitor size={20} />
-                            <span className="font-medium">Demos</span>
-                          </Link>
-                        </nav>
+                    <div className="p-4">
+                      <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-4">
+                        Overview
+                      </div>
+                      <nav className="space-y-1">
+                        <Link
+                          href="/admin/dashboard"
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                            isActive('/admin/dashboard')
+                              ? 'bg-[#0f5257] text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <LayoutDashboard size={20} />
+                          <span className="font-medium">Dashboard</span>
+                        </Link>
+                        <Link
+                          href="/admin/analytics"
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                            isActive('/admin/analytics')
+                              ? 'bg-[#0f5257] text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <BarChart3 size={20} />
+                          <span className="font-medium">Analytics</span>
+                        </Link>
+                      </nav>
+
+                      <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-4 mt-6">
+                        Management
+                      </div>
+                      <nav className="space-y-1">
+                                                <Link
+                                                  href="/admin"
+                                                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                                                    isActive('/admin/tenants')
+                                                      ? 'bg-[#0f5257] text-white shadow-md'
+                                                      : 'text-gray-700 hover:bg-gray-100'
+                                                  }`}
+                                                >
+                                                  <Building2 size={20} />
+                                                  <span className="font-medium">Clients</span>
+                                                </Link>
+                        <Link
+                          href="/admin/users"
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                            isActive('/admin/users')
+                              ? 'bg-[#0f5257] text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <Users size={20} />
+                          <span className="font-medium">Users</span>
+                        </Link>
+                                                <Link
+                                                  href="/admin/leads"
+                                                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                                                    isActive('/admin/leads')
+                                                      ? 'bg-[#0f5257] text-white shadow-md'
+                                                      : 'text-gray-700 hover:bg-gray-100'
+                                                  }`}
+                                                >
+                                                  <UserPlus size={20} />
+                                                  <span className="font-medium">Leads</span>
+                                                </Link>
+                                                <Link
+                                                  href="/admin/payments"
+                                                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                                                    isActive('/admin/payments')
+                                                      ? 'bg-[#0f5257] text-white shadow-md'
+                                                      : 'text-gray-700 hover:bg-gray-100'
+                                                  }`}
+                                                >
+                                                  <CreditCard size={20} />
+                                                  <span className="font-medium">Payments</span>
+                                                </Link>
+                                                <Link
+                                                  href="/admin/import"
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                            isActive('/admin/import')
+                              ? 'bg-[#0f5257] text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <Upload size={20} />
+                          <span className="font-medium">Data Import</span>
+                        </Link>
+                        <Link
+                          href="/admin/demos"
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                            isActive('/admin/demos')
+                              ? 'bg-[#0f5257] text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <Monitor size={20} />
+                          <span className="font-medium">Demos</span>
+                        </Link>
+                      </nav>
             
-            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-4 mt-8">
-              System
-            </div>
-            <nav className="space-y-1">
-              <Link
-                href="/admin/settings"
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  isActive('/admin/settings')
-                    ? 'bg-[#0f5257] text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Settings size={20} />
-                <span className="font-medium">Settings</span>
-              </Link>
-            </nav>
-          </div>
+                      <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-4 mt-6">
+                        System
+                      </div>
+                      <nav className="space-y-1">
+                        <Link
+                          href="/admin/settings"
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                            isActive('/admin/settings')
+                              ? 'bg-[#0f5257] text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <Settings size={20} />
+                          <span className="font-medium">Settings</span>
+                        </Link>
+                      </nav>
+                    </div>
           
           <div className="absolute bottom-0 left-0 w-64 p-4 border-t border-gray-200 bg-gray-50">
             <div className="text-xs text-gray-500 text-center">

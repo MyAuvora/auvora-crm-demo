@@ -96,3 +96,40 @@ CREATE TRIGGER update_import_jobs_updated_at
 CREATE TRIGGER update_auvora_admins_updated_at 
   BEFORE UPDATE ON auvora_admins 
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Create auvora_leads table for demo form submissions and lead tracking
+CREATE TABLE IF NOT EXISTS auvora_leads (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  business_name TEXT,
+  industry TEXT CHECK (industry IN ('fitness', 'education', 'wellness', 'beauty', 'auxiliary')),
+  sub_category TEXT,
+  source TEXT DEFAULT 'demo_form',
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'qualified', 'converted', 'lost')),
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS on auvora_leads
+ALTER TABLE auvora_leads ENABLE ROW LEVEL SECURITY;
+
+-- Auvora admins can manage all leads
+CREATE POLICY "Auvora admins can manage leads" ON auvora_leads
+  FOR ALL USING (is_auvora_admin());
+
+-- Allow public to insert leads (for demo form submissions)
+CREATE POLICY "Public can submit leads" ON auvora_leads
+  FOR INSERT WITH CHECK (true);
+
+-- Create trigger for auvora_leads updated_at
+CREATE TRIGGER update_auvora_leads_updated_at 
+  BEFORE UPDATE ON auvora_leads 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Create index on leads for faster queries
+CREATE INDEX IF NOT EXISTS idx_auvora_leads_status ON auvora_leads(status);
+CREATE INDEX IF NOT EXISTS idx_auvora_leads_industry ON auvora_leads(industry);
+CREATE INDEX IF NOT EXISTS idx_auvora_leads_created_at ON auvora_leads(created_at DESC);
