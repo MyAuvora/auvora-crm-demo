@@ -41,7 +41,10 @@ export async function middleware(request: NextRequest) {
                      request.nextUrl.pathname.startsWith('/signup') ||
                      request.nextUrl.pathname.startsWith('/auth');
 
-  if (!user && !isAuthPage) {
+  // Allow public access to the leads API for demo form submissions
+  const isPublicApi = request.nextUrl.pathname === '/api/leads' && request.method === 'POST';
+
+  if (!user && !isAuthPage && !isPublicApi) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
