@@ -19,7 +19,7 @@ export default function LoginPage() {
 
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -29,6 +29,23 @@ export default function LoginPage() {
         return;
       }
 
+      // Check if user is an Auvora admin
+      if (authData.user) {
+        const { data: adminData } = await supabase
+          .from('auvora_admins')
+          .select('id')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (adminData) {
+          // Auvora admin - redirect to admin portal
+          router.push('/admin');
+          router.refresh();
+          return;
+        }
+      }
+
+      // Regular user - redirect to CRM dashboard
       router.push('/');
       router.refresh();
     } catch (err) {
