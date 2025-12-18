@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Building2, Users, Upload, Settings, LogOut, Loader2, ChevronDown } from 'lucide-react';
+import { Building2, Users, Upload, Settings, LogOut, Loader2, ChevronDown, Monitor } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -148,18 +148,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Users size={20} />
                 <span className="font-medium">Users</span>
               </Link>
-              <Link
-                href="/admin/import"
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  isActive('/admin/import')
-                    ? 'bg-[#0f5257] text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Upload size={20} />
-                <span className="font-medium">Data Import</span>
-              </Link>
-            </nav>
+                          <Link
+                            href="/admin/import"
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                              isActive('/admin/import')
+                                ? 'bg-[#0f5257] text-white shadow-md'
+                                : 'text-gray-700 hover:bg-gray-100'
+                            }`}
+                          >
+                            <Upload size={20} />
+                            <span className="font-medium">Data Import</span>
+                          </Link>
+                          <Link
+                            href="/admin/demos"
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                              isActive('/admin/demos')
+                                ? 'bg-[#0f5257] text-white shadow-md'
+                                : 'text-gray-700 hover:bg-gray-100'
+                            }`}
+                          >
+                            <Monitor size={20} />
+                            <span className="font-medium">Demos</span>
+                          </Link>
+                        </nav>
             
             <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-4 mt-8">
               System
