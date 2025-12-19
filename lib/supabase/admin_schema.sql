@@ -133,3 +133,101 @@ CREATE TRIGGER update_auvora_leads_updated_at
 CREATE INDEX IF NOT EXISTS idx_auvora_leads_status ON auvora_leads(status);
 CREATE INDEX IF NOT EXISTS idx_auvora_leads_industry ON auvora_leads(industry);
 CREATE INDEX IF NOT EXISTS idx_auvora_leads_created_at ON auvora_leads(created_at DESC);
+
+-- =====================================================
+-- CONTRACTS & AGREEMENTS
+-- =====================================================
+
+-- Create tenant_contracts table for storing contract/agreement files
+CREATE TABLE IF NOT EXISTS tenant_contracts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  file_url TEXT,
+  file_type TEXT,
+  file_size INTEGER,
+  notes TEXT,
+  signed_date DATE,
+  expiry_date DATE,
+  status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'pending', 'signed', 'expired', 'cancelled')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS on tenant_contracts
+ALTER TABLE tenant_contracts ENABLE ROW LEVEL SECURITY;
+
+-- Auvora admins can manage all contracts
+CREATE POLICY "Auvora admins can manage contracts" ON tenant_contracts
+  FOR ALL USING (is_auvora_admin());
+
+-- Tenant owners can view their contracts
+CREATE POLICY "Owners can view their contracts" ON tenant_contracts
+  FOR SELECT USING (
+    tenant_id IN (SELECT tenant_id FROM users WHERE id = auth.uid() AND role = 'owner')
+  );
+
+-- Create trigger for tenant_contracts updated_at
+CREATE TRIGGER update_tenant_contracts_updated_at 
+  BEFORE UPDATE ON tenant_contracts 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Create index on contracts
+CREATE INDEX IF NOT EXISTS idx_tenant_contracts_tenant_id ON tenant_contracts(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_tenant_contracts_status ON tenant_contracts(status);
+
+-- =====================================================
+-- PAYMENT & BILLING INFO
+-- =====================================================
+
+-- Add subscription and billing fields to tenants table
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS subscription_plan TEXT DEFAULT 'starter' 
+  CHECK (subscription_plan IN ('starter', 'professional', 'enterprise', 'custom'));
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS billing_cycle TEXT DEFAULT 'monthly' 
+  CHECK (billing_cycle IN ('monthly', 'quarterly', 'annual'));
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS monthly_price DECIMAL(10,2);
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS next_billing_date DATE;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS payment_method TEXT;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS payment_method_last4 TEXT;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;
+
+-- Create tenant_invoices table for invoice history
+CREATE TABLE IF NOT EXISTS tenant_invoices (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  invoice_number TEXT NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'failed', 'refunded', 'cancelled')),
+  due_date DATE NOT NULL,
+  paid_date DATE,
+  payment_method TEXT,
+  stripe_invoice_id TEXT,
+  stripe_payment_intent_id TEXT,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS on tenant_invoices
+ALTER TABLE tenant_invoices ENABLE ROW LEVEL SECURITY;
+
+-- Auvora admins can manage all invoices
+CREATE POLICY "Auvora admins can manage invoices" ON tenant_invoices
+  FOR ALL USING (is_auvora_admin());
+
+-- Tenant owners can view their invoices
+CREATE POLICY "Owners can view their invoices" ON tenant_invoices
+  FOR SELECT USING (
+    tenant_id IN (SELECT tenant_id FROM users WHERE id = auth.uid() AND role = 'owner')
+  );
+
+-- Create trigger for tenant_invoices updated_at
+CREATE TRIGGER update_tenant_invoices_updated_at 
+  BEFORE UPDATE ON tenant_invoices 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Create indexes on invoices
+CREATE INDEX IF NOT EXISTS idx_tenant_invoices_tenant_id ON tenant_invoices(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_tenant_invoices_status ON tenant_invoices(status);
+CREATE INDEX IF NOT EXISTS idx_tenant_invoices_due_date ON tenant_invoices(due_date);
