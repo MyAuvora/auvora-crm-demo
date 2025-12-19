@@ -44,10 +44,26 @@ export async function GET(
     .from('members')
     .select('id', { count: 'exact' })
     .eq('tenant_id', id);
+
+  // Fetch contracts for this tenant
+  const { data: contracts } = await supabase
+    .from('tenant_contracts')
+    .select('*')
+    .eq('tenant_id', id)
+    .order('created_at', { ascending: false });
+
+  // Fetch invoices for this tenant
+  const { data: invoices } = await supabase
+    .from('tenant_invoices')
+    .select('*')
+    .eq('tenant_id', id)
+    .order('created_at', { ascending: false });
   
   return NextResponse.json({
     tenant,
     users: users || [],
+    contracts: contracts || [],
+    invoices: invoices || [],
     member_count: stats?.length || 0,
   });
 }
@@ -77,6 +93,12 @@ export async function PATCH(
       'timezone',
       'onboarding_status',
       'subscription_status',
+      'subscription_plan',
+      'billing_cycle',
+      'monthly_price',
+      'next_billing_date',
+      'payment_method',
+      'payment_method_last4',
     ];
     
     const updates: Record<string, string | null> = {};
