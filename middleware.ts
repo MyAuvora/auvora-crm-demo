@@ -51,17 +51,29 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && isAuthPage) {
-    // Check if user is an Auvora admin
+  // Check if user is an Auvora admin (for auth page redirect and root redirect)
+  const isRootPage = request.nextUrl.pathname === '/';
+  
+  if (user && (isAuthPage || isRootPage)) {
     const { data: adminData } = await supabase
       .from('auvora_admins')
       .select('id')
       .eq('id', user.id)
       .single();
 
-    const url = request.nextUrl.clone();
-    url.pathname = adminData ? '/admin' : '/';
-    return NextResponse.redirect(url);
+    // Redirect admins to /admin from auth pages or root
+    if (adminData) {
+      if (isAuthPage || isRootPage) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/admin';
+        return NextResponse.redirect(url);
+      }
+    } else if (isAuthPage) {
+      // Non-admin on auth page - redirect to dashboard
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url);
+    }
   }
 
   return response;
