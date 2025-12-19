@@ -231,3 +231,39 @@ CREATE TRIGGER update_tenant_invoices_updated_at
 CREATE INDEX IF NOT EXISTS idx_tenant_invoices_tenant_id ON tenant_invoices(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_tenant_invoices_status ON tenant_invoices(status);
 CREATE INDEX IF NOT EXISTS idx_tenant_invoices_due_date ON tenant_invoices(due_date);
+
+-- =====================================================
+-- DEMO TENANT MANAGEMENT
+-- =====================================================
+
+-- Add demo-related fields to tenants table
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS is_demo BOOLEAN DEFAULT false;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS demo_industry TEXT;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS demo_expires_at TIMESTAMPTZ;
+
+-- Create index on demo tenants for faster queries
+CREATE INDEX IF NOT EXISTS idx_tenants_is_demo ON tenants(is_demo) WHERE is_demo = true;
+
+-- Allow Auvora admins to manage all staff (for demo data seeding)
+CREATE POLICY IF NOT EXISTS "Auvora admins can manage all staff" ON staff
+  FOR ALL USING (is_auvora_admin());
+
+-- Allow Auvora admins to manage all members (for demo data seeding)
+CREATE POLICY IF NOT EXISTS "Auvora admins can manage all members" ON members
+  FOR ALL USING (is_auvora_admin());
+
+-- Allow Auvora admins to manage all classes (for demo data seeding)
+CREATE POLICY IF NOT EXISTS "Auvora admins can manage all classes" ON classes
+  FOR ALL USING (is_auvora_admin());
+
+-- Allow Auvora admins to manage all leads (for demo data seeding)
+CREATE POLICY IF NOT EXISTS "Auvora admins can manage all leads" ON leads
+  FOR ALL USING (is_auvora_admin());
+
+-- Allow Auvora admins to manage all bookings (for demo data cleanup)
+CREATE POLICY IF NOT EXISTS "Auvora admins can manage all bookings" ON bookings
+  FOR ALL USING (is_auvora_admin());
+
+-- Allow Auvora admins to manage all transactions (for demo data cleanup)
+CREATE POLICY IF NOT EXISTS "Auvora admins can manage all transactions" ON transactions
+  FOR ALL USING (is_auvora_admin());
