@@ -7,6 +7,17 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const resendApiKey = process.env.RESEND_API_KEY;
 const notificationEmail = process.env.NOTIFICATION_EMAIL || 'Patrick_Metzger@myauvora.com';
 
+// Helper function to escape HTML and prevent injection attacks
+function escapeHtml(str: string | null | undefined): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -60,10 +71,18 @@ export async function POST(request: NextRequest) {
     if (resendApiKey) {
       try {
         const resend = new Resend(resendApiKey);
+        // Escape all user inputs to prevent HTML injection
+        const safeName = escapeHtml(name);
+        const safeEmail = escapeHtml(email);
+        const safePhone = escapeHtml(phone);
+        const safeBusinessName = escapeHtml(business_name);
+        const safeIndustry = escapeHtml(industry);
+        const safeMessage = escapeHtml(message);
+        
         await resend.emails.send({
           from: 'Auvora Leads <leads@myauvora.com>',
           to: notificationEmail,
-          subject: `New Lead: ${name} - ${business_name || 'No Business Name'}`,
+          subject: `New Lead: ${safeName} - ${safeBusinessName || 'No Business Name'}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); padding: 20px; border-radius: 10px 10px 0 0;">
@@ -71,15 +90,15 @@ export async function POST(request: NextRequest) {
               </div>
               <div style="background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 10px 10px;">
                 <h2 style="color: #0d9488; margin-top: 0;">Contact Information</h2>
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-                ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
-                ${business_name ? `<p><strong>Business:</strong> ${business_name}</p>` : ''}
-                ${industry ? `<p><strong>Industry:</strong> ${industry}</p>` : ''}
+                <p><strong>Name:</strong> ${safeName}</p>
+                <p><strong>Email:</strong> <a href="mailto:${safeEmail}">${safeEmail}</a></p>
+                ${safePhone ? `<p><strong>Phone:</strong> ${safePhone}</p>` : ''}
+                ${safeBusinessName ? `<p><strong>Business:</strong> ${safeBusinessName}</p>` : ''}
+                ${safeIndustry ? `<p><strong>Industry:</strong> ${safeIndustry}</p>` : ''}
                 
-                ${message ? `
+                ${safeMessage ? `
                 <h2 style="color: #0d9488;">What they're looking to improve</h2>
-                <p style="background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #0d9488;">${message}</p>
+                <p style="background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #0d9488;">${safeMessage}</p>
                 ` : ''}
                 
                 <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
