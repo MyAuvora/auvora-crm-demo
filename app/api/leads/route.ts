@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         await resend.emails.send({
           from: 'Auvora Leads <leads@myauvora.com>',
           to: notificationEmail,
-          subject: `New Lead: ${safeName} - ${safeBusinessName || 'No Business Name'}`,
+          subject: `New Lead: ${name} - ${business_name || 'No Business Name'}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); padding: 20px; border-radius: 10px 10px 0 0;">
